@@ -2,8 +2,8 @@ version: 2
 updates:
 - package-ecosystem: nuget
   directories:
-    - "src/"
-    - "src/Tests/"
+    - "src/PureQL.CSharp.Model.Serialization"
+    - "src/Tests/PureQL.CSharp.Model.Serialization.Tests"
   schedule:
     interval: daily
 - package-ecosystem: "github-actions"
