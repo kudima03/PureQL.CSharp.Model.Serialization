@@ -16,5 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.1.0.0" />
+    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.2.0.0" />
   </ItemGroup>
 </Project>
