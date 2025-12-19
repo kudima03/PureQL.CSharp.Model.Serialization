@@ -35,9 +35,7 @@ public sealed class BooleanScalarConverter : JsonConverter<IBooleanScalar>
             options
         )!;
 
-        return scalar.Type.Name != new BooleanType().Name
-            ? throw new JsonException()
-            : new BooleanScalar(scalar.Value);
+        return new BooleanScalar(scalar.Value);
     }
 
     public override void Write(
