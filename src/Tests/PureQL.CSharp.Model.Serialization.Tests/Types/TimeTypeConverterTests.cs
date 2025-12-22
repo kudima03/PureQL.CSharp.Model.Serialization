@@ -35,78 +35,30 @@ public sealed record TimeTypeConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ThrowsExceptionOnBooleanType()
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"boolean"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"datetime"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"date"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"null"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"number"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"string"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"uuid"}"""
+    )]
+    public void ThrowsExceptionOnWrongType(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"name":"boolean"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnDateTimeType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"datetime"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnDateType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"date"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"null"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNumberType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"number"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnStringType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"string"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUuidType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"uuid"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<TimeType>(input, _options)
         );
