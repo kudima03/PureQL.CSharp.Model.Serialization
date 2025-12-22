@@ -74,10 +74,10 @@ public sealed record BooleanScalarConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnDateTimeType()
+    public void ThrowsExceptionOnEmptyValue()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"datetime"},"value":true}""";
+            """{"type":{"name":"boolean"},"value":""}""";
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
