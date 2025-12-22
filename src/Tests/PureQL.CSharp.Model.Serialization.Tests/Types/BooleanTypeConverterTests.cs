@@ -25,83 +25,6 @@ public sealed record BooleanTypeConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnDateTimeType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"datetime"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnDateType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"date"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"null"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNumberType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"number"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnStringType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"string"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnTimeType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"time"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUuidType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"name":"uuid"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanType>(input, _options)
-        );
-    }
-
-    [Fact]
     public void Write()
     {
         const string expected = /*lang=json,strict*/
@@ -110,5 +33,34 @@ public sealed record BooleanTypeConverterTests
         string output = JsonSerializer.Serialize(new BooleanType(), _options);
 
         Assert.Equal(expected, output);
+    }
+
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"datetime"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"date"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"null"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"number"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"string"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"time"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name":"uuid"}"""
+    )]
+    public void ThrowsExceptionOnWrongType(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BooleanType>(input, _options)
+        );
     }
 }
