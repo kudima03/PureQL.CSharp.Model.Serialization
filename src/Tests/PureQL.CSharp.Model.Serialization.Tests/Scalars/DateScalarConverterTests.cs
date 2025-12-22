@@ -75,78 +75,30 @@ public sealed record DateScalarConverterTests
         );
     }
 
-    [Fact]
-    public void ThrowsExceptionOnDateTimeType()
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"datetime"},"value":"2000-01-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"boolean"},"value":"2000-01-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"null"},"value":"2000-01-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"number"},"value":"2000-01-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"string"},"value":"2000-01-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"time"},"value":"2000-01-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"uuid"},"value":"2000-01-01-01"}"""
+    )]
+    public void ThrowsExceptionOnWrongType(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"datetime"},"value":"2000-01-01"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IDateScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnBoolType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"boolean"},"value":"2000-01-01"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IDateScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"null"},"value":"2000-01-01"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IDateScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNumberType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"number"},"value":"2000-01-01"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IDateScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnStringType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"string"},"value":"2000-01-01"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IDateScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnTimeType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"time"},"value":"2000-01-01"}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IDateScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUuidType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"uuid"},"value":"2000-01-01"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IDateScalar>(input, _options)
         );
