@@ -14,7 +14,6 @@ public sealed record DateScalarConverterTests
         PropertyNameCaseInsensitive = true,
         Converters =
         {
-            new BooleanScalarConverter(),
             new DateScalarConverter(),
             new TypeConverter<DateType>(),
         },
