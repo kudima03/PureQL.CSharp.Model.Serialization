@@ -84,67 +84,30 @@ public sealed record BooleanScalarConverterTests
         );
     }
 
-    [Fact]
-    public void ThrowsExceptionOnDateType()
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"datetime"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"date"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"null"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"number"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"string"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"time"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"uuid"},"value":true}"""
+    )]
+    public void ThrowsExceptionOnWrongType(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"date"},"value":true}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"null"},"value":true}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNumberType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"number"},"value":true}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnStringType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"string"},"value":true}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnTimeType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"time"},"value":true}""";
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUuidType()
-    {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"uuid"},"value":true}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
         );
