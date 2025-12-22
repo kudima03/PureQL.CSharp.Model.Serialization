@@ -27,12 +27,12 @@ public sealed record NumberTypeConverterTests
     [Fact]
     public void Write()
     {
-        const string expected = /*lang=json,strict*/
-            """{"name":"number"}""";
-
         string output = JsonSerializer.Serialize(new NumberType(), _options);
 
-        Assert.Equal(expected, output);
+        Assert.Equal( /*lang=json,strict*/
+            """{"name":"number"}""",
+            output
+        );
     }
 
     [Theory]

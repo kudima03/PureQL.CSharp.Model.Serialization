@@ -27,12 +27,12 @@ public sealed record DateTypeConverterTests
     [Fact]
     public void Write()
     {
-        const string expected = /*lang=json,strict*/
-            """{"name":"date"}""";
-
         string output = JsonSerializer.Serialize(new DateType(), _options);
 
-        Assert.Equal(expected, output);
+        Assert.Equal( /*lang=json,strict*/
+            """{"name":"date"}""",
+            output
+        );
     }
 
     [Theory]

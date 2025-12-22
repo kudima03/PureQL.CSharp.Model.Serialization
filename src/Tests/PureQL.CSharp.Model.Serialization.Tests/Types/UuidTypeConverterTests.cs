@@ -27,12 +27,13 @@ public sealed record UuidTypeConverterTests
     [Fact]
     public void Write()
     {
-        const string expected = /*lang=json,strict*/
-            """{"name":"uuid"}""";
-
         string output = JsonSerializer.Serialize(new UuidType(), _options);
 
-        Assert.Equal(expected, output);
+        Assert.Equal(
+            /*lang=json,strict*/
+            """{"name":"uuid"}""",
+            output
+        );
     }
 
     [Theory]

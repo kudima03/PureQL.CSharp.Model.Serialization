@@ -27,12 +27,12 @@ public sealed record NullTypeConverterTests
     [Fact]
     public void Write()
     {
-        const string expected = /*lang=json,strict*/
-            """{"name":"null"}""";
-
         string output = JsonSerializer.Serialize(new NullType(), _options);
 
-        Assert.Equal(expected, output);
+        Assert.Equal( /*lang=json,strict*/
+            """{"name":"null"}""",
+            output
+        );
     }
 
     [Theory]

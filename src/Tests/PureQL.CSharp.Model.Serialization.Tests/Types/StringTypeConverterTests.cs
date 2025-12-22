@@ -27,12 +27,12 @@ public sealed record StringTypeConverterTests
     [Fact]
     public void Write()
     {
-        const string expected = /*lang=json,strict*/
-            """{"name":"string"}""";
-
         string output = JsonSerializer.Serialize(new StringType(), _options);
 
-        Assert.Equal(expected, output);
+        Assert.Equal( /*lang=json,strict*/
+            """{"name":"string"}""",
+            output
+        );
     }
 
     [Theory]

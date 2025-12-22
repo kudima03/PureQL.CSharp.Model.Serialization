@@ -27,12 +27,12 @@ public sealed record BooleanTypeConverterTests
     [Fact]
     public void Write()
     {
-        const string expected = /*lang=json,strict*/
-            """{"name":"boolean"}""";
-
         string output = JsonSerializer.Serialize(new BooleanType(), _options);
 
-        Assert.Equal(expected, output);
+        Assert.Equal( /*lang=json,strict*/
+            """{"name":"boolean"}""",
+            output
+        );
     }
 
     [Theory]
