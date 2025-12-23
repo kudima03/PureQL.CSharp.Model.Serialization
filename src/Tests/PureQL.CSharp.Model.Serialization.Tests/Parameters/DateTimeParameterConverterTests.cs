@@ -1,0 +1,80 @@
+using System.Text.Json;
+using PureQL.CSharp.Model.Parameters;
+using PureQL.CSharp.Model.Serialization.Parameters;
+using PureQL.CSharp.Model.Serialization.Types;
+using PureQL.CSharp.Model.Types;
+
+namespace PureQL.CSharp.Model.Serialization.Tests.Parameters;
+
+public sealed record DateTimeParameterConverterTests
+{
+    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        Converters =
+        {
+            new DateTimeParameterConverter(),
+            new TypeConverter<DateTimeType>(),
+        },
+    };
+
+    [Fact]
+    public void ReadName()
+    {
+        const string expected = "iurhgndfjsb";
+
+        const string input = /*lang=json,strict*/
+            $$"""{"type": {"name":"datetime"},"name": "{{expected}}"}""";
+
+        DateTimeParameter parameter = JsonSerializer.Deserialize<DateTimeParameter>(
+            input,
+            _options
+        )!;
+
+        Assert.Equal(expected, parameter.Name);
+    }
+
+    [Fact]
+    public void Write()
+    {
+        const string expected = /*lang=json,strict*/
+            """{"name":"auiheyrdsnf","type":{"name":"datetime"}}""";
+
+        string output = JsonSerializer.Serialize(
+            new DateTimeParameter("auiheyrdsnf"),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"date"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"boolean"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"null"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"number"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"string"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"time"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"uuid"},"name": "auiheyrdsnf"}"""
+    )]
+    public void ThrowsExceptionOnWrongType(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<DateTimeParameter>(input, _options)
+        );
+    }
+}
