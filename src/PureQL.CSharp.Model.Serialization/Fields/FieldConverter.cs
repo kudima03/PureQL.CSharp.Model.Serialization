@@ -15,39 +15,37 @@ public sealed class FieldConverter : JsonConverter<Field>
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return TryDeserialize(root, options, out BooleanFieldJsonModel? boolean)
+        return JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out BooleanFieldJsonModel? boolean
+            )
                 ? new Field(new BooleanField(boolean!.Entity, boolean.Field))
-            : TryDeserialize(root, options, out DateFieldJsonModel? date)
+            : JsonExtensions.TryDeserialize(root, options, out DateFieldJsonModel? date)
                 ? new Field(new DateField(date!.Entity, date.Field))
-            : TryDeserialize(root, options, out DateTimeFieldJsonModel? dateTime)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out DateTimeFieldJsonModel? dateTime
+            )
                 ? new Field(new DateTimeField(dateTime!.Entity, dateTime.Field))
-            : TryDeserialize(root, options, out NumberFieldJsonModel? number)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out NumberFieldJsonModel? number
+            )
                 ? new Field(new NumberField(number!.Entity, number.Field))
-            : TryDeserialize(root, options, out TimeFieldJsonModel? time)
+            : JsonExtensions.TryDeserialize(root, options, out TimeFieldJsonModel? time)
                 ? new Field(new TimeField(time!.Entity, time.Field))
-            : TryDeserialize(root, options, out UuidFieldJsonModel? uuid)
+            : JsonExtensions.TryDeserialize(root, options, out UuidFieldJsonModel? uuid)
                 ? new Field(new UuidField(uuid!.Entity, uuid.Field))
-            : TryDeserialize(root, options, out StringFieldJsonModel? stringModel)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out StringFieldJsonModel? stringModel
+            )
                 ? new Field(new StringField(stringModel!.Entity, stringModel.Field))
             : throw new JsonException("Unable to determine Field type.");
-    }
-
-    private static bool TryDeserialize<T>(
-        JsonElement element,
-        JsonSerializerOptions options,
-        out T? result
-    )
-    {
-        try
-        {
-            result = JsonSerializer.Deserialize<T>(element.GetRawText(), options);
-            return result != null;
-        }
-        catch (JsonException)
-        {
-            result = default;
-            return false;
-        }
     }
 
     public override void Write(
