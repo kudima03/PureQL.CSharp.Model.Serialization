@@ -40,7 +40,7 @@ public sealed record DateTimeScalarConverterTests
 
         string expected = /*lang=json,strict*/
             $$"""
-            {"type":{"name":"datetime"},"value":"{{expectedValue:O}}"}
+            {"type":{"name":"datetime"},"value":{{JsonSerializer.Serialize(expectedValue)}}}
             """;
 
         string output = JsonSerializer.Serialize<IDateTimeScalar>(
