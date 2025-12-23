@@ -15,36 +15,20 @@ public sealed class FieldConverter : JsonConverter<Field>
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return JsonExtensions.TryDeserialize(
-                root,
-                options,
-                out BooleanFieldJsonModel? boolean
-            )
-                ? new Field(new BooleanField(boolean!.Entity, boolean.Field))
-            : JsonExtensions.TryDeserialize(root, options, out DateFieldJsonModel? date)
-                ? new Field(new DateField(date!.Entity, date.Field))
-            : JsonExtensions.TryDeserialize(
-                root,
-                options,
-                out DateTimeFieldJsonModel? dateTime
-            )
-                ? new Field(new DateTimeField(dateTime!.Entity, dateTime.Field))
-            : JsonExtensions.TryDeserialize(
-                root,
-                options,
-                out NumberFieldJsonModel? number
-            )
-                ? new Field(new NumberField(number!.Entity, number.Field))
-            : JsonExtensions.TryDeserialize(root, options, out TimeFieldJsonModel? time)
-                ? new Field(new TimeField(time!.Entity, time.Field))
-            : JsonExtensions.TryDeserialize(root, options, out UuidFieldJsonModel? uuid)
-                ? new Field(new UuidField(uuid!.Entity, uuid.Field))
-            : JsonExtensions.TryDeserialize(
-                root,
-                options,
-                out StringFieldJsonModel? stringModel
-            )
-                ? new Field(new StringField(stringModel!.Entity, stringModel.Field))
+        return JsonExtensions.TryDeserialize(root, options, out BooleanField? boolean)
+                ? new Field(boolean!)
+            : JsonExtensions.TryDeserialize(root, options, out DateField? date)
+                ? new Field(date!)
+            : JsonExtensions.TryDeserialize(root, options, out DateTimeField? dateTime)
+                ? new Field(dateTime!)
+            : JsonExtensions.TryDeserialize(root, options, out NumberField? number)
+                ? new Field(number!)
+            : JsonExtensions.TryDeserialize(root, options, out TimeField? time)
+                ? new Field(time!)
+            : JsonExtensions.TryDeserialize(root, options, out UuidField? uuid)
+                ? new Field(uuid!)
+            : JsonExtensions.TryDeserialize(root, options, out StringField? stringModel)
+                ? new Field(stringModel!)
             : throw new JsonException("Unable to determine Field type.");
     }
 
