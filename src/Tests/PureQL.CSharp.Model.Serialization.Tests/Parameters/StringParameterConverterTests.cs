@@ -56,6 +56,18 @@ public sealed record StringParameterConverterTests
     }
 
     [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    public void ThrowsExceptionOnBadFormat(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<StringParameter>(input, _options)
+        );
+    }
+
+    [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"name": "auiheyrdsnf"}"""
     )]
