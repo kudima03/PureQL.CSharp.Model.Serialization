@@ -56,6 +56,18 @@ public sealed record UuidParameterConverterTests
     }
 
     [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    public void ThrowsExceptionOnBadFormat(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<UuidParameter>(input, _options)
+        );
+    }
+
+    [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"name": "auiheyrdsnf"}"""
     )]
