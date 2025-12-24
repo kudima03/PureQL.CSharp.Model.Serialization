@@ -60,6 +60,18 @@ public sealed record BooleanParameterConverterTests
     }
 
     [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    public void ThrowsExceptionOnBadFormat(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BooleanParameter>(input, _options)
+        );
+    }
+
+    [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"name": "auiheyrdsnf"}"""
     )]
