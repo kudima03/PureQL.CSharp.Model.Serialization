@@ -13,8 +13,8 @@ internal sealed record UuidParameterJsonModel
     [JsonConstructor]
     public UuidParameterJsonModel(string name, UuidType type)
     {
-        Name = name;
-        Type = type;
+        Name = name ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Name { get; }
