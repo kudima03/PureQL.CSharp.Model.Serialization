@@ -56,6 +56,18 @@ public sealed record DateParameterConverterTests
     }
 
     [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    public void ThrowsExceptionOnBadFormat(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<DateParameter>(input, _options)
+        );
+    }
+
+    [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"name": "auiheyrdsnf"}"""
     )]
