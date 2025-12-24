@@ -70,27 +70,40 @@ public sealed record DateScalarConverterTests
         );
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingValueField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"datetime"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IDateScalar>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"datetime"},"value":"2000-01-01"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"boolean"},"value":"2000-01-01"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"null"},"value":"2000-01-01"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"number"},"value":"2000-01-01"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"string"},"value":"2000-01-01"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"time"},"value":"2000-01-01"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value":"2000-01-01-01"}"""
+        """{"type":{"name":"uuid"},"value":"2000-01-01"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"value":"2000-01-01"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
