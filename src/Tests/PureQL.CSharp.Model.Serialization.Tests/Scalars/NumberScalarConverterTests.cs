@@ -69,6 +69,16 @@ public sealed record NumberScalarConverterTests
         );
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingValueField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"number"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<INumberScalar>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"value":10.12345}"""
@@ -87,6 +97,9 @@ public sealed record NumberScalarConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"value":10.12345}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"value":10.12345}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
