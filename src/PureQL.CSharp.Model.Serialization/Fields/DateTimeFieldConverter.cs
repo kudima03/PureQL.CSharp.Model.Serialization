@@ -13,9 +13,9 @@ internal sealed record DateTimeFieldJsonModel
     [JsonConstructor]
     public DateTimeFieldJsonModel(string entity, string field, DateTimeType type)
     {
-        Entity = entity;
-        Field = field;
-        Type = type;
+        Entity = entity ?? throw new JsonException();
+        Field = field ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Entity { get; }
