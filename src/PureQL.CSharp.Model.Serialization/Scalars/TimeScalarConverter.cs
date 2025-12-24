@@ -11,15 +11,15 @@ internal sealed record TimeScalarJsonModel
         : this(new TimeType(), scalar.Value) { }
 
     [JsonConstructor]
-    public TimeScalarJsonModel(TimeType type, TimeOnly value)
+    public TimeScalarJsonModel(TimeType type, TimeOnly? value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public TimeType Type { get; }
 
-    public TimeOnly Value { get; }
+    public TimeOnly? Value { get; }
 }
 
 public sealed class TimeScalarConverter : JsonConverter<ITimeScalar>
@@ -35,7 +35,7 @@ public sealed class TimeScalarConverter : JsonConverter<ITimeScalar>
             options
         )!;
 
-        return new TimeScalar(scalar.Value);
+        return new TimeScalar(scalar.Value!.Value);
     }
 
     public override void Write(
