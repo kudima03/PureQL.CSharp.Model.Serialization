@@ -334,4 +334,16 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedOutput, output);
     }
+
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    public void ThrowsExceptionOnBadFormat(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<StringField>(input, _options)
+        );
+    }
 }
