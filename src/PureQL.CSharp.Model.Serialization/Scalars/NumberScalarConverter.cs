@@ -11,15 +11,15 @@ internal sealed record NumberScalarJsonModel
         : this(new NumberType(), scalar.Value) { }
 
     [JsonConstructor]
-    public NumberScalarJsonModel(NumberType type, double value)
+    public NumberScalarJsonModel(NumberType type, double? value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public NumberType Type { get; }
 
-    public double Value { get; }
+    public double? Value { get; }
 }
 
 public sealed class NumberScalarConverter : JsonConverter<INumberScalar>
@@ -35,7 +35,7 @@ public sealed class NumberScalarConverter : JsonConverter<INumberScalar>
             options
         )!;
 
-        return new NumberScalar(model.Value);
+        return new NumberScalar(model.Value!.Value);
     }
 
     public override void Write(
