@@ -57,7 +57,7 @@ public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
         }
         else if (value.IsT2)
         {
-            JsonSerializer.Serialize(writer, value.AsT2, options);
+            JsonSerializer.Serialize<IBooleanScalar>(writer, value.AsT2, options);
         }
         else if (value.IsT3)
         {
