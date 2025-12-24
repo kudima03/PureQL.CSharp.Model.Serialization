@@ -11,15 +11,15 @@ internal sealed record UuidScalarJsonModel
         : this(new UuidType(), scalar.Value) { }
 
     [JsonConstructor]
-    public UuidScalarJsonModel(UuidType type, Guid value)
+    public UuidScalarJsonModel(UuidType type, Guid? value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public UuidType Type { get; }
 
-    public Guid Value { get; }
+    public Guid? Value { get; }
 }
 
 public sealed class UuidScalarConverter : JsonConverter<IUuidScalar>
@@ -35,7 +35,7 @@ public sealed class UuidScalarConverter : JsonConverter<IUuidScalar>
             options
         )!;
 
-        return new UuidScalar(scalar.Value);
+        return new UuidScalar(scalar.Value!.Value);
     }
 
     public override void Write(
