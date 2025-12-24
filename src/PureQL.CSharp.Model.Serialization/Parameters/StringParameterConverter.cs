@@ -13,8 +13,8 @@ internal sealed record StringParameterJsonModel
     [JsonConstructor]
     public StringParameterJsonModel(string name, StringType type)
     {
-        Name = name;
-        Type = type;
+        Name = name ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Name { get; }
