@@ -47,12 +47,16 @@ public sealed record NumberScalarConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ThrowsExceptionOnBadFormat()
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"number"},"value":"35.16.10000"}"""
+    )]
+    public void ThrowsExceptionOnBadFormat(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"number"},"value":"35.16.10000"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
         );
