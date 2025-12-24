@@ -70,6 +70,16 @@ public sealed record TimeScalarConverterTests
         );
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingValueField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"time"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<ITimeScalar>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"value":"14:30"}"""
@@ -88,6 +98,9 @@ public sealed record TimeScalarConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"value":"14:30"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"value":"14:30"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
