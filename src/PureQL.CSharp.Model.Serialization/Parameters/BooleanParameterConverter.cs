@@ -13,8 +13,8 @@ internal sealed record BooleanParameterJsonModel
     [JsonConstructor]
     public BooleanParameterJsonModel(string name, BooleanType type)
     {
-        Name = name;
-        Type = type;
+        Name = name ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Name { get; }
