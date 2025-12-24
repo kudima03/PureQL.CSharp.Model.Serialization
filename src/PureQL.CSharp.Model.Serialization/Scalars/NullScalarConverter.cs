@@ -7,12 +7,12 @@ namespace PureQL.CSharp.Model.Serialization.Scalars;
 
 internal sealed record NullScalarJsonModel
 {
-    public NullScalarJsonModel(NullType type)
+    public NullScalarJsonModel(NullType? type)
     {
-        Type = type;
+        Type = type ?? throw new JsonException();
     }
 
-    public NullType Type { get; }
+    public NullType? Type { get; }
 }
 
 public sealed class NullScalarConverter : JsonConverter<INullScalar>
