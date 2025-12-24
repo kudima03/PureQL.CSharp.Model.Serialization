@@ -84,6 +84,16 @@ public sealed record BooleanScalarConverterTests
         );
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingValueField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"boolean"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"value":true}"""
@@ -105,6 +115,9 @@ public sealed record BooleanScalarConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"value":true}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"value":true}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
