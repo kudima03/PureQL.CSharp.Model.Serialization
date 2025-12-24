@@ -137,8 +137,10 @@ public sealed record DateReturningConverterTests
             }
             """;
 
-        string output = JsonSerializer
-            .Serialize(new DateReturning(new DateScalar(DateOnly.FromDateTime(DateTime.Now))), _options);
+        string output = JsonSerializer.Serialize(
+            new DateReturning(new DateScalar(DateOnly.FromDateTime(DateTime.Now))),
+            _options
+        );
 
         Assert.Equal(expectedOutput, output);
     }

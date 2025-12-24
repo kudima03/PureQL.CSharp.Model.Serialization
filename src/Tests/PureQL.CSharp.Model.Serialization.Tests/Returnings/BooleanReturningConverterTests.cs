@@ -137,8 +137,10 @@ public sealed record BooleanReturningConverterTests
             }
             """;
 
-        string output = JsonSerializer
-            .Serialize(new BooleanReturning(new BooleanScalar(true)), _options);
+        string output = JsonSerializer.Serialize(
+            new BooleanReturning(new BooleanScalar(true)),
+            _options
+        );
 
         Assert.Equal(expectedOutput, output);
     }
