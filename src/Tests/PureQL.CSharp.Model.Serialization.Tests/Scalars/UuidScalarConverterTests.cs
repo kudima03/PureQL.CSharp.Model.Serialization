@@ -48,12 +48,16 @@ public sealed record UuidScalarConverterTests
         Assert.Equal(expectedJson, output);
     }
 
-    [Fact]
-    public void ThrowsExceptionOnBadFormat()
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"uuid"},"value":"afdkjgnhajlkhisfdbng"}"""
+    )]
+    public void ThrowsExceptionOnBadFormat(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"uuid"},"value":"afdkjgnhajlkhisfdbng"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IUuidScalar>(input, _options)
         );
