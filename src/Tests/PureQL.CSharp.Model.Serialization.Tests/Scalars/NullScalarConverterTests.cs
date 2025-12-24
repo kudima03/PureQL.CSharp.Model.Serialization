@@ -63,6 +63,12 @@ public sealed record NullScalarConverterTests
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"}}"""
     )]
+    [InlineData( /*lang=json,strict*/
+        ""
+    )]
+    [InlineData( /*lang=json,strict*/
+        "{}"
+    )]
     public void ThrowsExceptionOnWrongType(string input)
     {
         _ = Assert.Throws<JsonException>(() =>
