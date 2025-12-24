@@ -124,6 +124,25 @@ public sealed record DateReturningConverterTests
         Assert.Equal(DateOnly.FromDateTime(DateTime.Now), scalar.Value);
     }
 
+    [Fact]
+    public void WriteDateScalar()
+    {
+        string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "type": {
+                "name": "date"
+              },
+              "value": "{{DateTime.Now:yyyy-MM-dd}}"
+            }
+            """;
+
+        string output = JsonSerializer
+            .Serialize(new DateReturning(new DateScalar(DateOnly.FromDateTime(DateTime.Now))), _options);
+
+        Assert.Equal(expectedOutput, output);
+    }
+
     [Theory]
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
