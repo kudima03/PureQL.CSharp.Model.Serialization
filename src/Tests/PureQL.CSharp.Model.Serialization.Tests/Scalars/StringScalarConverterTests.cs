@@ -47,6 +47,16 @@ public sealed record StringScalarConverterTests
         Assert.Equal(expected, output);
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingValueField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"string"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IStringScalar>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"value":"faijdhnjikabngf"}"""
@@ -65,6 +75,9 @@ public sealed record StringScalarConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"value":"faijdhnjikabngf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"value":"faijdhnjikabngf"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
