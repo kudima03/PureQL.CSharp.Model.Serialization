@@ -11,15 +11,15 @@ internal sealed record DateScalarJsonModel
         : this(new DateType(), scalar.Value) { }
 
     [JsonConstructor]
-    public DateScalarJsonModel(DateType type, DateOnly value)
+    public DateScalarJsonModel(DateType type, DateOnly? value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public DateType Type { get; }
 
-    public DateOnly Value { get; }
+    public DateOnly? Value { get; }
 }
 
 public sealed class DateScalarConverter : JsonConverter<IDateScalar>
@@ -35,7 +35,7 @@ public sealed class DateScalarConverter : JsonConverter<IDateScalar>
             options
         )!;
 
-        return new DateScalar(scalar.Value);
+        return new DateScalar(scalar.Value!.Value);
     }
 
     public override void Write(
