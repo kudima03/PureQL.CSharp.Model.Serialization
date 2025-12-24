@@ -124,6 +124,25 @@ public sealed record BooleanReturningConverterTests
         Assert.True(scalar.Value);
     }
 
+    [Fact]
+    public void WriteBooleanScalar()
+    {
+        string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "value": true
+            }
+            """;
+
+        string output = JsonSerializer
+            .Serialize(new BooleanReturning(new BooleanScalar(true)), _options);
+
+        Assert.Equal(expectedOutput, output);
+    }
+
 #pragma warning disable xUnit1004 // Test methods should not be skipped
     [Fact(Skip = "NotImplemented")]
 #pragma warning restore xUnit1004 // Test methods should not be skipped
