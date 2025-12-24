@@ -45,6 +45,16 @@ public sealed record UuidParameterConverterTests
         Assert.Equal(expected, output);
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingNameField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"uuid"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<UuidParameter>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"name": "auiheyrdsnf"}"""
@@ -66,6 +76,9 @@ public sealed record UuidParameterConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"time"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name": "auiheyrdsnf"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
