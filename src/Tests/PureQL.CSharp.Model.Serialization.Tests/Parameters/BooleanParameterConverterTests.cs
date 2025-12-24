@@ -49,6 +49,16 @@ public sealed record BooleanParameterConverterTests
         Assert.Equal(expected, output);
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingNameField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"boolean"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BooleanParameter>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"name": "auiheyrdsnf"}"""
@@ -70,6 +80,9 @@ public sealed record BooleanParameterConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name": "auiheyrdsnf"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
