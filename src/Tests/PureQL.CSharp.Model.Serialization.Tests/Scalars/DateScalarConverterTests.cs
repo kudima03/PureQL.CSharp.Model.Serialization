@@ -48,12 +48,16 @@ public sealed record DateScalarConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ThrowsExceptionOnBadFormat()
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"datetime"},"value":"2000-01-01-01"}"""
+    )]
+    public void ThrowsExceptionOnBadFormat(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"datetime"},"value":"2000-01-01-01"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IDateScalar>(input, _options)
         );
