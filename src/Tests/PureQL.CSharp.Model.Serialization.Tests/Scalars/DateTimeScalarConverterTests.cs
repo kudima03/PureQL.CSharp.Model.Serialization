@@ -39,8 +39,10 @@ public sealed record DateTimeScalarConverterTests
         DateTime expectedValue = DateTime.Now;
 
         string expected = /*lang=json,strict*/
-            $$"""
-            {"type":{"name":"datetime"},"value":{{JsonSerializer.Serialize(expectedValue)}}}
+        $$"""
+            {"type":{"name":"datetime"},"value":{{JsonSerializer.Serialize(
+                expectedValue
+            )}}}
             """;
 
         string output = JsonSerializer.Serialize<IDateTimeScalar>(
@@ -73,6 +75,16 @@ public sealed record DateTimeScalarConverterTests
         );
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingValueField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"datetime"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"value":"22.12.2025 9:52:31"}"""
@@ -94,6 +106,9 @@ public sealed record DateTimeScalarConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"value":"22.12.2025 9:52:31"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"value":"22.12.2025 9:52:31"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
