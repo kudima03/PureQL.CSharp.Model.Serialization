@@ -13,8 +13,8 @@ internal sealed record NumberParameterJsonModel
     [JsonConstructor]
     public NumberParameterJsonModel(string name, NumberType type)
     {
-        Name = name;
-        Type = type;
+        Name = name ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Name { get; }
