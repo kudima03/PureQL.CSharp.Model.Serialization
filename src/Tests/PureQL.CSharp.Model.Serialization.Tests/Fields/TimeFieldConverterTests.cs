@@ -56,6 +56,26 @@ public sealed record TimeFieldConverterTests
         Assert.Equal(expected, output);
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingEntityField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"field":"jinaudferv","type":{"name":"time"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeField>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnMissingFieldField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"entity":"auiheyrdsnf","type":{"name":"time"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeField>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
@@ -77,6 +97,9 @@ public sealed record TimeFieldConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"entity": "auiheyrdsnf","field": "jinaudferv"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
