@@ -13,8 +13,8 @@ internal sealed record DateParameterJsonModel
     [JsonConstructor]
     public DateParameterJsonModel(string name, DateType type)
     {
-        Name = name;
-        Type = type;
+        Name = name ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Name { get; }
