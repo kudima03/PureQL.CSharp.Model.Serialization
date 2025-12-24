@@ -13,8 +13,8 @@ internal sealed record NullParameterJsonModel
     [JsonConstructor]
     public NullParameterJsonModel(string name, NullType type)
     {
-        Name = name;
-        Type = type;
+        Name = name ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Name { get; }
