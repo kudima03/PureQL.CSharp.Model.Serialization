@@ -13,8 +13,8 @@ internal sealed record StringScalarJsonModel
     [JsonConstructor]
     public StringScalarJsonModel(StringType type, string value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public StringType Type { get; }
