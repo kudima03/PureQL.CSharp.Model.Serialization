@@ -6,9 +6,6 @@ using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Returnings;
 
@@ -28,15 +25,11 @@ public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
-                out BooleanParameter? booleanParameter
+                out BooleanParameter? parameter
             )
-                ? new BooleanReturning(booleanParameter!)
-            : JsonExtensions.TryDeserialize(
-                root,
-                options,
-                out BooleanScalar? boolScalarJsonModel
-            )
-                ? new BooleanReturning(boolScalarJsonModel!)
+                ? new BooleanReturning(parameter!)
+            : JsonExtensions.TryDeserialize(root, options, out IBooleanScalar? scalar)
+                ? new BooleanReturning(new BooleanScalar(scalar!.Value))
             : JsonExtensions.TryDeserialize(root, options, out Equality? equality)
                 ? throw new NotImplementedException()
             : JsonExtensions.TryDeserialize(
@@ -56,27 +49,15 @@ public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
     {
         if (value.IsT0)
         {
-            JsonSerializer.Serialize(
-                writer,
-                new BooleanFieldJsonModel(value.AsT0),
-                options
-            );
+            JsonSerializer.Serialize(writer, value.AsT0, options);
         }
         else if (value.IsT1)
         {
-            JsonSerializer.Serialize(
-                writer,
-                new BooleanParameterJsonModel(value.AsT1),
-                options
-            );
+            JsonSerializer.Serialize(writer, value.AsT1, options);
         }
         else if (value.IsT2)
         {
-            JsonSerializer.Serialize(
-                writer,
-                new BoolScalarJsonModel(value.AsT2),
-                options
-            );
+            JsonSerializer.Serialize(writer, value.AsT2, options);
         }
         else if (value.IsT3)
         {
@@ -85,6 +66,10 @@ public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
         else if (value.IsT4)
         {
             throw new NotImplementedException();
+        }
+        else
+        {
+            throw new JsonException();
         }
     }
 }
