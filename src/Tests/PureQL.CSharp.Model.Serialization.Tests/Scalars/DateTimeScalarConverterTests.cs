@@ -53,12 +53,16 @@ public sealed record DateTimeScalarConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ThrowsExceptionOnBadFormat()
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"datetime"},"value":"35.16.10000 25:00:00"}"""
+    )]
+    public void ThrowsExceptionOnBadFormat(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"datetime"},"value":"35.16.10000 25:00:00"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
         );
