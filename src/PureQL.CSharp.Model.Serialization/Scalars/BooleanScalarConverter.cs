@@ -11,15 +11,15 @@ internal sealed record BoolScalarJsonModel
         : this(new BooleanType(), scalar.Value) { }
 
     [JsonConstructor]
-    public BoolScalarJsonModel(BooleanType type, bool value)
+    public BoolScalarJsonModel(BooleanType type, bool? value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public BooleanType Type { get; }
 
-    public bool Value { get; }
+    public bool? Value { get; }
 }
 
 public sealed class BooleanScalarConverter : JsonConverter<IBooleanScalar>
@@ -35,7 +35,7 @@ public sealed class BooleanScalarConverter : JsonConverter<IBooleanScalar>
             options
         )!;
 
-        return new BooleanScalar(scalar.Value);
+        return new BooleanScalar(scalar.Value!.Value);
     }
 
     public override void Write(
