@@ -11,15 +11,15 @@ internal sealed record DateTimeScalarJsonModel
         : this(new DateTimeType(), scalar.Value) { }
 
     [JsonConstructor]
-    public DateTimeScalarJsonModel(DateTimeType type, DateTime value)
+    public DateTimeScalarJsonModel(DateTimeType type, DateTime? value)
     {
-        Type = type;
-        Value = value;
+        Type = type ?? throw new JsonException();
+        Value = value ?? throw new JsonException();
     }
 
     public DateTimeType Type { get; }
 
-    public DateTime Value { get; }
+    public DateTime? Value { get; }
 }
 
 public sealed class DateTimeScalarConverter : JsonConverter<IDateTimeScalar>
@@ -33,7 +33,7 @@ public sealed class DateTimeScalarConverter : JsonConverter<IDateTimeScalar>
         DateTimeScalarJsonModel scalar =
             JsonSerializer.Deserialize<DateTimeScalarJsonModel>(ref reader, options)!;
 
-        return new DateTimeScalar(scalar.Value);
+        return new DateTimeScalar(scalar.Value!.Value);
     }
 
     public override void Write(
