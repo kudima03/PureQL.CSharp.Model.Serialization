@@ -58,6 +58,18 @@ public sealed record StringScalarConverterTests
     }
 
     [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    public void ThrowsExceptionOnBadFormat(string input)
+    {
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IStringScalar>(input, _options)
+        );
+    }
+
+    [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"value":"faijdhnjikabngf"}"""
     )]
