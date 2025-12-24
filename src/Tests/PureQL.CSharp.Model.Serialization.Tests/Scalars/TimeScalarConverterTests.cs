@@ -48,12 +48,16 @@ public sealed record TimeScalarConverterTests
         Assert.Equal(expectedJson, output);
     }
 
-    [Fact]
-    public void ThrowsExceptionOnBadFormat()
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("{asdasdasd}")]
+    [InlineData("""{"asdasd":   }""")]
+    [InlineData(""" """)]
+    [InlineData( /*lang=json,strict*/
+        """{"type":{"name":"time"},"value":"2000-01-01-01"}"""
+    )]
+    public void ThrowsExceptionOnBadFormat(string input)
     {
-        const string input = /*lang=json,strict*/
-            """{"type":{"name":"time"},"value":"2000-01-01-01"}""";
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<ITimeScalar>(input, _options)
         );
