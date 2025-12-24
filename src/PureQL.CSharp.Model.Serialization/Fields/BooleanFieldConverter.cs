@@ -13,9 +13,9 @@ internal sealed record BooleanFieldJsonModel
     [JsonConstructor]
     public BooleanFieldJsonModel(string entity, string field, BooleanType type)
     {
-        Entity = entity;
-        Field = field;
-        Type = type;
+        Entity = entity ?? throw new JsonException();
+        Field = field ?? throw new JsonException();
+        Type = type ?? throw new JsonException();
     }
 
     public string Entity { get; }
