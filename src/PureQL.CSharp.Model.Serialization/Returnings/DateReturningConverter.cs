@@ -43,7 +43,7 @@ public sealed class DateReturningConverter : JsonConverter<DateReturning>
         }
         else if (value.IsT2)
         {
-            JsonSerializer.Serialize(writer, value.AsT2, options);
+            JsonSerializer.Serialize<IDateScalar>(writer, value.AsT2, options);
         }
         else
         {
