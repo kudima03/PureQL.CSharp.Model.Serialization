@@ -45,6 +45,16 @@ public sealed record StringParameterConverterTests
         Assert.Equal(expected, output);
     }
 
+    [Fact]
+    public void ThrowsExceptionOnMissingNameField()
+    {
+        const string input = /*lang=json,strict*/
+            """{"type":{"name":"string"}}""";
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<StringParameter>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"date"},"name": "auiheyrdsnf"}"""
@@ -66,6 +76,9 @@ public sealed record StringParameterConverterTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"name": "auiheyrdsnf"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"name": "auiheyrdsnf"}"""
     )]
     public void ThrowsExceptionOnWrongType(string input)
     {
