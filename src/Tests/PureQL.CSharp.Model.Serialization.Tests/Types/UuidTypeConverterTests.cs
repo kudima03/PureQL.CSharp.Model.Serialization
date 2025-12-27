@@ -10,7 +10,7 @@ public sealed record UuidTypeConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new TypeConverter<UuidType>() },
+        Converters = { new TypeConverter<UuidType>() }
     };
 
     [Fact]

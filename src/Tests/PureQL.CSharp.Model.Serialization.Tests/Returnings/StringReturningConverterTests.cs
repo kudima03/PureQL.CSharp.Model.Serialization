@@ -26,8 +26,8 @@ public sealed record StringReturningConverterTests
             new StringFieldConverter(),
             new StringParameterConverter(),
             new StringScalarConverter(),
-            new TypeConverter<StringType>(),
-        },
+            new TypeConverter<StringType>()
+        }
     };
 
     [Fact]

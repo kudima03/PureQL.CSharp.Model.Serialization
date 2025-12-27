@@ -10,7 +10,7 @@ public sealed record DateTypeConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new TypeConverter<DateType>() },
+        Converters = { new TypeConverter<DateType>() }
     };
 
     [Fact]

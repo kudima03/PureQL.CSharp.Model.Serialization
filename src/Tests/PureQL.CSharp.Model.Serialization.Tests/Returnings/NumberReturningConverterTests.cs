@@ -27,8 +27,8 @@ public sealed record NumberReturningConverterTests
             new NumberFieldConverter(),
             new NumberParameterConverter(),
             new NumberScalarConverter(),
-            new TypeConverter<NumberType>(),
-        },
+            new TypeConverter<NumberType>()
+        }
     };
 
     [Fact]

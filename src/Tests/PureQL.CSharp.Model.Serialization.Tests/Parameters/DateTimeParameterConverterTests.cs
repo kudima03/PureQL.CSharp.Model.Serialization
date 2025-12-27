@@ -15,8 +15,8 @@ public sealed record DateTimeParameterConverterTests
         Converters =
         {
             new DateTimeParameterConverter(),
-            new TypeConverter<DateTimeType>(),
-        },
+            new TypeConverter<DateTimeType>()
+        }
     };
 
     [Fact]

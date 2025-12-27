@@ -12,7 +12,7 @@ public sealed record BooleanFieldConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new BooleanFieldConverter(), new TypeConverter<BooleanType>() },
+        Converters = { new BooleanFieldConverter(), new TypeConverter<BooleanType>() }
     };
 
     [Fact]

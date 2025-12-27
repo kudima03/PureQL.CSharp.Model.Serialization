@@ -12,7 +12,7 @@ public sealed record NumberFieldConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new NumberFieldConverter(), new TypeConverter<NumberType>() },
+        Converters = { new NumberFieldConverter(), new TypeConverter<NumberType>() }
     };
 
     [Fact]

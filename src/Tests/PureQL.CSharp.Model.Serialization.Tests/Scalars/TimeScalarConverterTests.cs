@@ -12,7 +12,7 @@ public sealed record TimeScalarConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new TimeScalarConverter(), new TypeConverter<TimeType>() },
+        Converters = { new TimeScalarConverter(), new TypeConverter<TimeType>() }
     };
 
     [Fact]

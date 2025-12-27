@@ -15,8 +15,8 @@ public sealed record BooleanParameterConverterTests
         Converters =
         {
             new BooleanParameterConverter(),
-            new TypeConverter<BooleanType>(),
-        },
+            new TypeConverter<BooleanType>()
+        }
     };
 
     [Fact]

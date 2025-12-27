@@ -30,8 +30,8 @@ public sealed record FieldConverterTests
             new TypeConverter<NumberType>(),
             new TypeConverter<StringType>(),
             new TypeConverter<TimeType>(),
-            new TypeConverter<UuidType>(),
-        },
+            new TypeConverter<UuidType>()
+        }
     };
 
     [Fact]
