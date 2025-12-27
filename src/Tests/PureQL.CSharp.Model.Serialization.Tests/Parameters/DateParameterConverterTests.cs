@@ -59,7 +59,7 @@ public sealed record DateParameterConverterTests
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
-    [InlineData(""" """)]
+    [InlineData(" ")]
     public void ThrowsExceptionOnBadFormat(string input)
     {
         _ = Assert.Throws<JsonException>(() =>

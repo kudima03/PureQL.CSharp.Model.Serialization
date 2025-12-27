@@ -52,7 +52,7 @@ public sealed record UuidScalarConverterTests
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
-    [InlineData(""" """)]
+    [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"uuid"},"value":"afdkjgnhajlkhisfdbng"}"""
     )]

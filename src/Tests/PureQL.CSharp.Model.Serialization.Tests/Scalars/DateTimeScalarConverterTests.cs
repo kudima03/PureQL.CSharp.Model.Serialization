@@ -57,7 +57,7 @@ public sealed record DateTimeScalarConverterTests
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
-    [InlineData(""" """)]
+    [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"value":"35.16.10000 25:00:00"}"""
     )]

@@ -80,7 +80,7 @@ public sealed record TimeFieldConverterTests
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
-    [InlineData(""" """)]
+    [InlineData(" ")]
     public void ThrowsExceptionOnBadFormat(string input)
     {
         _ = Assert.Throws<JsonException>(() =>

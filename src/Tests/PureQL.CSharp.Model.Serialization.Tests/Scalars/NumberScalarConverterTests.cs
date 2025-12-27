@@ -51,7 +51,7 @@ public sealed record NumberScalarConverterTests
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
-    [InlineData(""" """)]
+    [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"number"},"value":"35.16.10000"}"""
     )]

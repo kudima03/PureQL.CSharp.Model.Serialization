@@ -52,7 +52,7 @@ public sealed record DateScalarConverterTests
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
-    [InlineData(""" """)]
+    [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
         """{"type":{"name":"datetime"},"value":"2000-01-01-01"}"""
     )]
