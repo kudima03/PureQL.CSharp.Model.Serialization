@@ -27,7 +27,7 @@ internal sealed record DateTimeFieldJsonModel
 
 public sealed class DateTimeFieldConverter : JsonConverter<DateTimeField>
 {
-    public override DateTimeField? Read(
+    public override DateTimeField Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

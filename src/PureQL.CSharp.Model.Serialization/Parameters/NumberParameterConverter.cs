@@ -24,7 +24,7 @@ internal sealed record NumberParameterJsonModel
 
 public sealed class NumberParameterConverter : JsonConverter<NumberParameter>
 {
-    public override NumberParameter? Read(
+    public override NumberParameter Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

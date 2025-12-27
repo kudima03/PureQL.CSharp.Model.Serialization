@@ -9,7 +9,7 @@ namespace PureQL.CSharp.Model.Serialization.Returnings;
 
 public sealed class DateTimeReturningConverter : JsonConverter<DateTimeReturning>
 {
-    public override DateTimeReturning? Read(
+    public override DateTimeReturning Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

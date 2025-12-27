@@ -24,7 +24,7 @@ internal sealed record BoolScalarJsonModel
 
 public sealed class BooleanScalarConverter : JsonConverter<IBooleanScalar>
 {
-    public override IBooleanScalar? Read(
+    public override IBooleanScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

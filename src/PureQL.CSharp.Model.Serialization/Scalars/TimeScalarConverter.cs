@@ -24,7 +24,7 @@ internal sealed record TimeScalarJsonModel
 
 public sealed class TimeScalarConverter : JsonConverter<ITimeScalar>
 {
-    public override ITimeScalar? Read(
+    public override ITimeScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

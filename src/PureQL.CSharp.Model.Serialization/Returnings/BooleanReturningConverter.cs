@@ -11,7 +11,7 @@ namespace PureQL.CSharp.Model.Serialization.Returnings;
 
 public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
 {
-    public override BooleanReturning? Read(
+    public override BooleanReturning Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

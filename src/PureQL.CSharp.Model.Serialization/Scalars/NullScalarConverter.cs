@@ -17,7 +17,7 @@ internal sealed record NullScalarJsonModel
 
 public sealed class NullScalarConverter : JsonConverter<INullScalar>
 {
-    public override INullScalar? Read(
+    public override INullScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

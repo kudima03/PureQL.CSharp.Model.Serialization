@@ -9,7 +9,7 @@ namespace PureQL.CSharp.Model.Serialization.Returnings;
 
 public sealed class NumberReturningConverter : JsonConverter<NumberReturning>
 {
-    public override NumberReturning? Read(
+    public override NumberReturning Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

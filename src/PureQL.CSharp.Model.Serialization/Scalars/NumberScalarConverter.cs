@@ -24,7 +24,7 @@ internal sealed record NumberScalarJsonModel
 
 public sealed class NumberScalarConverter : JsonConverter<INumberScalar>
 {
-    public override INumberScalar? Read(
+    public override INumberScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

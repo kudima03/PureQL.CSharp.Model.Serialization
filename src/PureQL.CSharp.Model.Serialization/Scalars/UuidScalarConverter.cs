@@ -24,7 +24,7 @@ internal sealed record UuidScalarJsonModel
 
 public sealed class UuidScalarConverter : JsonConverter<IUuidScalar>
 {
-    public override IUuidScalar? Read(
+    public override IUuidScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

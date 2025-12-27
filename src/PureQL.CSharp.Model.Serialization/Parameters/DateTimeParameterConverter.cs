@@ -24,7 +24,7 @@ internal sealed record DateTimeParameterJsonModel
 
 public sealed class DateTimeParameterConverter : JsonConverter<DateTimeParameter>
 {
-    public override DateTimeParameter? Read(
+    public override DateTimeParameter Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

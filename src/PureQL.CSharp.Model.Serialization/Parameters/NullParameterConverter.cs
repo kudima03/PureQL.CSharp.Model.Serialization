@@ -24,7 +24,7 @@ internal sealed record NullParameterJsonModel
 
 public sealed class NullParameterConverter : JsonConverter<NullParameter>
 {
-    public override NullParameter? Read(
+    public override NullParameter Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

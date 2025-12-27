@@ -24,7 +24,7 @@ internal sealed record StringParameterJsonModel
 
 public sealed class StringParameterConverter : JsonConverter<StringParameter>
 {
-    public override StringParameter? Read(
+    public override StringParameter Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

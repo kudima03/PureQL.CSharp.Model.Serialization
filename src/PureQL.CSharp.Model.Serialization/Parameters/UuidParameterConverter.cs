@@ -24,7 +24,7 @@ internal sealed record UuidParameterJsonModel
 
 public sealed class UuidParameterConverter : JsonConverter<UuidParameter>
 {
-    public override UuidParameter? Read(
+    public override UuidParameter Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

@@ -27,7 +27,7 @@ internal sealed record BooleanFieldJsonModel
 
 public sealed class BooleanFieldConverter : JsonConverter<BooleanField>
 {
-    public override BooleanField? Read(
+    public override BooleanField Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

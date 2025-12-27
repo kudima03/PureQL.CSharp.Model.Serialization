@@ -6,7 +6,7 @@ namespace PureQL.CSharp.Model.Serialization.Fields;
 
 public sealed class FieldConverter : JsonConverter<Field>
 {
-    public override Field? Read(
+    public override Field Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

@@ -24,7 +24,7 @@ internal sealed record DateScalarJsonModel
 
 public sealed class DateScalarConverter : JsonConverter<IDateScalar>
 {
-    public override IDateScalar? Read(
+    public override IDateScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

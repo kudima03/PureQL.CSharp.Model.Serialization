@@ -27,7 +27,7 @@ internal sealed record NumberFieldJsonModel
 
 public sealed class NumberFieldConverter : JsonConverter<NumberField>
 {
-    public override NumberField? Read(
+    public override NumberField Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

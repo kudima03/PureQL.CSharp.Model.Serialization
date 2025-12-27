@@ -7,7 +7,7 @@ namespace PureQL.CSharp.Model.Serialization.Types;
 public sealed class TypeConverter<T> : JsonConverter<T>
     where T : IType, new()
 {
-    public override T? Read(
+    public override T Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

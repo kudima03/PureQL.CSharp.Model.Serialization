@@ -24,7 +24,7 @@ internal sealed record BooleanParameterJsonModel
 
 public sealed class BooleanParameterConverter : JsonConverter<BooleanParameter>
 {
-    public override BooleanParameter? Read(
+    public override BooleanParameter Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options

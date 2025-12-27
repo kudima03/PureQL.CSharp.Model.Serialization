@@ -24,7 +24,7 @@ internal sealed record StringScalarJsonModel
 
 public sealed class StringScalarConverter : JsonConverter<IStringScalar>
 {
-    public override IStringScalar? Read(
+    public override IStringScalar Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options
