@@ -15,9 +15,6 @@ internal enum BooleanOperator
 
 internal sealed record BooleanOperationJsonModel
 {
-    public BooleanOperationJsonModel(NotOperator @operator)
-        : this(BooleanOperator.Not, [@operator.Condition]) { }
-
     public BooleanOperationJsonModel(OrOperator @operator)
         : this(BooleanOperator.Or, @operator.Conditions) { }
 
