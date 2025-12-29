@@ -12,7 +12,7 @@ public sealed record StringParameterConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new StringParameterConverter(), new TypeConverter<StringType>() }
+        Converters = { new StringParameterConverter(), new TypeConverter<StringType>() },
     };
 
     [Fact]

@@ -26,8 +26,8 @@ public sealed record DateReturningConverterTests
             new DateFieldConverter(),
             new DateParameterConverter(),
             new DateScalarConverter(),
-            new TypeConverter<DateType>()
-        }
+            new TypeConverter<DateType>(),
+        },
     };
 
     [Fact]

@@ -26,8 +26,8 @@ public sealed record BooleanReturningConverterTests
             new BooleanFieldConverter(),
             new BooleanParameterConverter(),
             new BooleanScalarConverter(),
-            new TypeConverter<BooleanType>()
-        }
+            new TypeConverter<BooleanType>(),
+        },
     };
 
     [Fact]

@@ -26,8 +26,8 @@ public sealed record StringReturningConverterTests
             new StringFieldConverter(),
             new StringParameterConverter(),
             new StringScalarConverter(),
-            new TypeConverter<StringType>()
-        }
+            new TypeConverter<StringType>(),
+        },
     };
 
     [Fact]
@@ -60,14 +60,14 @@ public sealed record StringReturningConverterTests
 
         const string expectedOutput = /*lang=json,strict*/
             $$"""
-              {
-                "entity": "{{expectedEntity}}",
-                "field": "{{expectedField}}",
-                "type": {
-                  "name": "string"
-                }
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "string"
               }
-              """;
+            }
+            """;
 
         Assert.Equal(expectedOutput, output);
     }
@@ -100,13 +100,13 @@ public sealed record StringReturningConverterTests
 
         const string expectedOutput = /*lang=json,strict*/
             $$"""
-              {
-                "name": "{{expectedParamName}}",
-                "type": {
-                  "name": "string"
-                }
+            {
+              "name": "{{expectedParamName}}",
+              "type": {
+                "name": "string"
               }
-              """;
+            }
+            """;
 
         Assert.Equal(expectedOutput, output);
     }
@@ -117,13 +117,13 @@ public sealed record StringReturningConverterTests
         const string expectedValue = "fbdhidflefbhbfdhvjz";
 
         const string input = $$"""
-                               {
-                                 "type": {
-                                   "name": "string"
-                                 },
-                                 "value": "{{expectedValue}}"
-                               }
-                               """;
+            {
+              "type": {
+                "name": "string"
+              },
+              "value": "{{expectedValue}}"
+            }
+            """;
         StringScalar scalar = JsonSerializer
             .Deserialize<StringReturning>(input, _options)!
             .AsT2;
@@ -137,13 +137,13 @@ public sealed record StringReturningConverterTests
         const string expectedValue = "fbdhidflefbhbfdhvjz";
 
         const string expected = $$"""
-                                  {
-                                    "type": {
-                                      "name": "string"
-                                    },
-                                    "value": "{{expectedValue}}"
-                                  }
-                                  """;
+            {
+              "type": {
+                "name": "string"
+              },
+              "value": "{{expectedValue}}"
+            }
+            """;
 
         string output = JsonSerializer.Serialize(
             new StringReturning(new StringScalar(expectedValue)),

@@ -12,7 +12,7 @@ public sealed record NullScalarConverterTests
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
-        Converters = { new NullScalarConverter(), new TypeConverter<NullType>() }
+        Converters = { new NullScalarConverter(), new TypeConverter<NullType>() },
     };
 
     [Fact]
