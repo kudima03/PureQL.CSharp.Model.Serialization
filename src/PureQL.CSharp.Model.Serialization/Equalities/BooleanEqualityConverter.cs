@@ -32,7 +32,7 @@ internal sealed record BooleanEqualityJsonModel
 
 public sealed class BooleanEqualityConverter : JsonConverter<BooleanEquality>
 {
-    public override BooleanEquality? Read(
+    public override BooleanEquality Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options
