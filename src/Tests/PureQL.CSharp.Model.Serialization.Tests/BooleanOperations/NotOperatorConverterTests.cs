@@ -567,12 +567,10 @@ public sealed record NotOperatorConverterTests
         Assert.Equal(
             value.Condition.AsT4,
             new BooleanOperator(
-                new OrOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
+                new OrOperator([
+                    new BooleanReturning(new BooleanScalar(false)),
+                    new BooleanReturning(new BooleanScalar(true)),
+                ])
             )
         );
     }

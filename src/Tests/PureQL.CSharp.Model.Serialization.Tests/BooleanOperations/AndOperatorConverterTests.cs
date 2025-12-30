@@ -252,12 +252,10 @@ public sealed record AndOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(new BooleanScalar(false)),
-                ]
-            ),
+            new AndOperator([
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanScalar(false)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -373,12 +371,10 @@ public sealed record AndOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
-                    new BooleanReturning(new BooleanParameter(expectedSecondParamName)),
-                ]
-            ),
+            new AndOperator([
+                new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
+                new BooleanReturning(new BooleanParameter(expectedSecondParamName)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -511,19 +507,14 @@ public sealed record AndOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(
-                        new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-                    ),
-                    new BooleanReturning(
-                        new BooleanField(
-                            expectedSecondEntityName,
-                            expectedSecondFieldName
-                        )
-                    ),
-                ]
-            ),
+            new AndOperator([
+                new BooleanReturning(
+                    new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
+                ),
+                new BooleanReturning(
+                    new BooleanField(expectedSecondEntityName, expectedSecondFieldName)
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -706,26 +697,24 @@ public sealed record AndOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(
-                        new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+            new AndOperator([
+                new BooleanReturning(
+                    new Equality(
+                        new BooleanEquality(
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true))
                         )
-                    ),
-                    new BooleanReturning(
-                        new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+                    )
+                ),
+                new BooleanReturning(
+                    new Equality(
+                        new BooleanEquality(
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true))
                         )
-                    ),
-                ]
-            ),
+                    )
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -786,23 +775,19 @@ public sealed record AndOperatorConverterTests
         Assert.Equal(
             value.Conditions.First().AsT4,
             new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
+                new AndOperator([
+                    new BooleanReturning(new BooleanScalar(false)),
+                    new BooleanReturning(new BooleanScalar(true)),
+                ])
             )
         );
         Assert.Equal(
             value.Conditions.Last().AsT4,
             new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
+                new AndOperator([
+                    new BooleanReturning(new BooleanScalar(false)),
+                    new BooleanReturning(new BooleanScalar(true)),
+                ])
             )
         );
     }
@@ -924,26 +909,24 @@ public sealed record AndOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(
-                        new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+            new AndOperator([
+                new BooleanReturning(
+                    new Equality(
+                        new BooleanEquality(
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true))
                         )
-                    ),
-                    new BooleanReturning(
-                        new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+                    )
+                ),
+                new BooleanReturning(
+                    new Equality(
+                        new BooleanEquality(
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true))
                         )
-                    ),
-                ]
-            ),
+                    )
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -1027,12 +1010,10 @@ public sealed record AndOperatorConverterTests
         Assert.Equal(
             value.Conditions.First().AsT4,
             new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
+                new AndOperator([
+                    new BooleanReturning(new BooleanScalar(false)),
+                    new BooleanReturning(new BooleanScalar(true)),
+                ])
             )
         );
         Assert.Equal(value.Conditions.Skip(1).First().AsT2, new BooleanScalar(true));
@@ -1214,33 +1195,29 @@ public sealed record AndOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(
-                        new BooleanOperator(
-                            new AndOperator(
-                                [
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true)),
-                                ]
-                            )
+            new AndOperator([
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new AndOperator([
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true)),
+                        ])
+                    )
+                ),
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(
+                    new BooleanField(expectedEntityName, expectedFieldName)
+                ),
+                new BooleanReturning(new BooleanParameter(expectedParamName)),
+                new BooleanReturning(
+                    new Equality(
+                        new BooleanEquality(
+                            new BooleanReturning(new BooleanScalar(true)),
+                            new BooleanReturning(new BooleanScalar(false))
                         )
-                    ),
-                    new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(
-                        new BooleanField(expectedEntityName, expectedFieldName)
-                    ),
-                    new BooleanReturning(new BooleanParameter(expectedParamName)),
-                    new BooleanReturning(
-                        new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(true)),
-                                new BooleanReturning(new BooleanScalar(false))
-                            )
-                        )
-                    ),
-                ]
-            ),
+                    )
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
