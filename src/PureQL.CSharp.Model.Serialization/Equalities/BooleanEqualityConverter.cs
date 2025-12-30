@@ -5,12 +5,6 @@ using PureQL.CSharp.Model.Returnings;
 
 namespace PureQL.CSharp.Model.Serialization.Equalities;
 
-internal enum EqualityOperator
-{
-    None,
-    Equal,
-}
-
 internal sealed record BooleanEqualityJsonModel
 {
     public BooleanEqualityJsonModel(BooleanEquality equality)
