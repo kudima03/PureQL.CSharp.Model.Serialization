@@ -12,6 +12,8 @@ using PureQL.CSharp.Model.Serialization.Fields;
 using PureQL.CSharp.Model.Serialization.Parameters;
 using PureQL.CSharp.Model.Serialization.Returnings;
 using PureQL.CSharp.Model.Serialization.Scalars;
+using PureQL.CSharp.Model.Serialization.Types;
+using BooleanType = PureQL.CSharp.Model.Types.BooleanType;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Equalities;
 
@@ -31,6 +33,7 @@ public sealed record BooleanEqualityConverterTests
             new BooleanFieldConverter(),
             new BooleanParameterConverter(),
             new BooleanScalarConverter(),
+            new TypeConverter<BooleanType>(),
         },
     };
 
