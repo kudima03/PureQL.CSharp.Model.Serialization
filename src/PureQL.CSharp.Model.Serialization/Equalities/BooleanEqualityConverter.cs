@@ -41,9 +41,7 @@ public sealed class BooleanEqualityConverter : JsonConverter<BooleanEquality>
         BooleanEqualityJsonModel equality =
             JsonSerializer.Deserialize<BooleanEqualityJsonModel>(ref reader, options)!;
 
-        return equality.Operator == EqualityOperator.None
-            ? throw new JsonException()
-            : new BooleanEquality(equality.Left, equality.Right);
+        return new BooleanEquality(equality.Left, equality.Right);
     }
 
     public override void Write(
