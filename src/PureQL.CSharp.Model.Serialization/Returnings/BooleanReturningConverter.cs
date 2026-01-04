@@ -31,13 +31,13 @@ public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
             : JsonExtensions.TryDeserialize(root, options, out IBooleanScalar? scalar)
                 ? new BooleanReturning(new BooleanScalar(scalar!.Value))
             : JsonExtensions.TryDeserialize(root, options, out Equality? equality)
-                ? throw new NotImplementedException()
+                ? new BooleanReturning(equality!)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out BooleanOperator? booleanOperator
             )
-                ? throw new NotImplementedException()
+                ? new BooleanReturning(booleanOperator!)
             : throw new JsonException("Unable to determine BooleanReturning type.");
     }
 
