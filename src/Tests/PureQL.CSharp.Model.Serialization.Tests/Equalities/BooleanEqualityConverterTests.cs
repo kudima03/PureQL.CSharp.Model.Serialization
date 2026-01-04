@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
@@ -7,12 +6,14 @@ using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
+using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Equalities;
 using PureQL.CSharp.Model.Serialization.Fields;
 using PureQL.CSharp.Model.Serialization.Parameters;
 using PureQL.CSharp.Model.Serialization.Returnings;
 using PureQL.CSharp.Model.Serialization.Scalars;
 using PureQL.CSharp.Model.Serialization.Types;
+using PureQL.CSharp.Model.Types;
 using BooleanType = PureQL.CSharp.Model.Types.BooleanType;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Equalities;
@@ -33,7 +34,10 @@ public sealed record BooleanEqualityConverterTests
             new BooleanFieldConverter(),
             new BooleanParameterConverter(),
             new BooleanScalarConverter(),
+            new EqualityConverter(),
+            new BooleanOperatorConverter(),
             new TypeConverter<BooleanType>(),
+            new TypeConverter<NullType>(),
         },
     };
 
@@ -247,8 +251,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Fact(Skip = "Not implemented")]
-    [SuppressMessage("Usage", "xUnit1004:Test methods should not be skipped")]
+    [Fact]
     public void ThrowsExceptionOnEmptyRight()
     {
         const string input = /*lang=json,strict*/
@@ -270,8 +273,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Fact(Skip = "Not implemented")]
-    [SuppressMessage("Usage", "xUnit1004:Test methods should not be skipped")]
+    [Fact]
     public void ThrowsExceptionOnEmptyLeft()
     {
         const string input = /*lang=json,strict*/
@@ -323,12 +325,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(value.Right.AsT2, new BooleanScalar(false));
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -427,12 +424,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(value.Right.AsT1, new BooleanParameter(expectedSecondParamName));
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -548,12 +540,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -639,12 +626,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadEqualityArgs()
     {
         const string input = /*lang=json,strict*/
@@ -708,12 +690,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -765,12 +742,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteEqualityArgs()
     {
         const string expected = /*lang=json,strict*/
@@ -836,12 +808,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadBooleanOperatorArgs()
     {
         const string input = /*lang=json,strict*/
@@ -909,12 +876,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -972,12 +934,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteBooleanOperatorArgs()
     {
         const string expected = /*lang=json,strict*/
@@ -1047,12 +1004,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadMixedArgs()
     {
         const string expectedEntityName = "aruhybfe";
@@ -1093,12 +1045,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -1137,12 +1084,7 @@ public sealed record BooleanEqualityConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteMixedArgs()
     {
         const string expectedEntityName = "aruhybfe";
