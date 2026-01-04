@@ -82,5 +82,9 @@ public sealed class FieldConverter : JsonConverter<Field>
                 options
             );
         }
+        else
+        {
+            throw new JsonException("Unable to determine Field type.");
+        }
     }
 }
