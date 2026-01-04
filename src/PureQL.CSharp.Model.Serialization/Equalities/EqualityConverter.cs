@@ -82,5 +82,9 @@ public sealed class EqualityConverter : JsonConverter<Equality>
         {
             JsonSerializer.Serialize(writer, value.AsT6, options);
         }
+        else
+        {
+            throw new JsonException("Unable to determine Equality type.");
+        }
     }
 }
