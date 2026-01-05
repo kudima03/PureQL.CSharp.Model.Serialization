@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -203,18 +204,18 @@ public sealed record BooleanReturningConverterTests
               "operator": "and",
               "conditions": [
                 {
-                "entity": "u",
-                "field": "active",
-                "type": {
-                  "name": "boolean"
-                }
-              },
-                {
-                "type": {
-                  "name": "boolean"
+                  "entity": "u",
+                  "field": "active",
+                  "type": {
+                    "name": "boolean"
+                  }
                 },
-                "value": true
-              }
+                {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
+                }
               ]
             }
             """;
@@ -296,9 +297,7 @@ public sealed record BooleanReturningConverterTests
         );
     }
 
-#pragma warning disable xUnit1004
-    [Theory(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004
+    [Theory]
     [InlineData("datetime")]
     [InlineData("date")]
     [InlineData("null")]
