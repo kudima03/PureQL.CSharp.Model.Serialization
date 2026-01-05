@@ -855,8 +855,6 @@ public sealed record AndOperatorConverterTests
             }
             """;
 
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<AndOperator>(input, _options)
         );
