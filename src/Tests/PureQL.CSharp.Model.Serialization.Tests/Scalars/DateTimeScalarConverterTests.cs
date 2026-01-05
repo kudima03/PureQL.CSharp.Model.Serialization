@@ -1,19 +1,27 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.Scalars;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Scalars;
 
 public sealed record DateTimeScalarConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public DateTimeScalarConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new DateTimeScalarConverter(), new TypeConverter<DateTimeType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void Read()
@@ -22,7 +30,12 @@ public sealed record DateTimeScalarConverterTests
 
         string input = /*lang=json,strict*/
             $$"""
-            {"type":{"name":"datetime"},"value":"{{expected:O}}"}
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "value": "{{expected:O}}"
+            }
             """;
 
         IDateTimeScalar scalar = JsonSerializer.Deserialize<IDateTimeScalar>(
@@ -39,10 +52,13 @@ public sealed record DateTimeScalarConverterTests
         DateTime expectedValue = DateTime.Now;
 
         string expected = /*lang=json,strict*/
-        $$"""
-            {"type":{"name":"datetime"},"value":{{JsonSerializer.Serialize(
-                expectedValue
-            )}}}
+            $$"""
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "value": {{JsonSerializer.Serialize(expectedValue)}}
+            }
             """;
 
         string output = JsonSerializer.Serialize<IDateTimeScalar>(
@@ -59,7 +75,14 @@ public sealed record DateTimeScalarConverterTests
     [InlineData("""{"asdasd":   }""")]
     [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value":"35.16.10000 25:00:00"}"""
+            """
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "value": "35.16.10000 25:00:00"
+            }
+            """
     )]
     public void ThrowsExceptionOnBadFormat(string input)
     {
@@ -72,7 +95,14 @@ public sealed record DateTimeScalarConverterTests
     public void ThrowsExceptionOnEmptyValue()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"datetime"},"value":""}""";
+            """
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "value": ""
+            }
+            """;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
@@ -83,39 +113,37 @@ public sealed record DateTimeScalarConverterTests
     public void ThrowsExceptionOnMissingValueField()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"datetime"}}""";
+            """
+            {
+              "type": {
+                "name": "datetime"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value":"22.12.2025 9:52:31"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value":"22.12.2025 9:52:31"}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "value": "22.12.2025 9:52:31"
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
         );
