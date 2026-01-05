@@ -22,7 +22,7 @@ internal sealed record NumberScalarJsonModel
     public double? Value { get; }
 }
 
-public sealed class NumberScalarConverter : JsonConverter<INumberScalar>
+internal sealed class NumberScalarConverter : JsonConverter<INumberScalar>
 {
     public override INumberScalar Read(
         ref Utf8JsonReader reader,

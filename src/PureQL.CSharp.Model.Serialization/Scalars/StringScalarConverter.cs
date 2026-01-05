@@ -22,7 +22,7 @@ internal sealed record StringScalarJsonModel
     public string Value { get; }
 }
 
-public sealed class StringScalarConverter : JsonConverter<IStringScalar>
+internal sealed class StringScalarConverter : JsonConverter<IStringScalar>
 {
     public override IStringScalar Read(
         ref Utf8JsonReader reader,

@@ -22,7 +22,7 @@ internal sealed record BooleanParameterJsonModel
     public BooleanType Type { get; }
 }
 
-public sealed class BooleanParameterConverter : JsonConverter<BooleanParameter>
+internal sealed class BooleanParameterConverter : JsonConverter<BooleanParameter>
 {
     public override BooleanParameter Read(
         ref Utf8JsonReader reader,

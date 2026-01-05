@@ -30,7 +30,7 @@ internal sealed record UuidEqualityJsonModel
     public UuidReturning Right { get; }
 }
 
-public sealed class UuidEqualityConverter : JsonConverter<UuidEquality>
+internal sealed class UuidEqualityConverter : JsonConverter<UuidEquality>
 {
     public override UuidEquality Read(
         ref Utf8JsonReader reader,

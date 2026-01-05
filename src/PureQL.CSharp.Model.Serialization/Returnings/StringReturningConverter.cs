@@ -7,7 +7,7 @@ using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Returnings;
 
-public sealed class StringReturningConverter : JsonConverter<StringReturning>
+internal sealed class StringReturningConverter : JsonConverter<StringReturning>
 {
     public override StringReturning Read(
         ref Utf8JsonReader reader,

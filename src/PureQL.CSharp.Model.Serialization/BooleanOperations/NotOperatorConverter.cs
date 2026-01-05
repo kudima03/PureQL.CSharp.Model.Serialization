@@ -23,7 +23,7 @@ internal sealed record NotOperatorJsonModel
     public BooleanReturning Condition { get; }
 }
 
-public sealed class NotOperatorConverter : JsonConverter<NotOperator>
+internal sealed class NotOperatorConverter : JsonConverter<NotOperator>
 {
     public override NotOperator Read(
         ref Utf8JsonReader reader,

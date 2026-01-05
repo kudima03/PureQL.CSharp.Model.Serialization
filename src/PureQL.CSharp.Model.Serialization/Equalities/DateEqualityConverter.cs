@@ -30,7 +30,7 @@ internal sealed record DateEqualityJsonModel
     public DateReturning Right { get; }
 }
 
-public sealed class DateEqualityConverter : JsonConverter<DateEquality>
+internal sealed class DateEqualityConverter : JsonConverter<DateEquality>
 {
     public override DateEquality Read(
         ref Utf8JsonReader reader,

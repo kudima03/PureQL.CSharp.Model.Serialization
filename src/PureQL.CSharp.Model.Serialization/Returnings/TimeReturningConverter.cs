@@ -7,7 +7,7 @@ using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Returnings;
 
-public sealed class TimeReturningConverter : JsonConverter<TimeReturning>
+internal sealed class TimeReturningConverter : JsonConverter<TimeReturning>
 {
     public override TimeReturning Read(
         ref Utf8JsonReader reader,

@@ -4,7 +4,7 @@ using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
-public sealed class FieldConverter : JsonConverter<Field>
+internal sealed class FieldConverter : JsonConverter<Field>
 {
     public override Field Read(
         ref Utf8JsonReader reader,

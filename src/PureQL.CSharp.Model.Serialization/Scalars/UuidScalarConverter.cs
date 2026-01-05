@@ -22,7 +22,7 @@ internal sealed record UuidScalarJsonModel
     public Guid? Value { get; }
 }
 
-public sealed class UuidScalarConverter : JsonConverter<IUuidScalar>
+internal sealed class UuidScalarConverter : JsonConverter<IUuidScalar>
 {
     public override IUuidScalar Read(
         ref Utf8JsonReader reader,

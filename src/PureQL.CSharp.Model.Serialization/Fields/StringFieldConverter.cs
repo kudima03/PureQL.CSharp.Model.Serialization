@@ -25,7 +25,7 @@ internal sealed record StringFieldJsonModel
     public StringType Type { get; }
 }
 
-public sealed class StringFieldConverter : JsonConverter<StringField>
+internal sealed class StringFieldConverter : JsonConverter<StringField>
 {
     public override StringField Read(
         ref Utf8JsonReader reader,

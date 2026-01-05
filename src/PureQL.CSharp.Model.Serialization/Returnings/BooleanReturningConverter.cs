@@ -9,7 +9,7 @@ using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Returnings;
 
-public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
+internal sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
 {
     public override BooleanReturning Read(
         ref Utf8JsonReader reader,

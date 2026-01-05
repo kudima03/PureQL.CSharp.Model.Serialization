@@ -22,7 +22,7 @@ internal sealed record NullParameterJsonModel
     public NullType Type { get; }
 }
 
-public sealed class NullParameterConverter : JsonConverter<NullParameter>
+internal sealed class NullParameterConverter : JsonConverter<NullParameter>
 {
     public override NullParameter Read(
         ref Utf8JsonReader reader,

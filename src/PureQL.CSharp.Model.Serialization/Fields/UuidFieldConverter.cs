@@ -25,7 +25,7 @@ internal sealed record UuidFieldJsonModel
     public UuidType Type { get; }
 }
 
-public sealed class UuidFieldConverter : JsonConverter<UuidField>
+internal sealed class UuidFieldConverter : JsonConverter<UuidField>
 {
     public override UuidField Read(
         ref Utf8JsonReader reader,

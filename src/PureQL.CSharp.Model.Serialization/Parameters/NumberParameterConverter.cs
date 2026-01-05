@@ -22,7 +22,7 @@ internal sealed record NumberParameterJsonModel
     public NumberType Type { get; }
 }
 
-public sealed class NumberParameterConverter : JsonConverter<NumberParameter>
+internal sealed class NumberParameterConverter : JsonConverter<NumberParameter>
 {
     public override NumberParameter Read(
         ref Utf8JsonReader reader,

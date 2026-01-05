@@ -30,7 +30,7 @@ internal sealed record StringEqualityJsonModel
     public StringReturning Right { get; }
 }
 
-public sealed class StringEqualityConverter : JsonConverter<StringEquality>
+internal sealed class StringEqualityConverter : JsonConverter<StringEquality>
 {
     public override StringEquality Read(
         ref Utf8JsonReader reader,

@@ -22,7 +22,7 @@ internal sealed record TimeParameterJsonModel
     public TimeType Type { get; }
 }
 
-public sealed class TimeParameterConverter : JsonConverter<TimeParameter>
+internal sealed class TimeParameterConverter : JsonConverter<TimeParameter>
 {
     public override TimeParameter Read(
         ref Utf8JsonReader reader,

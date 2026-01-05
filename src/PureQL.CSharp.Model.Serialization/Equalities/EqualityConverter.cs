@@ -4,7 +4,7 @@ using PureQL.CSharp.Model.Equalities;
 
 namespace PureQL.CSharp.Model.Serialization.Equalities;
 
-public sealed class EqualityConverter : JsonConverter<Equality>
+internal sealed class EqualityConverter : JsonConverter<Equality>
 {
     public override Equality Read(
         ref Utf8JsonReader reader,

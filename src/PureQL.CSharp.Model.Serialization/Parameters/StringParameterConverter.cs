@@ -22,7 +22,7 @@ internal sealed record StringParameterJsonModel
     public StringType Type { get; }
 }
 
-public sealed class StringParameterConverter : JsonConverter<StringParameter>
+internal sealed class StringParameterConverter : JsonConverter<StringParameter>
 {
     public override StringParameter Read(
         ref Utf8JsonReader reader,

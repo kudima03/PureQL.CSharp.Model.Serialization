@@ -22,7 +22,7 @@ internal sealed record DateTimeScalarJsonModel
     public DateTime? Value { get; }
 }
 
-public sealed class DateTimeScalarConverter : JsonConverter<IDateTimeScalar>
+internal sealed class DateTimeScalarConverter : JsonConverter<IDateTimeScalar>
 {
     public override IDateTimeScalar Read(
         ref Utf8JsonReader reader,

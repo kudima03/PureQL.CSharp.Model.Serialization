@@ -4,7 +4,7 @@ using PureQL.CSharp.Model.BooleanOperations;
 
 namespace PureQL.CSharp.Model.Serialization.BooleanOperations;
 
-public sealed class BooleanOperatorConverter
+internal sealed class BooleanOperatorConverter
     : JsonConverter<Model.BooleanOperations.BooleanOperator>
 {
     public override Model.BooleanOperations.BooleanOperator Read(

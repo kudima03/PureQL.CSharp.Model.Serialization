@@ -22,7 +22,7 @@ internal sealed record BoolScalarJsonModel
     public bool? Value { get; }
 }
 
-public sealed class BooleanScalarConverter : JsonConverter<IBooleanScalar>
+internal sealed class BooleanScalarConverter : JsonConverter<IBooleanScalar>
 {
     public override IBooleanScalar Read(
         ref Utf8JsonReader reader,

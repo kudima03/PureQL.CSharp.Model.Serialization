@@ -22,7 +22,7 @@ internal sealed record TimeScalarJsonModel
     public TimeOnly? Value { get; }
 }
 
-public sealed class TimeScalarConverter : JsonConverter<ITimeScalar>
+internal sealed class TimeScalarConverter : JsonConverter<ITimeScalar>
 {
     public override ITimeScalar Read(
         ref Utf8JsonReader reader,

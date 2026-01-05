@@ -30,7 +30,7 @@ internal sealed record TimeEqualityJsonModel
     public TimeReturning Right { get; }
 }
 
-public sealed class TimeEqualityConverter : JsonConverter<TimeEquality>
+internal sealed class TimeEqualityConverter : JsonConverter<TimeEquality>
 {
     public override TimeEquality Read(
         ref Utf8JsonReader reader,

@@ -4,7 +4,7 @@ using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Types;
 
-public sealed class TypeConverter<T> : JsonConverter<T>
+internal sealed class TypeConverter<T> : JsonConverter<T>
     where T : IType, new()
 {
     public override T Read(

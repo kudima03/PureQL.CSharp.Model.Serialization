@@ -30,7 +30,7 @@ internal sealed record BooleanEqualityJsonModel
     public BooleanReturning Right { get; }
 }
 
-public sealed class BooleanEqualityConverter : JsonConverter<BooleanEquality>
+internal sealed class BooleanEqualityConverter : JsonConverter<BooleanEquality>
 {
     public override BooleanEquality Read(
         ref Utf8JsonReader reader,

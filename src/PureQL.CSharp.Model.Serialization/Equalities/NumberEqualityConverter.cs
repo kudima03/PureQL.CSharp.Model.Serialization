@@ -30,7 +30,7 @@ internal sealed record NumberEqualityJsonModel
     public NumberReturning Right { get; }
 }
 
-public sealed class NumberEqualityConverter : JsonConverter<NumberEquality>
+internal sealed class NumberEqualityConverter : JsonConverter<NumberEquality>
 {
     public override NumberEquality Read(
         ref Utf8JsonReader reader,

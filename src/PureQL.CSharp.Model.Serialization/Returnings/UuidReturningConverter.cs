@@ -7,7 +7,7 @@ using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Returnings;
 
-public sealed class UuidReturningConverter : JsonConverter<UuidReturning>
+internal sealed class UuidReturningConverter : JsonConverter<UuidReturning>
 {
     public override UuidReturning Read(
         ref Utf8JsonReader reader,

@@ -25,7 +25,7 @@ internal sealed record TimeFieldJsonModel
     public TimeType Type { get; }
 }
 
-public sealed class TimeFieldConverter : JsonConverter<TimeField>
+internal sealed class TimeFieldConverter : JsonConverter<TimeField>
 {
     public override TimeField Read(
         ref Utf8JsonReader reader,

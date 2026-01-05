@@ -22,7 +22,7 @@ internal sealed record UuidParameterJsonModel
     public UuidType Type { get; }
 }
 
-public sealed class UuidParameterConverter : JsonConverter<UuidParameter>
+internal sealed class UuidParameterConverter : JsonConverter<UuidParameter>
 {
     public override UuidParameter Read(
         ref Utf8JsonReader reader,
