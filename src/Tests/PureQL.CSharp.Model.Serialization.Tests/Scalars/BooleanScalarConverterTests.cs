@@ -1,25 +1,40 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.Scalars;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Scalars;
 
 public sealed record BooleanScalarConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public BooleanScalarConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new BooleanScalarConverter(), new TypeConverter<BooleanType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ReadTrue()
     {
         const string input = /*lang=json,strict*/
-            """{"type": {"name":"boolean"},"value": true}""";
+            """
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "value": true
+            }
+            """;
 
         IBooleanScalar scalar = JsonSerializer.Deserialize<IBooleanScalar>(
             input,
@@ -33,7 +48,14 @@ public sealed record BooleanScalarConverterTests
     public void ReadFalse()
     {
         const string input = /*lang=json,strict*/
-            """{"type": {"name":"boolean"},"value": false}""";
+            """
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "value": false
+            }
+            """;
 
         IBooleanScalar scalar = JsonSerializer.Deserialize<IBooleanScalar>(
             input,
@@ -48,7 +70,14 @@ public sealed record BooleanScalarConverterTests
     {
         const string expected =
             /*lang=json,strict*/
-            """{"type":{"name":"boolean"},"value":true}""";
+            """
+                {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
+                }
+                """;
 
         string output = JsonSerializer.Serialize<IBooleanScalar>(
             new BooleanScalar(true),
@@ -63,7 +92,14 @@ public sealed record BooleanScalarConverterTests
     {
         const string expected =
             /*lang=json,strict*/
-            """{"type":{"name":"boolean"},"value":false}""";
+            """
+                {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": false
+                }
+                """;
 
         string output = JsonSerializer.Serialize<IBooleanScalar>(
             new BooleanScalar(false),
@@ -77,7 +113,14 @@ public sealed record BooleanScalarConverterTests
     public void ThrowsExceptionOnEmptyValue()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"boolean"},"value":""}""";
+            """
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "value": ""
+            }
+            """;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
@@ -88,7 +131,13 @@ public sealed record BooleanScalarConverterTests
     public void ThrowsExceptionOnMissingValueField()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"boolean"}}""";
+            """
+            {
+              "type": {
+                "name": "boolean"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
         );
@@ -107,32 +156,24 @@ public sealed record BooleanScalarConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value":true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value":true}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("date")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "value": true
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
         );
