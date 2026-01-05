@@ -75,7 +75,14 @@ public sealed record DateReturningConverterTests
         const string paramName = "auryehgfbduygbhaerf";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"date"},"name": "{{paramName}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "date"
+              },
+              "name": "{{paramName}}"
+            }
+            """;
 
         DateParameter parameter = JsonSerializer
             .Deserialize<DateReturning>(input, _options)!
@@ -112,7 +119,14 @@ public sealed record DateReturningConverterTests
     public void ReadDateScalar()
     {
         string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"date"},"value": "{{DateTime.Now:yyyy-MM-dd}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "date"
+              },
+              "value": "{{DateTime.Now:yyyy-MM-dd}}"
+            }
+            """;
 
         DateScalar scalar = JsonSerializer
             .Deserialize<DateReturning>(input, _options)!
@@ -155,102 +169,75 @@ public sealed record DateReturningConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"ihufd"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    public void ThrowsExceptionOnWrongFieldType(string input)
+    [InlineData("datetime")]
+    [InlineData("boolean")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("ihufd")]
+    public void ThrowsExceptionOnWrongFieldType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "entity": "ufbrdeyhov",
+              "field": "heuiyrndfosgv"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateReturning>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type": {"name":"datetime"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"ihufd"},"name": "erfinjdhksgt"}"""
-    )]
-    public void ThrowsExceptionOnWrongParameterType(string input)
+    [InlineData("datetime")]
+    [InlineData("boolean")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("ihufd")]
+    public void ThrowsExceptionOnWrongParameterType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "name": "erfinjdhksgt"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateReturning>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value": "2000-01-01"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value": "2000-01-01"}"""
-    )]
-    public void ThrowsExceptionOnWrongScalarType(string input)
+    [InlineData("datetime")]
+    [InlineData("boolean")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    public void ThrowsExceptionOnWrongScalarType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "value": "2000-01-01"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateReturning>(input, _options)
         );
