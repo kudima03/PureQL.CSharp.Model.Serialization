@@ -61,11 +61,11 @@ public sealed class BooleanReturningConverter : JsonConverter<BooleanReturning>
         }
         else if (value.IsT3)
         {
-            throw new NotImplementedException();
+            JsonSerializer.Serialize(writer, value.AsT3, options);
         }
         else if (value.IsT4)
         {
-            throw new NotImplementedException();
+            JsonSerializer.Serialize(writer, value.AsT4, options);
         }
         else
         {
