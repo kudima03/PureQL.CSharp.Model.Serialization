@@ -6,32 +6,27 @@ using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.BooleanOperations;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.Returnings;
-using PureQL.CSharp.Model.Serialization.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.BooleanOperations;
 
 public sealed record OrOperatorConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public OrOperatorConverterTests()
     {
-        NewLine = "\n",
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters =
+        _options = new JsonSerializerOptions()
         {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-            new OrOperatorConverter(),
-            new BooleanReturningConverter(),
-            new BooleanFieldConverter(),
-            new BooleanParameterConverter(),
-            new BooleanScalarConverter(),
-        },
-    };
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ThrowsExceptionOnOtherOperatorNameAbsence()
@@ -252,10 +247,12 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator([
-                new BooleanReturning(new BooleanScalar(true)),
-                new BooleanReturning(new BooleanScalar(false)),
-            ]),
+            new OrOperator(
+                [
+                    new BooleanReturning(new BooleanScalar(true)),
+                    new BooleanReturning(new BooleanScalar(false)),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -371,10 +368,12 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator([
-                new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
-                new BooleanReturning(new BooleanParameter(expectedSecondParamName)),
-            ]),
+            new OrOperator(
+                [
+                    new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
+                    new BooleanReturning(new BooleanParameter(expectedSecondParamName)),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -507,14 +506,19 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator([
-                new BooleanReturning(
-                    new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new BooleanReturning(
-                    new BooleanField(expectedSecondEntityName, expectedSecondFieldName)
-                ),
-            ]),
+            new OrOperator(
+                [
+                    new BooleanReturning(
+                        new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
+                    ),
+                    new BooleanReturning(
+                        new BooleanField(
+                            expectedSecondEntityName,
+                            expectedSecondFieldName
+                        )
+                    ),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -697,24 +701,26 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator([
-                new BooleanReturning(
-                    new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+            new OrOperator(
+                [
+                    new BooleanReturning(
+                        new Equality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
-                    )
-                ),
-                new BooleanReturning(
-                    new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                    ),
+                    new BooleanReturning(
+                        new Equality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
-                    )
-                ),
-            ]),
+                    ),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -775,19 +781,23 @@ public sealed record OrOperatorConverterTests
         Assert.Equal(
             value.Conditions.First().AsT4,
             new BooleanOperator(
-                new OrOperator([
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true)),
-                ])
+                new OrOperator(
+                    [
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true)),
+                    ]
+                )
             )
         );
         Assert.Equal(
             value.Conditions.Last().AsT4,
             new BooleanOperator(
-                new OrOperator([
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true)),
-                ])
+                new OrOperator(
+                    [
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true)),
+                    ]
+                )
             )
         );
     }
@@ -909,24 +919,26 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator([
-                new BooleanReturning(
-                    new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+            new OrOperator(
+                [
+                    new BooleanReturning(
+                        new Equality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
-                    )
-                ),
-                new BooleanReturning(
-                    new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                    ),
+                    new BooleanReturning(
+                        new Equality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
-                    )
-                ),
-            ]),
+                    ),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -1010,10 +1022,12 @@ public sealed record OrOperatorConverterTests
         Assert.Equal(
             value.Conditions.First().AsT4,
             new BooleanOperator(
-                new OrOperator([
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true)),
-                ])
+                new OrOperator(
+                    [
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true)),
+                    ]
+                )
             )
         );
         Assert.Equal(value.Conditions.Skip(1).First().AsT2, new BooleanScalar(true));
@@ -1195,29 +1209,33 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator([
-                new BooleanReturning(
-                    new BooleanOperator(
-                        new OrOperator([
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true)),
-                        ])
-                    )
-                ),
-                new BooleanReturning(new BooleanScalar(true)),
-                new BooleanReturning(
-                    new BooleanField(expectedEntityName, expectedFieldName)
-                ),
-                new BooleanReturning(new BooleanParameter(expectedParamName)),
-                new BooleanReturning(
-                    new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(true)),
-                            new BooleanReturning(new BooleanScalar(false))
+            new OrOperator(
+                [
+                    new BooleanReturning(
+                        new BooleanOperator(
+                            new OrOperator(
+                                [
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true)),
+                                ]
+                            )
                         )
-                    )
-                ),
-            ]),
+                    ),
+                    new BooleanReturning(new BooleanScalar(true)),
+                    new BooleanReturning(
+                        new BooleanField(expectedEntityName, expectedFieldName)
+                    ),
+                    new BooleanReturning(new BooleanParameter(expectedParamName)),
+                    new BooleanReturning(
+                        new Equality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(true)),
+                                new BooleanReturning(new BooleanScalar(false))
+                            )
+                        )
+                    ),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
