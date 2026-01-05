@@ -1,38 +1,28 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.Types;
 using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Fields;
 
 public sealed record FieldConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public FieldConverterTests()
     {
-        NewLine = "\n",
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters =
+        _options = new JsonSerializerOptions()
         {
-            new FieldConverter(),
-            new BooleanFieldConverter(),
-            new DateFieldConverter(),
-            new DateTimeFieldConverter(),
-            new NumberFieldConverter(),
-            new StringFieldConverter(),
-            new TimeFieldConverter(),
-            new UuidFieldConverter(),
-            new TypeConverter<BooleanType>(),
-            new TypeConverter<DateType>(),
-            new TypeConverter<DateTimeType>(),
-            new TypeConverter<NumberType>(),
-            new TypeConverter<StringType>(),
-            new TypeConverter<TimeType>(),
-            new TypeConverter<UuidType>(),
-        },
-    };
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ReadBooleanField()
@@ -42,7 +32,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"boolean"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         BooleanField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT0;
 
@@ -85,7 +83,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"date"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "date"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         DateField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT1;
 
@@ -128,7 +134,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"datetime"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         DateTimeField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT2;
 
@@ -171,7 +185,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"number"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "number"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         NumberField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT3;
 
@@ -214,7 +236,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"time"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "time"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         TimeField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT4;
 
@@ -257,7 +287,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"uuid"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         UuidField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT5;
 
@@ -300,7 +338,15 @@ public sealed record FieldConverterTests
         const string expectedField = "arfeinjuhg";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"string"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "string"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         StringField field = JsonSerializer.Deserialize<Field>(input, _options)!.AsT6;
 
