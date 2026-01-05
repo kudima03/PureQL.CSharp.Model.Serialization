@@ -1129,12 +1129,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteMixedConditions()
     {
         const string expectedEntityName = "aruhybfe";
@@ -1184,20 +1179,18 @@ public sealed record AndOperatorConverterTests
                 },
                 {
                   "operator": "equal",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": true
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": false
+                  }
                 }
               ]
             }
