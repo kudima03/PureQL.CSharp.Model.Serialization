@@ -1,19 +1,27 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.Scalars;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Scalars;
 
 public sealed record UuidScalarConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public UuidScalarConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new UuidScalarConverter(), new TypeConverter<UuidType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void Read()
@@ -22,7 +30,12 @@ public sealed record UuidScalarConverterTests
 
         string input = /*lang=json,strict*/
             $$"""
-            {"type":{"name":"uuid"},"value":"{{expected}}"}
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "value": "{{expected}}"
+            }
             """;
 
         IUuidScalar scalar = JsonSerializer.Deserialize<IUuidScalar>(input, _options)!;
@@ -37,7 +50,12 @@ public sealed record UuidScalarConverterTests
 
         string expectedJson = /*lang=json,strict*/
             $$"""
-            {"type":{"name":"uuid"},"value":"{{expected}}"}
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "value": "{{expected}}"
+            }
             """;
 
         string output = JsonSerializer.Serialize<IUuidScalar>(
@@ -54,7 +72,14 @@ public sealed record UuidScalarConverterTests
     [InlineData("""{"asdasd":   }""")]
     [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value":"afdkjgnhajlkhisfdbng"}"""
+            """
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "value": "afdkjgnhajlkhisfdbng"
+            }
+            """
     )]
     public void ThrowsExceptionOnBadFormat(string input)
     {
@@ -67,7 +92,14 @@ public sealed record UuidScalarConverterTests
     public void ThrowsExceptionOnEmptyValue()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"uuid"},"value":""}""";
+            """
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "value": ""
+            }
+            """;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IUuidScalar>(input, _options)
@@ -78,36 +110,37 @@ public sealed record UuidScalarConverterTests
     public void ThrowsExceptionOnMissingValueField()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"uuid"}}""";
+            """
+            {
+              "type": {
+                "name": "uuid"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IUuidScalar>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value":"86246f01-f5be-4925-a699-ed1f988b0a7c"}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "value": "86246f01-f5be-4925-a699-ed1f988b0a7c"
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IUuidScalar>(input, _options)
         );
