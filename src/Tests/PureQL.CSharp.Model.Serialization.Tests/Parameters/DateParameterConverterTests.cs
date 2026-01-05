@@ -1,19 +1,27 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Parameters;
 
 public sealed record DateParameterConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public DateParameterConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new DateParameterConverter(), new TypeConverter<DateType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ReadName()
@@ -21,7 +29,14 @@ public sealed record DateParameterConverterTests
         const string expected = "iurhgndfjsb";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"date"},"name": "{{expected}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "date"
+              },
+              "name": "{{expected}}"
+            }
+            """;
 
         DateParameter parameter = JsonSerializer.Deserialize<DateParameter>(
             input,
@@ -35,7 +50,14 @@ public sealed record DateParameterConverterTests
     public void Write()
     {
         const string expected = /*lang=json,strict*/
-            """{"name":"auiheyrdsnf","type":{"name":"date"}}""";
+            """
+            {
+              "name": "auiheyrdsnf",
+              "type": {
+                "name": "date"
+              }
+            }
+            """;
 
         string output = JsonSerializer.Serialize(
             new DateParameter("auiheyrdsnf"),
@@ -49,7 +71,13 @@ public sealed record DateParameterConverterTests
     public void ThrowsExceptionOnMissingNameField()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"date"}}""";
+            """
+            {
+              "type": {
+                "name": "date"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateParameter>(input, _options)
         );
@@ -68,32 +96,24 @@ public sealed record DateParameterConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name": "auiheyrdsnf"}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "name": "auiheyrdsnf"
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateParameter>(input, _options)
         );
