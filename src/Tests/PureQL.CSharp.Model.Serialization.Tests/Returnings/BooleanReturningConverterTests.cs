@@ -245,9 +245,7 @@ public sealed record BooleanReturningConverterTests
         );
     }
 
-#pragma warning disable xUnit1004
-    [Theory(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004
+    [Theory]
     [InlineData("datetime")]
     [InlineData("date")]
     [InlineData("null")]
