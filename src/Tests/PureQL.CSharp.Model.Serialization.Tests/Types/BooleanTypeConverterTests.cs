@@ -1,23 +1,37 @@
 using System.Text.Json;
-using PureQL.CSharp.Model.Serialization.Types;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Types;
 
 public sealed record BooleanTypeConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public BooleanTypeConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new TypeConverter<BooleanType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void Read()
     {
         const string input = /*lang=json,strict*/
-            """{"name":"boolean"}""";
+            """
+            {
+              "name": "boolean"
+            }
+            """;
 
         BooleanType type = JsonSerializer.Deserialize<BooleanType>(input, _options)!;
 
@@ -30,35 +44,31 @@ public sealed record BooleanTypeConverterTests
         string output = JsonSerializer.Serialize(new BooleanType(), _options);
 
         Assert.Equal( /*lang=json,strict*/
-            """{"name":"boolean"}""",
+            """
+            {
+              "name": "boolean"
+            }
+            """,
             output
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"datetime"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"date"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"null"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"number"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"string"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"time"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name":"uuid"}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("uuid")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "name": "{{type}}"
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanType>(input, _options)
         );
