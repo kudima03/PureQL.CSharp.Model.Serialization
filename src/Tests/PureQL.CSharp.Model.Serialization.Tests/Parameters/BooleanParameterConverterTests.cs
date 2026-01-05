@@ -1,23 +1,27 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Parameters;
 
 public sealed record BooleanParameterConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public BooleanParameterConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters =
+        _options = new JsonSerializerOptions()
         {
-            new BooleanParameterConverter(),
-            new TypeConverter<BooleanType>(),
-        },
-    };
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ReadName()
@@ -25,7 +29,14 @@ public sealed record BooleanParameterConverterTests
         const string expected = "iurhgndfjsb";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"boolean"},"name": "{{expected}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "name": "{{expected}}"
+            }
+            """;
 
         BooleanParameter parameter = JsonSerializer.Deserialize<BooleanParameter>(
             input,
@@ -39,7 +50,14 @@ public sealed record BooleanParameterConverterTests
     public void Write()
     {
         const string expected = /*lang=json,strict*/
-            """{"name":"auiheyrdsnf","type":{"name":"boolean"}}""";
+            """
+            {
+              "name": "auiheyrdsnf",
+              "type": {
+                "name": "boolean"
+              }
+            }
+            """;
 
         string output = JsonSerializer.Serialize(
             new BooleanParameter("auiheyrdsnf"),
@@ -53,7 +71,13 @@ public sealed record BooleanParameterConverterTests
     public void ThrowsExceptionOnMissingNameField()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"boolean"}}""";
+            """
+            {
+              "type": {
+                "name": "boolean"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanParameter>(input, _options)
         );
@@ -72,32 +96,24 @@ public sealed record BooleanParameterConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"name": "auiheyrdsnf"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name": "auiheyrdsnf"}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("date")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "name": "auiheyrdsnf"
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanParameter>(input, _options)
         );
