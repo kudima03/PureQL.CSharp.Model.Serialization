@@ -194,34 +194,43 @@ public sealed record BooleanReturningConverterTests
         );
     }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-    [Fact(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
+    [Fact]
     public void ReadBooleanOperator()
     {
         const string input = /*lang=json,strict*/
             """
             {
               "operator": "and",
-              "left": {
+              "conditions": [
+                {
                 "entity": "u",
                 "field": "active",
                 "type": {
                   "name": "boolean"
                 }
               },
-              "right": {
+                {
                 "type": {
                   "name": "boolean"
                 },
                 "value": true
               }
+              ]
             }
             """;
 
-        Assert.NotNull(
-            JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT4
+        BooleanReturning booleanReturning = JsonSerializer.Deserialize<BooleanReturning>(
+            input,
+            _options
+        )!;
+
+        AndOperator andOperator = booleanReturning.AsT4.AsT0;
+
+        Assert.Equal(
+            new BooleanField("u", "active"),
+            andOperator.Conditions.First().AsT0
         );
+        Assert.Equal(new BooleanScalar(true), andOperator.Conditions.Last().AsT2);
     }
 
 #pragma warning disable xUnit1004 // Test methods should not be skipped
