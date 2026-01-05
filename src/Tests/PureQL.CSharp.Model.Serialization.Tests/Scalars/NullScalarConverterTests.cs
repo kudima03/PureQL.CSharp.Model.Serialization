@@ -1,26 +1,38 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.Scalars;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Scalars;
 
 public sealed record NullScalarConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public NullScalarConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new NullScalarConverter(), new TypeConverter<NullType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void Read()
     {
         string input = /*lang=json,strict*/
             """
-            {"type":{"name":"null"}}
+            {
+              "type": {
+                "name": "null"
+              }
+            }
             """;
 
         INullScalar scalar = JsonSerializer.Deserialize<INullScalar>(input, _options)!;
@@ -33,7 +45,11 @@ public sealed record NullScalarConverterTests
     {
         string expected = /*lang=json,strict*/
             """
-            {"type":{"name":"null"}}
+            {
+              "type": {
+                "name": "null"
+              }
+            }
             """;
 
         string output = JsonSerializer.Serialize<INullScalar>(new NullScalar(), _options);
@@ -54,35 +70,23 @@ public sealed record NullScalarConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"dateTime"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"}}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        ""
-    )]
-    [InlineData( /*lang=json,strict*/
-        "{}"
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<INullScalar>(input, _options)
         );
