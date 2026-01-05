@@ -6,79 +6,27 @@ using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.BooleanOperations;
-using PureQL.CSharp.Model.Serialization.Equalities;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.Returnings;
-using PureQL.CSharp.Model.Serialization.Scalars;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
-using BooleanType = PureQL.CSharp.Model.Types.BooleanType;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Equalities;
 
 public sealed record BooleanEqualityConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public BooleanEqualityConverterTests()
     {
-        NewLine = "\n",
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters =
+        _options = new JsonSerializerOptions()
         {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-            new BooleanEqualityConverter(),
-            new BooleanReturningConverter(),
-            new BooleanFieldConverter(),
-            new BooleanParameterConverter(),
-            new BooleanScalarConverter(),
-            new EqualityConverter(),
-            new DateEqualityConverter(),
-            new DateReturningConverter(),
-            new DateFieldConverter(),
-            new DateScalarConverter(),
-            new DateParameterConverter(),
-            new DateTimeEqualityConverter(),
-            new DateTimeReturningConverter(),
-            new DateTimeFieldConverter(),
-            new DateTimeParameterConverter(),
-            new DateTimeScalarConverter(),
-            new NumberEqualityConverter(),
-            new NumberReturningConverter(),
-            new NumberFieldConverter(),
-            new NumberScalarConverter(),
-            new NumberParameterConverter(),
-            new StringEqualityConverter(),
-            new StringReturningConverter(),
-            new StringFieldConverter(),
-            new StringScalarConverter(),
-            new StringParameterConverter(),
-            new TimeEqualityConverter(),
-            new TimeReturningConverter(),
-            new TimeFieldConverter(),
-            new TimeScalarConverter(),
-            new TimeParameterConverter(),
-            new UuidEqualityConverter(),
-            new UuidReturningConverter(),
-            new UuidFieldConverter(),
-            new UuidScalarConverter(),
-            new UuidParameterConverter(),
-            new AndOperatorConverter(),
-            new OrOperatorConverter(),
-            new NotOperatorConverter(),
-            new BooleanOperatorConverter(),
-            new TypeConverter<BooleanType>(),
-            new TypeConverter<DateType>(),
-            new TypeConverter<DateTimeType>(),
-            new TypeConverter<NumberType>(),
-            new TypeConverter<StringType>(),
-            new TypeConverter<TimeType>(),
-            new TypeConverter<UuidType>(),
-            new TypeConverter<NullType>(),
-        },
-    };
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ThrowsExceptionOnOperatorNameAbsence()
