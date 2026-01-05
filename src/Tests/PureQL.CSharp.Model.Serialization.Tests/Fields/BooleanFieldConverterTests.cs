@@ -1,19 +1,27 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Fields;
 
 public sealed record BooleanFieldConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public BooleanFieldConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new BooleanFieldConverter(), new TypeConverter<BooleanType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ReadEntity()
@@ -21,7 +29,15 @@ public sealed record BooleanFieldConverterTests
         const string expected = "test";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"boolean"},"entity": "{{expected}}","field": "test"}""";
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "entity": "{{expected}}",
+              "field": "test"
+            }
+            """;
 
         BooleanField scalar = JsonSerializer.Deserialize<BooleanField>(input, _options)!;
 
@@ -34,7 +50,15 @@ public sealed record BooleanFieldConverterTests
         const string expected = "test";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"boolean"},"entity": "test","field": "{{expected}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "entity": "test",
+              "field": "{{expected}}"
+            }
+            """;
 
         BooleanField scalar = JsonSerializer.Deserialize<BooleanField>(input, _options)!;
 
@@ -47,7 +71,13 @@ public sealed record BooleanFieldConverterTests
         const string expected =
             /*lang=json,strict*/
             """
-                {"entity":"auiheyrdsnf","field":"jinaudferv","type":{"name":"boolean"}}
+                {
+                  "entity": "auiheyrdsnf",
+                  "field": "jinaudferv",
+                  "type": {
+                    "name": "boolean"
+                  }
+                }
                 """;
 
         string output = JsonSerializer.Serialize(
@@ -62,7 +92,14 @@ public sealed record BooleanFieldConverterTests
     public void ThrowsExceptionOnMissingEntityField()
     {
         const string input = /*lang=json,strict*/
-            """{"field":"jinaudferv","type":{"name":"boolean"}}""";
+            """
+            {
+              "field": "jinaudferv",
+              "type": {
+                "name": "boolean"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanField>(input, _options)
         );
@@ -72,7 +109,14 @@ public sealed record BooleanFieldConverterTests
     public void ThrowsExceptionOnMissingFieldField()
     {
         const string input = /*lang=json,strict*/
-            """{"entity":"auiheyrdsnf","type":{"name":"boolean"}}""";
+            """
+            {
+              "entity": "auiheyrdsnf",
+              "type": {
+                "name": "boolean"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanField>(input, _options)
         );
@@ -91,32 +135,26 @@ public sealed record BooleanFieldConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"entity": "auiheyrdsnf","field": "jinaudferv"}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("datetime")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "entity": "auiheyrdsnf",
+              "field": "jinaudferv"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanField>(input, _options)
         );
