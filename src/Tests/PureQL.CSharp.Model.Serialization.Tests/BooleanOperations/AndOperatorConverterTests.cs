@@ -802,12 +802,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
