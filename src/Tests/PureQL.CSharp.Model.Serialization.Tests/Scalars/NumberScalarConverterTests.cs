@@ -1,26 +1,39 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.Scalars;
-using PureQL.CSharp.Model.Serialization.Types;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Scalars;
 
 public sealed record NumberScalarConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public NumberScalarConverterTests()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters = { new NumberScalarConverter(), new TypeConverter<NumberType>() },
-    };
+        _options = new JsonSerializerOptions()
+        {
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void Read()
     {
         string input = /*lang=json,strict*/
             """
-            {"type":{"name":"number"},"value":0.5800537796011547}
+            {
+              "type": {
+                "name": "number"
+              },
+              "value": 0.5800537796011547
+            }
             """;
 
         INumberScalar scalar = JsonSerializer.Deserialize<INumberScalar>(
@@ -36,7 +49,12 @@ public sealed record NumberScalarConverterTests
     {
         string expected = /*lang=json,strict*/
             """
-            {"type":{"name":"number"},"value":0.5800537796011547}
+            {
+              "type": {
+                "name": "number"
+              },
+              "value": 0.5800537796011547
+            }
             """;
 
         string output = JsonSerializer.Serialize<INumberScalar>(
@@ -53,7 +71,14 @@ public sealed record NumberScalarConverterTests
     [InlineData("""{"asdasd":   }""")]
     [InlineData(" ")]
     [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value":"35.16.10000"}"""
+            """
+            {
+              "type": {
+                "name": "number"
+              },
+              "value": "35.16.10000"
+            }
+            """
     )]
     public void ThrowsExceptionOnBadFormat(string input)
     {
@@ -66,7 +91,14 @@ public sealed record NumberScalarConverterTests
     public void ThrowsExceptionOnEmptyValue()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"number"},"value":""}""";
+            """
+            {
+              "type": {
+                "name": "number"
+              },
+              "value": ""
+            }
+            """;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
@@ -77,36 +109,37 @@ public sealed record NumberScalarConverterTests
     public void ThrowsExceptionOnMissingValueField()
     {
         const string input = /*lang=json,strict*/
-            """{"type":{"name":"number"}}""";
+            """
+            {
+              "type": {
+                "name": "number"
+              }
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"value":10.12345}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"value":10.12345}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value":10.12345}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value":10.12345}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value":10.12345}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value":10.12345}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value":10.12345}"""
-    )]
-    public void ThrowsExceptionOnWrongType(string input)
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("datetime")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("")]
+    public void ThrowsExceptionOnWrongType(string type)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{type}}"
+              },
+              "value": 10.12345
+            }
+            """;
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
         );
