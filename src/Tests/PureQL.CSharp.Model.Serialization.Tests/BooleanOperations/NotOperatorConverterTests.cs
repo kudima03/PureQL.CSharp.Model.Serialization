@@ -6,32 +6,27 @@ using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Serialization.BooleanOperations;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.Returnings;
-using PureQL.CSharp.Model.Serialization.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.BooleanOperations;
 
 public sealed record NotOperatorConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _options;
+
+    public NotOperatorConverterTests()
     {
-        NewLine = "\n",
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        Converters =
+        _options = new JsonSerializerOptions()
         {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-            new NotOperatorConverter(),
-            new BooleanReturningConverter(),
-            new BooleanFieldConverter(),
-            new BooleanParameterConverter(),
-            new BooleanScalarConverter(),
-        },
-    };
+            NewLine = "\n",
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        };
+        foreach (JsonConverter converter in new PureQLConverters())
+        {
+            _options.Converters.Add(converter);
+        }
+    }
 
     [Fact]
     public void ThrowsExceptionOnOtherOperatorNameAbsence()
@@ -567,10 +562,12 @@ public sealed record NotOperatorConverterTests
         Assert.Equal(
             value.Condition.AsT4,
             new BooleanOperator(
-                new OrOperator([
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true)),
-                ])
+                new OrOperator(
+                    [
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true)),
+                    ]
+                )
             )
         );
     }
