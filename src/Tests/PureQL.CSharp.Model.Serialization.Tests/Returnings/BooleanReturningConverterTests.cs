@@ -33,7 +33,15 @@ public sealed record BooleanReturningConverterTests
         const string expectedEntity = "uheayfodrbniJ";
         const string expectedField = "ubhjedwasuyhgbefrda";
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"boolean"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         BooleanField field = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
@@ -75,7 +83,14 @@ public sealed record BooleanReturningConverterTests
         const string paramName = "auryehgfbduygbhaerf";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"boolean"},"name": "{{paramName}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "name": "{{paramName}}"
+            }
+            """;
 
         BooleanParameter parameter = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
@@ -112,7 +127,14 @@ public sealed record BooleanReturningConverterTests
     public void ReadBooleanScalar()
     {
         const string input = /*lang=json,strict*/
-            """{"type": {"name":"boolean"},"value": true}""";
+            """
+            {
+              "type": {
+                "name": "boolean"
+              },
+              "value": true
+            }
+            """;
 
         BooleanScalar scalar = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
@@ -148,7 +170,24 @@ public sealed record BooleanReturningConverterTests
     public void ReadEquality()
     {
         const string input = /*lang=json,strict*/
-            """{"operator":"equal","left":{"entity":"u","field":"active","type":{"name":"boolean"}},"right":{"type":{"name":"boolean"},"value":true}}""";
+            """
+            {
+              "operator": "equal",
+              "left": {
+                "entity": "u",
+                "field": "active",
+                "type": {
+                  "name": "boolean"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "boolean"
+                },
+                "value": true
+              }
+            }
+            """;
 
         Assert.NotNull(
             JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT3
@@ -161,7 +200,24 @@ public sealed record BooleanReturningConverterTests
     public void ReadBooleanOperator()
     {
         const string input = /*lang=json,strict*/
-            """{"operator":"and","left":{"entity":"u","field":"active","type":{"name":"boolean"}},"right":{"type":{"name":"boolean"},"value":true}}""";
+            """
+            {
+              "operator": "and",
+              "left": {
+                "entity": "u",
+                "field": "active",
+                "type": {
+                  "name": "boolean"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "boolean"
+                },
+                "value": true
+              }
+            }
+            """;
 
         Assert.NotNull(
             JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT4
@@ -182,109 +238,82 @@ public sealed record BooleanReturningConverterTests
         );
     }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
+#pragma warning disable xUnit1004
     [Theory(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"ihufd"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    public void ThrowsExceptionOnWrongFieldType(string input)
+#pragma warning restore xUnit1004
+    [InlineData("datetime")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("ihufd")]
+    public void ThrowsExceptionOnWrongFieldType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "entity": "ufbrdeyhov",
+              "field": "heuiyrndfosgv"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanReturning>(input, _options)
         );
     }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
+#pragma warning disable xUnit1004
     [Theory(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
-    [InlineData( /*lang=json,strict*/
-        """{"type": {"name":"boolean"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"entity": "ufbrdeyhov","name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"ihufd"},"name": "erfinjdhksgt"}"""
-    )]
-    public void ThrowsExceptionOnWrongParameterType(string input)
+#pragma warning restore xUnit1004
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("ihufd")]
+    public void ThrowsExceptionOnWrongParameterType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "name": "erfinjdhksgt"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanReturning>(input, _options)
         );
     }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
+#pragma warning disable xUnit1004
     [Theory(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"uuid"},"value": true}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value": true}"""
-    )]
-    public void ThrowsExceptionOnWrongScalarType(string input)
+#pragma warning restore xUnit1004
+    [InlineData("datetime")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    public void ThrowsExceptionOnWrongScalarType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "value": true
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanReturning>(input, _options)
         );
