@@ -233,9 +233,7 @@ public sealed record BooleanReturningConverterTests
         Assert.Equal(new BooleanScalar(true), andOperator.Conditions.Last().AsT2);
     }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-    [Theory(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
+    [Theory]
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
     [InlineData("""{"asdasd":   }""")]
