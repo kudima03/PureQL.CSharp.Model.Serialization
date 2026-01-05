@@ -33,7 +33,15 @@ public sealed record UuidReturningConverterTests
         const string expectedEntity = "uheayfodrbniJ";
         const string expectedField = "ubhjedwasuyhgbefrda";
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"uuid"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
 
         UuidField field = JsonSerializer
             .Deserialize<UuidReturning>(input, _options)!
@@ -75,7 +83,14 @@ public sealed record UuidReturningConverterTests
         const string paramName = "auryehgfbduygbhaerf";
 
         const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"uuid"},"name": "{{paramName}}"}""";
+            $$"""
+            {
+              "type": {
+                "name": "uuid"
+              },
+              "name": "{{paramName}}"
+            }
+            """;
 
         UuidParameter parameter = JsonSerializer
             .Deserialize<UuidReturning>(input, _options)!
@@ -163,102 +178,75 @@ public sealed record UuidReturningConverterTests
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"ihufd"},"entity": "ufbrdeyhov","field": "heuiyrndfosgv"}"""
-    )]
-    public void ThrowsExceptionOnWrongFieldType(string input)
+    [InlineData("date")]
+    [InlineData("boolean")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("ihufd")]
+    public void ThrowsExceptionOnWrongFieldType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "entity": "ufbrdeyhov",
+              "field": "heuiyrndfosgv"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<UuidReturning>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type": {"name":"date"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"name": "erfinjdhksgt"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"ihufd"},"name": "erfinjdhksgt"}"""
-    )]
-    public void ThrowsExceptionOnWrongParameterType(string input)
+    [InlineData("date")]
+    [InlineData("boolean")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("ihufd")]
+    public void ThrowsExceptionOnWrongParameterType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "name": "erfinjdhksgt"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<UuidReturning>(input, _options)
         );
     }
 
     [Theory]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"date"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"boolean"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"null"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"datetime"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"number"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"string"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"type":{"name":"time"},"value": "hbgfrtdvsdhcif"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"value": "hbgfrtdvsdhcif"}"""
-    )]
-    public void ThrowsExceptionOnWrongScalarType(string input)
+    [InlineData("date")]
+    [InlineData("boolean")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    public void ThrowsExceptionOnWrongScalarType(string typeName)
     {
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "value": "hbgfrtdvsdhcif"
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<UuidReturning>(input, _options)
         );
