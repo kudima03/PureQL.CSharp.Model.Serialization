@@ -463,12 +463,7 @@ public sealed record NotOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteEqualitycondition()
     {
         const string expected = /*lang=json,strict*/
@@ -476,20 +471,20 @@ public sealed record NotOperatorConverterTests
             {
               "operator": "not",
               "condition": {
-                  "operator": "equal",
-                  "left": {
-                    "type": {
-                      "name": "boolean"
-                    },
-                    "value": false
+                "operator": "equal",
+                "left": {
+                  "type": {
+                    "name": "boolean"
                   },
-                  "right": {
-                    "type": {
-                      "name": "boolean"
-                    },
-                    "value": true
-                  }
+                  "value": false
+                },
+                "right": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
                 }
+              }
             }
             """;
 
