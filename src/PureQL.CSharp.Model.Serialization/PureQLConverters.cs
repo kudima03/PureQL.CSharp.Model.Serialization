@@ -2,6 +2,7 @@ using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Serialization.BooleanOperations;
+using PureQL.CSharp.Model.Serialization.Comparisons;
 using PureQL.CSharp.Model.Serialization.Equalities;
 using PureQL.CSharp.Model.Serialization.Fields;
 using PureQL.CSharp.Model.Serialization.Parameters;
@@ -60,6 +61,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new StringScalarConverter();
         yield return new TimeScalarConverter();
         yield return new UuidScalarConverter();
+        yield return new DateComparisonConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
         yield return new TypeConverter<DateTimeType>();
