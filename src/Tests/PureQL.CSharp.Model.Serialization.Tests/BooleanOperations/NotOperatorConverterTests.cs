@@ -394,13 +394,8 @@ public sealed record NotOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
-    public void ReadEqualitycondition()
+    [Fact]
+    public void ReadEqualityCondition()
     {
         const string input = /*lang=json,strict*/
             """
