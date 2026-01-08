@@ -189,7 +189,9 @@ public sealed record BooleanReturningConverterTests
             }
             """;
 
-        BooleanEquality equality = JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT3.AsT0;
+        BooleanEquality equality = JsonSerializer
+            .Deserialize<BooleanReturning>(input, _options)!
+            .AsT3.AsT0;
 
         Assert.Equal(new BooleanField("u", "active"), equality.Left.AsT0);
         Assert.Equal(new BooleanScalar(true), equality.Right.AsT2);
