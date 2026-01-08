@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Serialization.Arithmetics;
 using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
 using PureQL.CSharp.Model.Serialization.Equalities;
@@ -67,6 +68,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new StringComparisonConverter();
         yield return new TimeComparisonConverter();
         yield return new ComparisonConverter();
+        yield return new AddConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
         yield return new TypeConverter<DateTimeType>();
