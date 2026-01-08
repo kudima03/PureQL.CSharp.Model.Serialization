@@ -235,12 +235,7 @@ public sealed record NotOperatorConverterTests
         Assert.Equal(value.Condition.AsT1, new BooleanParameter(expectedParamName));
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
