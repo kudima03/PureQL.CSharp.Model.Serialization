@@ -15,6 +15,6 @@
     <PackageProjectUrl>https://github.com/kudima03/PureQL.CSharp.Model.Serialization</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.4.0.0" />
+    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.5.0.0" />
   </ItemGroup>
 </Project>
