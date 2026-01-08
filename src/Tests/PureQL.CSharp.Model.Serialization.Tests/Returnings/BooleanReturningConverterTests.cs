@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
+using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -165,9 +166,7 @@ public sealed record BooleanReturningConverterTests
         Assert.Equal(expectedOutput, output);
     }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-    [Fact(Skip = "NotImplemented")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
+    [Fact]
     public void ReadEquality()
     {
         const string input = /*lang=json,strict*/
@@ -190,9 +189,10 @@ public sealed record BooleanReturningConverterTests
             }
             """;
 
-        Assert.NotNull(
-            JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT3
-        );
+        BooleanEquality equality = JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT3.AsT0;
+
+        Assert.Equal(new BooleanField("u", "active"), equality.Left.AsT0);
+        Assert.Equal(new BooleanScalar(true), equality.Right.AsT2);
     }
 
     [Fact]
