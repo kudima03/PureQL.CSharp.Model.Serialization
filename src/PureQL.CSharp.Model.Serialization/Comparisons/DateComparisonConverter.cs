@@ -23,8 +23,8 @@ internal sealed record DateComparisonJsonModel
     )
     {
         Operator = @operator;
-        Left = left?? throw new JsonException();
-        Right = right?? throw new JsonException();
+        Left = left ?? throw new JsonException();
+        Right = right ?? throw new JsonException();
     }
 
     public ComparisonOperatorJsonModel Operator { get; }
