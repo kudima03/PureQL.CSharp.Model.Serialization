@@ -314,12 +314,7 @@ public sealed record NotOperatorConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -345,8 +340,6 @@ public sealed record NotOperatorConverterTests
                 }
             }
             """;
-
-        NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<NotOperator>(input, _options)
