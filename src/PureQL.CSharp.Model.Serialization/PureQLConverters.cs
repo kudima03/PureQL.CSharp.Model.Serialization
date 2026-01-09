@@ -72,6 +72,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new SubtractConverter();
         yield return new MultiplyConverter();
         yield return new DivideConverter();
+        yield return new ArithmeticConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
         yield return new TypeConverter<DateTimeType>();
