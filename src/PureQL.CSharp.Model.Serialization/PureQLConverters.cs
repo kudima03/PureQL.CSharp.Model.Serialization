@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Serialization.Aggregates.Date;
 using PureQL.CSharp.Model.Serialization.Arithmetics;
 using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
@@ -73,6 +74,9 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new MultiplyConverter();
         yield return new DivideConverter();
         yield return new ArithmeticConverter();
+        yield return new MaxDateConverter();
+        yield return new MinDateConverter();
+        yield return new AverageDateConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
         yield return new TypeConverter<DateTimeType>();
