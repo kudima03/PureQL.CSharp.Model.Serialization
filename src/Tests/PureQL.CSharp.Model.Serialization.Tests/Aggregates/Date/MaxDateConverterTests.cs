@@ -107,7 +107,7 @@ public sealed record MaxDateConverterTests
         const string input = /*lang=json,strict*/
             """
             {
-              "operator": "max_date",
+              "operator": "max_date"
             }
             """;
 
@@ -170,7 +170,7 @@ public sealed record MaxDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -188,7 +188,7 @@ public sealed record MaxDateConverterTests
                   "type": {
                     "name": "{{type}}"
                   },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}"
+                  "value": {{JsonSerializer.Serialize(now, _options)}}
                 }
             }
             """;

@@ -170,7 +170,7 @@ public sealed record MinDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -188,7 +188,7 @@ public sealed record MinDateConverterTests
                   "type": {
                     "name": "{{type}}"
                   },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}"
+                  "value": {{JsonSerializer.Serialize(now, _options)}}
                 }
             }
             """;
