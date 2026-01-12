@@ -177,6 +177,7 @@ public sealed record AverageDateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
         DateOnly now = DateOnly.FromDateTime(DateTime.Now);
@@ -245,13 +246,14 @@ public sealed record AverageDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("ehufry")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -259,7 +261,7 @@ public sealed record AverageDateConverterTests
         string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "not",
+              "operator": "average_date",
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {

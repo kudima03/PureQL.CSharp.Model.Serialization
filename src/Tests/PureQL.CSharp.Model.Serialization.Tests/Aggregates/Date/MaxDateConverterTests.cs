@@ -177,6 +177,7 @@ public sealed record MaxDateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("hiujerfndsa")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
         DateOnly now = DateOnly.FromDateTime(DateTime.Now);
@@ -245,13 +246,14 @@ public sealed record MaxDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("eharuinjfg")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -259,7 +261,7 @@ public sealed record MaxDateConverterTests
         string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "not",
+              "operator": "max_date",
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
