@@ -90,6 +90,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new AverageNumberConverter();
         yield return new SumNumberConverter();
         yield return new MaxStringConverter();
+        yield return new MinStringConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
         yield return new TypeConverter<DateTimeType>();
