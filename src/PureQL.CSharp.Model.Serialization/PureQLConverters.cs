@@ -99,6 +99,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new MinTimeConverter();
         yield return new FromExpressionConverter();
         yield return new TimeAggregateConverter();
+        yield return new JoinConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
         yield return new TypeConverter<DateTimeType>();
