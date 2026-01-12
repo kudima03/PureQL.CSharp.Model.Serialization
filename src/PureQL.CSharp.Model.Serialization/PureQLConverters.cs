@@ -11,6 +11,7 @@ using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
 using PureQL.CSharp.Model.Serialization.Equalities;
 using PureQL.CSharp.Model.Serialization.Fields;
+using PureQL.CSharp.Model.Serialization.FromExpression;
 using PureQL.CSharp.Model.Serialization.Parameters;
 using PureQL.CSharp.Model.Serialization.Returnings;
 using PureQL.CSharp.Model.Serialization.Scalars;
@@ -97,6 +98,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new AverageTimeConverter();
         yield return new MaxTimeConverter();
         yield return new MinTimeConverter();
+        yield return new FromExpressionConverter();
         yield return new TimeAggregateConverter();
         yield return new TypeConverter<BooleanType>();
         yield return new TypeConverter<DateType>();
