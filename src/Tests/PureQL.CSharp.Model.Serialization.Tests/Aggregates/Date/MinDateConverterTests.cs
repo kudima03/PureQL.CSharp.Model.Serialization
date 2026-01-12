@@ -328,7 +328,7 @@ public sealed record MinDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -345,7 +345,7 @@ public sealed record MinDateConverterTests
             {
               "operator": "min_date",
               "arg": {
-                  "entity": "{{expectedEntityName}}"
+                  "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
                     "name": "{{type}}"

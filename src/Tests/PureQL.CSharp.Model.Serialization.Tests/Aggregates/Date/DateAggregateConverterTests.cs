@@ -279,7 +279,7 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -296,7 +296,7 @@ public sealed record DateAggregateConverterTests
             {
               "operator": "average_date",
               "arg": {
-                  "entity": "{{expectedEntityName}}"
+                  "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
                     "name": "{{type}}"
@@ -572,7 +572,7 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -589,7 +589,7 @@ public sealed record DateAggregateConverterTests
             {
               "operator": "max_date",
               "arg": {
-                  "entity": "{{expectedEntityName}}"
+                  "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
                     "name": "{{type}}"
@@ -865,7 +865,7 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -882,7 +882,7 @@ public sealed record DateAggregateConverterTests
             {
               "operator": "min_date",
               "arg": {
-                  "entity": "{{expectedEntityName}}"
+                  "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
                     "name": "{{type}}"

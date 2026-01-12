@@ -328,7 +328,7 @@ public sealed record MaxDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -345,7 +345,7 @@ public sealed record MaxDateConverterTests
             {
               "operator": "max_date",
               "arg": {
-                  "entity": "{{expectedEntityName}}"
+                  "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
                     "name": "{{type}}"

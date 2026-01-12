@@ -328,7 +328,7 @@ public sealed record AverageDateConverterTests
     }
 
     [Theory]
-    [InlineData("date")]
+    [InlineData("boolean")]
     [InlineData("datetime")]
     [InlineData("null")]
     [InlineData("number")]
@@ -345,7 +345,7 @@ public sealed record AverageDateConverterTests
             {
               "operator": "average_date",
               "arg": {
-                  "entity": "{{expectedEntityName}}"
+                  "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
                     "name": "{{type}}"
