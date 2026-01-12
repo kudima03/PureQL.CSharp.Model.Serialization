@@ -22,8 +22,8 @@ internal sealed record JoinJsonModel
     public JoinJsonModel(JoinTypeJsonModel type, string entity, BooleanReturning on)
     {
         Type = type;
-        Entity = entity;
-        On = on;
+        Entity = entity ?? throw new JsonException();
+        On = on ?? throw new JsonException();
     }
 
     public JoinTypeJsonModel Type { get; }
