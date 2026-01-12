@@ -11,7 +11,6 @@ using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
 using PureQL.CSharp.Model.Serialization.Equalities;
 using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.FromExpression;
 using PureQL.CSharp.Model.Serialization.Parameters;
 using PureQL.CSharp.Model.Serialization.Returnings;
 using PureQL.CSharp.Model.Serialization.Scalars;

@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace PureQL.CSharp.Model.Serialization.FromExpression;
+namespace PureQL.CSharp.Model.Serialization;
 
 internal sealed record FromExpressionJsonModel
 {
-    public FromExpressionJsonModel(Model.FromExpression expression)
+    public FromExpressionJsonModel(FromExpression expression)
         : this(expression.Entity, expression.Alias) { }
 
     [JsonConstructor]
@@ -20,9 +20,9 @@ internal sealed record FromExpressionJsonModel
     public string Alias { get; }
 }
 
-internal sealed class FromExpressionConverter : JsonConverter<Model.FromExpression>
+internal sealed class FromExpressionConverter : JsonConverter<FromExpression>
 {
-    public override Model.FromExpression Read(
+    public override FromExpression Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options
@@ -31,12 +31,12 @@ internal sealed class FromExpressionConverter : JsonConverter<Model.FromExpressi
         FromExpressionJsonModel model =
             JsonSerializer.Deserialize<FromExpressionJsonModel>(ref reader, options)!;
 
-        return new Model.FromExpression(model.Entity, model.Alias);
+        return new FromExpression(model.Entity, model.Alias);
     }
 
     public override void Write(
         Utf8JsonWriter writer,
-        Model.FromExpression value,
+        FromExpression value,
         JsonSerializerOptions options
     )
     {
