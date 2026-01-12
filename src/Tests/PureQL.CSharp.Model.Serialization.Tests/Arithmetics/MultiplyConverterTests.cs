@@ -251,10 +251,12 @@ public sealed record MultiplyConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Multiply([
-                new NumberReturning(new NumberScalar(expectedValue1)),
-                new NumberReturning(new NumberScalar(expectedValue2)),
-            ]),
+            new Multiply(
+                [
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -365,10 +367,12 @@ public sealed record MultiplyConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Multiply([
-                new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                new NumberReturning(new NumberParameter(expectedSecondParamName)),
-            ]),
+            new Multiply(
+                [
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -494,14 +498,16 @@ public sealed record MultiplyConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Multiply([
-                new NumberReturning(
-                    new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new NumberReturning(
-                    new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-                ),
-            ]),
+            new Multiply(
+                [
+                    new NumberReturning(
+                        new NumberField(expectedFirstEntityName, expectedFirstFieldName)
+                    ),
+                    new NumberReturning(
+                        new NumberField(expectedSecondEntityName, expectedSecondFieldName)
+                    ),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -594,13 +600,15 @@ public sealed record MultiplyConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Multiply([
-                new NumberReturning(new NumberScalar(expectedValue)),
-                new NumberReturning(
-                    new NumberField(expectedEntityName, expectedFieldName)
-                ),
-                new NumberReturning(new NumberParameter(expectedParamName)),
-            ]),
+            new Multiply(
+                [
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(
+                        new NumberField(expectedEntityName, expectedFieldName)
+                    ),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ]
+            ),
             _options
         );
         Assert.Equal(expected, value);
