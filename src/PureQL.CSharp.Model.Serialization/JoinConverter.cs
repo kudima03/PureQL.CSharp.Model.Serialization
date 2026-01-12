@@ -46,7 +46,9 @@ internal sealed class JoinConverter : JsonConverter<Join>
             options
         )!;
 
-        return new Join((JoinType)(model.Type - 1), model.Entity, model.On);
+        return model.Type == JoinTypeJsonModel.None
+            ? throw new JsonException()
+            : new Join((JoinType)(model.Type - 1), model.Entity, model.On);
     }
 
     public override void Write(
