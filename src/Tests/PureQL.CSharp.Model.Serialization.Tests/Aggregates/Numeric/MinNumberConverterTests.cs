@@ -295,9 +295,7 @@ public sealed record MinNumberConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new MinNumber(
-                new NumberReturning(new NumberParameter(expectedParamName))
-            ),
+            new MinNumber(new NumberReturning(new NumberParameter(expectedParamName))),
             _options
         );
         Assert.Equal(expected, value);

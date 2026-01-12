@@ -295,9 +295,7 @@ public sealed record MaxNumberConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new MaxNumber(
-                new NumberReturning(new NumberParameter(expectedParamName))
-            ),
+            new MaxNumber(new NumberReturning(new NumberParameter(expectedParamName))),
             _options
         );
         Assert.Equal(expected, value);

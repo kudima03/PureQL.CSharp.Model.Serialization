@@ -165,10 +165,7 @@ public sealed record MinDateTimeConverterTests
             }
             """;
 
-        MinDateTime value = JsonSerializer.Deserialize<MinDateTime>(
-            input,
-            _options
-        )!;
+        MinDateTime value = JsonSerializer.Deserialize<MinDateTime>(input, _options)!;
         Assert.Equal(new DateTimeScalar(now), value.Argument.AsT2);
     }
 
@@ -244,10 +241,7 @@ public sealed record MinDateTimeConverterTests
             }
             """;
 
-        MinDateTime value = JsonSerializer.Deserialize<MinDateTime>(
-            input,
-            _options
-        )!;
+        MinDateTime value = JsonSerializer.Deserialize<MinDateTime>(input, _options)!;
         Assert.Equal(new DateTimeParameter(expectedParamName), value.Argument.AsT1);
     }
 
@@ -328,10 +322,7 @@ public sealed record MinDateTimeConverterTests
             }
             """;
 
-        MinDateTime value = JsonSerializer.Deserialize<MinDateTime>(
-            input,
-            _options
-        )!;
+        MinDateTime value = JsonSerializer.Deserialize<MinDateTime>(input, _options)!;
         Assert.Equal(
             new DateTimeField(expectedEntityName, expectedFieldName),
             value.Argument.AsT0

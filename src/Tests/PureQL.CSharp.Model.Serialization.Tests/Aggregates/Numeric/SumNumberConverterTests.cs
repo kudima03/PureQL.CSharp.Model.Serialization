@@ -295,9 +295,7 @@ public sealed record SumNumberConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new SumNumber(
-                new NumberReturning(new NumberParameter(expectedParamName))
-            ),
+            new SumNumber(new NumberReturning(new NumberParameter(expectedParamName))),
             _options
         );
         Assert.Equal(expected, value);
