@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Serialization.Aggregates.Date;
 using PureQL.CSharp.Model.Serialization.Aggregates.DateTime;
+using PureQL.CSharp.Model.Serialization.Aggregates.Numeric;
 using PureQL.CSharp.Model.Serialization.Arithmetics;
 using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
