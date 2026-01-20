@@ -254,4 +254,28 @@ public sealed record DateTimeReturningConverterTests
             JsonSerializer.Deserialize<DateTimeReturning>(input, _options)
         );
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("asdasd")]
+    [InlineData("123123123123")]
+    [InlineData("2000-01-01 asdasd")]
+    [InlineData("ghjghjghj 2000-01-01")]
+    [InlineData("ghjghjghj 2000-01-01 tyhjghj")]
+    [InlineData("17:05:49.8658905")]
+    public void ThrowsExceptionOnWrongValue(string value)
+    {
+        string input = $$"""
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "value": "{{value}}"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<DateTimeReturning>(input, _options)
+        );
+    }
 }
