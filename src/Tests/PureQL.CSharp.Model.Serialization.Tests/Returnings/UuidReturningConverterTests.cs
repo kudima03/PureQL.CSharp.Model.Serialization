@@ -219,7 +219,7 @@ public sealed record UuidReturningConverterTests
               "type": {
                 "name": "{{typeName}}"
               },
-              "name": "erfinjdhksgt"
+              "value": "{{Guid.CreateVersion7()}}"
             }
             """;
 
@@ -243,7 +243,7 @@ public sealed record UuidReturningConverterTests
               "type": {
                 "name": "{{typeName}}"
               },
-              "value": "hbgfrtdvsdhcif"
+              "value": "{{Guid.CreateVersion7()}}"
             }
             """;
 
