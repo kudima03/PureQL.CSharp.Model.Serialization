@@ -219,7 +219,10 @@ public sealed record TimeReturningConverterTests
               "type": {
                 "name": "{{typeName}}"
               },
-              "name": "erfinjdhksgt"
+              "value": "{{JsonSerializer.Serialize(
+                TimeOnly.FromDateTime(DateTime.Now),
+                _options
+            )}}"
             }
             """;
 
@@ -243,7 +246,10 @@ public sealed record TimeReturningConverterTests
               "type": {
                 "name": "{{typeName}}"
               },
-              "value": "hbgfrtdvsdhcif"
+              "value": "{{JsonSerializer.Serialize(
+                TimeOnly.FromDateTime(DateTime.Now),
+                _options
+            )}}"
             }
             """;
 
