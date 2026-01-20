@@ -246,7 +246,7 @@ public sealed record NumberReturningConverterTests
               "type": {
                 "name": "{{typeName}}"
               },
-              "value": "2025-12-24T15:20:36.6778291+03:00"
+              "value": 10
             }
             """;
 
