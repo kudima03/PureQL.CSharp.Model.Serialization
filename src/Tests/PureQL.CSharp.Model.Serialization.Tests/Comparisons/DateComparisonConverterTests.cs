@@ -180,7 +180,7 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
@@ -206,7 +206,7 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": null
             }
@@ -234,7 +234,7 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
@@ -260,7 +260,7 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": []
             }
@@ -287,7 +287,7 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": {}
             }
@@ -314,7 +314,7 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "left": {}
             }
@@ -341,13 +341,13 @@ public sealed record DateComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": {
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;

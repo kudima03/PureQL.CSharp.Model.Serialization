@@ -180,7 +180,7 @@ public sealed record NumberComparisonConverterTests
                 "type": {
                   "name": "number"
                 },
-                "value": {{JsonSerializer.Serialize(value)}}
+                "value": {{JsonSerializer.Serialize(value, _options)}}
               }
             }
             """;

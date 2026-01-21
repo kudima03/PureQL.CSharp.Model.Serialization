@@ -134,7 +134,7 @@ public sealed record DateTimeReturningConverterTests
               "type": {
                 "name": "datetime"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 
@@ -156,7 +156,7 @@ public sealed record DateTimeReturningConverterTests
               "type": {
                 "name": "datetime"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 

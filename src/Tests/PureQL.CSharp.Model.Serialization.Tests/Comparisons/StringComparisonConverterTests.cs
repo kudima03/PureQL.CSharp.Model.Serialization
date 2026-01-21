@@ -181,7 +181,7 @@ public sealed record StringComparisonConverterTests
                 "type": {
                   "name": "string"
                 },
-                "value": {{JsonSerializer.Serialize(value)}}
+                "value": {{JsonSerializer.Serialize(value, _options)}}
               }
             }
             """;

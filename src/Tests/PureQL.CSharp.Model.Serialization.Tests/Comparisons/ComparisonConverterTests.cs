@@ -182,7 +182,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
@@ -208,7 +208,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": null
             }
@@ -236,7 +236,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
@@ -262,7 +262,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": []
             }
@@ -289,7 +289,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": {}
             }
@@ -316,7 +316,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "left": {}
             }
@@ -343,13 +343,13 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               },
               "right": {
                 "type": {
                   "name": "date"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
@@ -946,7 +946,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "datetime"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
@@ -1628,7 +1628,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "number"
                 },
-                "value": {{JsonSerializer.Serialize(value)}}
+                "value": {{JsonSerializer.Serialize(value, _options)}}
               }
             }
             """;
@@ -2257,7 +2257,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "string"
                 },
-                "value": {{JsonSerializer.Serialize(value)}}
+                "value": {{JsonSerializer.Serialize(value, _options)}}
               }
             }
             """;
@@ -2886,7 +2886,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "time"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;

@@ -57,7 +57,7 @@ public sealed record DateTimeScalarConverterTests
               "type": {
                 "name": "datetime"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 

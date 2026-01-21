@@ -133,7 +133,7 @@ public sealed record TimeReturningConverterTests
               "type": {
                 "name": "time"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
         TimeScalar scalar = JsonSerializer
@@ -153,7 +153,7 @@ public sealed record TimeReturningConverterTests
               "type": {
                 "name": "time"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 

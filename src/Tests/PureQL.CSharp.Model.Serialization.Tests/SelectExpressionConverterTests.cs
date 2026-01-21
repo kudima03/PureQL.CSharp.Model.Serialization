@@ -638,7 +638,7 @@ public sealed record SelectExpressionConverterTests
               "type": {
                 "name": "datetime"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 
@@ -660,7 +660,7 @@ public sealed record SelectExpressionConverterTests
               "type": {
                 "name": "datetime"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 
@@ -1139,7 +1139,7 @@ public sealed record SelectExpressionConverterTests
               "type": {
                 "name": "time"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
         TimeScalar scalar = JsonSerializer
@@ -1159,7 +1159,7 @@ public sealed record SelectExpressionConverterTests
               "type": {
                 "name": "time"
               },
-              "value": {{JsonSerializer.Serialize(expectedValue)}}
+              "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
 

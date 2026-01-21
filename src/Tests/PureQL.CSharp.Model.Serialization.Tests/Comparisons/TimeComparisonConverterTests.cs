@@ -181,7 +181,7 @@ public sealed record TimeComparisonConverterTests
                 "type": {
                   "name": "time"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;

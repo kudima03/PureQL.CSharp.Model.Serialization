@@ -180,7 +180,7 @@ public sealed record DateTimeComparisonConverterTests
                 "type": {
                   "name": "datetime"
                 },
-                "value": {{JsonSerializer.Serialize(now)}}
+                "value": {{JsonSerializer.Serialize(now, _options)}}
               }
             }
             """;
