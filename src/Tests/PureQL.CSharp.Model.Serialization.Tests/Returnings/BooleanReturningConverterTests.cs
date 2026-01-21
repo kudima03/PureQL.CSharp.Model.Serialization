@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
+using PureQL.CSharp.Model.Comparisons;
 using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
@@ -234,6 +235,90 @@ public sealed record BooleanReturningConverterTests
             andOperator.Conditions.First().AsT0
         );
         Assert.Equal(new BooleanScalar(true), andOperator.Conditions.Last().AsT2);
+    }
+
+    [Fact]
+    public void ReadComparison()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "efrnijk";
+        const ushort rightValue = 12;
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "greaterThan",
+              "left": {
+                "entity": "{{expectedEntity}}",
+                "field": "{{expectedField}}",
+                "type": {
+                  "name": "number"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": {{rightValue}}
+              }
+            }
+            """;
+
+        NumberComparison comparison = JsonSerializer
+            .Deserialize<BooleanReturning>(input, _options)!
+            .AsT5.AsT2;
+
+        Assert.Equal(
+            new NumberComparison(
+                ComparisonOperator.GreaterThan,
+                new NumberReturning(new NumberField(expectedEntity, expectedField)),
+                new NumberReturning(new NumberScalar(rightValue))
+            ),
+            comparison
+        );
+    }
+
+    [Fact]
+    public void WriteComparison()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "efrnijk";
+        const ushort rightValue = 12;
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "greaterThan",
+              "left": {
+                "entity": "{{expectedEntity}}",
+                "field": "{{expectedField}}",
+                "type": {
+                  "name": "number"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": {{rightValue}}
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanReturning(
+                new Comparison(
+                    new NumberComparison(
+                        ComparisonOperator.GreaterThan,
+                        new NumberReturning(
+                            new NumberField(expectedEntity, expectedField)
+                        ),
+                        new NumberReturning(new NumberScalar(rightValue))
+                    )
+                )
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
