@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Returnings;
 
@@ -6,6 +7,8 @@ namespace PureQL.CSharp.Model.Serialization;
 
 internal sealed class SelectExpressionConverter : JsonConverter<SelectExpression>
 {
+    private const string AliasFieldName = "alias";
+
     public override SelectExpression Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
@@ -15,28 +18,34 @@ internal sealed class SelectExpressionConverter : JsonConverter<SelectExpression
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
+        string? alias = null;
+        if (root.TryGetProperty(AliasFieldName, out JsonElement aliasElement))
+        {
+            alias = aliasElement.GetString();
+        }
+
         return JsonExtensions.TryDeserialize(root, options, out BooleanReturning? boolean)
-                ? new SelectExpression(boolean!)
+                ? new SelectExpression(boolean!, alias)
             : JsonExtensions.TryDeserialize(root, options, out NumberReturning? number)
-                ? new SelectExpression(number!)
+                ? new SelectExpression(number!, alias)
             : JsonExtensions.TryDeserialize(root, options, out UuidReturning? uuid)
-                ? new SelectExpression(uuid!)
+                ? new SelectExpression(uuid!, alias)
             : JsonExtensions.TryDeserialize(root, options, out DateReturning? date)
-                ? new SelectExpression(date!)
+                ? new SelectExpression(date!, alias)
             : JsonExtensions.TryDeserialize(root, options, out TimeReturning? time)
-                ? new SelectExpression(time!)
+                ? new SelectExpression(time!, alias)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out DateTimeReturning? dateTime
             )
-                ? new SelectExpression(dateTime!)
+                ? new SelectExpression(dateTime!, alias)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out StringReturning? stringModel
             )
-                ? new SelectExpression(stringModel!)
+                ? new SelectExpression(stringModel!, alias)
             : throw new JsonException("Unable to determine SelectExpression type.");
     }
 
@@ -46,37 +55,23 @@ internal sealed class SelectExpressionConverter : JsonConverter<SelectExpression
         JsonSerializerOptions options
     )
     {
-        if (value.IsT0)
+        JsonNode node = value switch
         {
-            JsonSerializer.Serialize(writer, value.AsT0, options);
-        }
-        else if (value.IsT1)
+            var v when v.IsT0 => JsonSerializer.SerializeToNode(v.AsT0, options)!,
+            var v when v.IsT1 => JsonSerializer.SerializeToNode(v.AsT1, options)!,
+            var v when v.IsT2 => JsonSerializer.SerializeToNode(v.AsT2, options)!,
+            var v when v.IsT3 => JsonSerializer.SerializeToNode(v.AsT3, options)!,
+            var v when v.IsT4 => JsonSerializer.SerializeToNode(v.AsT4, options)!,
+            var v when v.IsT5 => JsonSerializer.SerializeToNode(v.AsT5, options)!,
+            var v when v.IsT6 => JsonSerializer.SerializeToNode(v.AsT6, options)!,
+            _ => throw new JsonException("Unable to determine SelectExpression type."),
+        };
+
+        if (value.Alias is not null)
         {
-            JsonSerializer.Serialize(writer, value.AsT1, options);
+            node[AliasFieldName] = value.Alias;
         }
-        else if (value.IsT2)
-        {
-            JsonSerializer.Serialize(writer, value.AsT2, options);
-        }
-        else if (value.IsT3)
-        {
-            JsonSerializer.Serialize(writer, value.AsT3, options);
-        }
-        else if (value.IsT4)
-        {
-            JsonSerializer.Serialize(writer, value.AsT4, options);
-        }
-        else if (value.IsT5)
-        {
-            JsonSerializer.Serialize(writer, value.AsT5, options);
-        }
-        else if (value.IsT6)
-        {
-            JsonSerializer.Serialize(writer, value.AsT6, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine SelectExpression type.");
-        }
+
+        node.WriteTo(writer, options);
     }
 }
