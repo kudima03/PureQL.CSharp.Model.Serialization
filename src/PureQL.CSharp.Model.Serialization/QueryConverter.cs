@@ -10,7 +10,7 @@ internal sealed record QueryJsonModel
     public QueryJsonModel(Query query)
         : this(
             query.From,
-            query.Select,
+            query.SelectExpressions,
             query.Where,
             query.Join,
             query.GroupBy,
@@ -23,7 +23,7 @@ internal sealed record QueryJsonModel
     [JsonConstructor]
     public QueryJsonModel(
         FromExpression from,
-        SelectExpression select,
+        IEnumerable<SelectExpression> selectExpressions,
         BooleanReturning? where,
         IEnumerable<Join>? join,
         IEnumerable<Field>? groupBy,
@@ -33,7 +33,7 @@ internal sealed record QueryJsonModel
     )
     {
         From = from ?? throw new JsonException();
-        Select = select ?? throw new JsonException();
+        SelectExpressions = selectExpressions ?? throw new JsonException();
         Where = where;
         Join = join;
         GroupBy = groupBy;
@@ -44,7 +44,7 @@ internal sealed record QueryJsonModel
 
     public FromExpression From { get; }
 
-    public SelectExpression Select { get; }
+    public IEnumerable<SelectExpression> SelectExpressions { get; }
 
     public BooleanReturning? Where { get; }
 
@@ -74,7 +74,7 @@ internal sealed class QueryConverter : JsonConverter<Query>
 
         return new Query(
             model.From,
-            model.Select,
+            model.SelectExpressions,
             model.Where,
             model.Join,
             model.GroupBy,
