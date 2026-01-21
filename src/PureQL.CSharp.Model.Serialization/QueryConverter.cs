@@ -23,7 +23,7 @@ internal sealed record QueryJsonModel
     [JsonConstructor]
     public QueryJsonModel(
         FromExpression from,
-        IEnumerable<SelectExpression> selectExpressions,
+        IEnumerable<SelectExpression> select,
         BooleanReturning? where,
         IEnumerable<Join>? join,
         IEnumerable<Field>? groupBy,
@@ -33,7 +33,7 @@ internal sealed record QueryJsonModel
     )
     {
         From = from ?? throw new JsonException();
-        SelectExpressions = selectExpressions ?? throw new JsonException();
+        Select = select ?? throw new JsonException();
         Where = where;
         Join = join;
         GroupBy = groupBy;
@@ -44,18 +44,24 @@ internal sealed record QueryJsonModel
 
     public FromExpression From { get; }
 
-    public IEnumerable<SelectExpression> SelectExpressions { get; }
+    public IEnumerable<SelectExpression> Select { get; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public BooleanReturning? Where { get; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<Join>? Join { get; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<Field>? GroupBy { get; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public BooleanReturning? Having { get; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<Field>? OrderBy { get; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Pagination? Pagination { get; }
 }
 
@@ -74,7 +80,7 @@ internal sealed class QueryConverter : JsonConverter<Query>
 
         return new Query(
             model.From,
-            model.SelectExpressions,
+            model.Select,
             model.Where,
             model.Join,
             model.GroupBy,
