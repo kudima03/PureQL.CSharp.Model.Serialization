@@ -23,6 +23,12 @@ public sealed record SelectExpressionConverterTests
             WriteIndented = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true,
+            Encoder = System
+                .Text
+                .Encodings
+                .Web
+                .JavaScriptEncoder
+                .UnsafeRelaxedJsonEscaping,
         };
         foreach (JsonConverter converter in new PureQLConverters())
         {
@@ -270,6 +276,68 @@ public sealed record SelectExpressionConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<SelectExpression>(input, _options)
         );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("date")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    public void ReadAlias(string typeName)
+    {
+        const string expectedEntity = "sadiJUNFH";
+        const string expectedField = "dfijng";
+        const string expectedAlias = "regtnhjlnijlhregft";
+
+        string input = $$"""
+            {
+              "type": {
+                "name": "{{typeName}}"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "alias": "{{expectedAlias}}"
+            }
+            """;
+
+        SelectExpression value = JsonSerializer.Deserialize<SelectExpression>(
+            input,
+            _options
+        )!;
+
+        Assert.Equal(expectedAlias, value.Alias);
+    }
+
+    [Fact]
+    public void WriteAlias()
+    {
+        const string expectedEntity = "sadiJUNFH";
+        const string expectedField = "dfijng";
+        const string expectedAlias = "regtnhjlnijlhregft";
+
+        string expected = $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "boolean"
+              },
+              "alias": "{{expectedAlias}}"
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new SelectExpression(
+                new BooleanReturning(new BooleanField(expectedEntity, expectedField)),
+                expectedAlias
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
