@@ -38,6 +38,12 @@ internal sealed class BooleanReturningConverter : JsonConverter<BooleanReturning
                 out BooleanOperator? booleanOperator
             )
                 ? new BooleanReturning(booleanOperator!)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out Model.Comparisons.Comparison? comparison
+            )
+                ? new BooleanReturning(comparison!)
             : throw new JsonException("Unable to determine BooleanReturning type.");
     }
 
@@ -66,6 +72,10 @@ internal sealed class BooleanReturningConverter : JsonConverter<BooleanReturning
         else if (value.IsT4)
         {
             JsonSerializer.Serialize(writer, value.AsT4, options);
+        }
+        else if (value.IsT5)
+        {
+            JsonSerializer.Serialize(writer, value.AsT5, options);
         }
         else
         {
