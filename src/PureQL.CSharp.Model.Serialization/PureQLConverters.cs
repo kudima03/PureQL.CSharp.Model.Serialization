@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Serialization.Aggregates.Date;
 using PureQL.CSharp.Model.Serialization.Aggregates.DateTime;
 using PureQL.CSharp.Model.Serialization.Aggregates.Numeric;
@@ -111,6 +112,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new TypeConverter<StringType>();
         yield return new TypeConverter<TimeType>();
         yield return new TypeConverter<UuidType>();
+        yield return new TypeConverter<BooleanArrayType>();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
