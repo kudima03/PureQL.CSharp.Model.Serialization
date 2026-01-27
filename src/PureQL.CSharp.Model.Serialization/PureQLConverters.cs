@@ -118,6 +118,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new TypeConverter<NullArrayType>();
         yield return new TypeConverter<NumberArrayType>();
         yield return new TypeConverter<StringArrayType>();
+        yield return new TypeConverter<TimeArrayType>();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
