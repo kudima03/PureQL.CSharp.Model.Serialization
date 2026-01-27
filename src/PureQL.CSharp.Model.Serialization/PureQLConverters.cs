@@ -125,6 +125,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new DateArrayScalarConverter();
         yield return new DateTimeArrayScalarConverter();
         yield return new NullArrayScalarConverter();
+        yield return new NumberArrayScalarConverter();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
