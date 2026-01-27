@@ -8,6 +8,7 @@ using PureQL.CSharp.Model.Serialization.Aggregates.Numeric;
 using PureQL.CSharp.Model.Serialization.Aggregates.String;
 using PureQL.CSharp.Model.Serialization.Aggregates.Time;
 using PureQL.CSharp.Model.Serialization.Arithmetics;
+using PureQL.CSharp.Model.Serialization.ArrayParameters;
 using PureQL.CSharp.Model.Serialization.ArrayScalars;
 using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
@@ -129,6 +130,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new StringArrayScalarConverter();
         yield return new TimeArrayScalarConverter();
         yield return new UuidArrayScalarConverter();
+        yield return new BooleanArrayParameterConverter();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
