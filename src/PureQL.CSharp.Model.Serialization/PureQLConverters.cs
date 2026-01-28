@@ -140,6 +140,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new TimeArrayParameterConverter();
         yield return new UuidArrayParameterConverter();
         yield return new BooleanArrayReturningConverter();
+        yield return new DateArrayReturningConverter();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
