@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -28,48 +27,6 @@ public sealed record DateReturningConverterTests
     }
 
     [Fact]
-    public void ReadDateField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""{"type": {"name":"date"},"entity": "{{expectedEntity}}","field": "{{expectedField}}"}""";
-
-        DateField field = JsonSerializer
-            .Deserialize<DateReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteDateField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new DateReturning(new DateField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "date"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadDateParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
@@ -86,7 +43,7 @@ public sealed record DateReturningConverterTests
 
         DateParameter parameter = JsonSerializer
             .Deserialize<DateReturning>(input, _options)!
-            .AsT1;
+            .AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new DateType(), parameter.Type);
@@ -130,7 +87,7 @@ public sealed record DateReturningConverterTests
 
         DateScalar scalar = JsonSerializer
             .Deserialize<DateReturning>(input, _options)!
-            .AsT2;
+            .AsT1;
 
         Assert.Equal(DateOnly.FromDateTime(DateTime.Now), scalar.Value);
     }
