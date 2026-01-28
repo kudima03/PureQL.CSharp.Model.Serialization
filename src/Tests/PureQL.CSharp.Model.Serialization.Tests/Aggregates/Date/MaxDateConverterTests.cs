@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Date;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.Date;
 
@@ -40,7 +40,7 @@ public sealed record MaxDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record MaxDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record MaxDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -151,46 +151,64 @@ public sealed record MaxDateConverterTests
     [Fact]
     public void ReadScalarArgument()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "max_date",
-              "arg": {
-                  "type": {
-                    "name": "date"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         MaxDate value = JsonSerializer.Deserialize<MaxDate>(input, _options)!;
-        Assert.Equal(new DateScalar(now), value.Argument.AsT2);
+        Assert.Equal(new DateArrayScalar(expectedDates), value.Argument.AsT2);
     }
 
     [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("hiujerfndsa")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "max_date",
-              "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+              "type": {
+                "name": "{{type}}"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
@@ -202,22 +220,33 @@ public sealed record MaxDateConverterTests
     [Fact]
     public void WriteScalarArgument()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
         string expected = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "operator": "max_date",
               "arg": {
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
+                "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new MaxDate(new DateReturning(new DateScalar(now))),
+            new MaxDate(new DateArrayReturning(new DateArrayScalar(expectedDates))),
             _options
         );
         Assert.Equal(expected, value);
@@ -235,24 +264,24 @@ public sealed record MaxDateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
             """;
 
         MaxDate value = JsonSerializer.Deserialize<MaxDate>(input, _options)!;
-        Assert.Equal(value.Argument.AsT1, new DateParameter(expectedParamName));
+        Assert.Equal(value.Argument.AsT0, new DateArrayParameter(expectedParamName));
     }
 
     [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("eharuinjfg")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
@@ -287,14 +316,16 @@ public sealed record MaxDateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new MaxDate(new DateReturning(new DateParameter(expectedParamName))),
+            new MaxDate(
+                new DateArrayReturning(new DateArrayParameter(expectedParamName))
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -314,7 +345,7 @@ public sealed record MaxDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -322,19 +353,19 @@ public sealed record MaxDateConverterTests
 
         MaxDate value = JsonSerializer.Deserialize<MaxDate>(input, _options)!;
         Assert.Equal(
-            value.Argument.AsT0,
+            value.Argument.AsT1,
             new DateField(expectedEntityName, expectedFieldName)
         );
     }
 
     [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -373,7 +404,7 @@ public sealed record MaxDateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -381,7 +412,9 @@ public sealed record MaxDateConverterTests
 
         string value = JsonSerializer.Serialize(
             new MaxDate(
-                new DateReturning(new DateField(expectedEntityName, expectedFieldName))
+                new DateArrayReturning(
+                    new DateField(expectedEntityName, expectedFieldName)
+                )
             ),
             _options
         );

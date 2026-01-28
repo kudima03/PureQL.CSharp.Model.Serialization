@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.DateTime;
+using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.Returnings;
 
 namespace PureQL.CSharp.Model.Serialization.Aggregates.DateTime;
@@ -31,7 +32,7 @@ internal sealed record DateTimeAggregateJsonModel
     [JsonConstructor]
     public DateTimeAggregateJsonModel(
         DateTimeAggregateOperatorJsonModel @operator,
-        DateTimeReturning arg
+        DateTimeArrayReturning arg
     )
     {
         Operator = @operator;
@@ -40,5 +41,5 @@ internal sealed record DateTimeAggregateJsonModel
 
     public DateTimeAggregateOperatorJsonModel Operator { get; }
 
-    public DateTimeReturning Arg { get; }
+    public DateTimeArrayReturning Arg { get; }
 }

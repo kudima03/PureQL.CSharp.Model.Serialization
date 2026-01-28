@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -28,56 +27,6 @@ public sealed record UuidReturningConverterTests
     }
 
     [Fact]
-    public void ReadUuidField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "type": {
-                "name": "uuid"
-              },
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}"
-            }
-            """;
-
-        UuidField field = JsonSerializer
-            .Deserialize<UuidReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new UuidType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteUuidField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new UuidReturning(new UuidField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "uuid"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadUuidParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
@@ -94,7 +43,7 @@ public sealed record UuidReturningConverterTests
 
         UuidParameter parameter = JsonSerializer
             .Deserialize<UuidReturning>(input, _options)!
-            .AsT1;
+            .AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new UuidType(), parameter.Type);
@@ -138,7 +87,7 @@ public sealed record UuidReturningConverterTests
             """;
         UuidScalar scalar = JsonSerializer
             .Deserialize<UuidReturning>(input, _options)!
-            .AsT2;
+            .AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -172,32 +121,6 @@ public sealed record UuidReturningConverterTests
     [InlineData(" ")]
     public void ThrowsExceptionOnBadFormat(string input)
     {
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<UuidReturning>(input, _options)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("boolean")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("ihufd")]
-    public void ThrowsExceptionOnWrongFieldType(string typeName)
-    {
-        string input = $$"""
-            {
-              "type": {
-                "name": "{{typeName}}"
-              },
-              "entity": "ufbrdeyhov",
-              "field": "heuiyrndfosgv"
-            }
-            """;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<UuidReturning>(input, _options)
         );
