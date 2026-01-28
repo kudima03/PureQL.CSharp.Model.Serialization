@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
 
@@ -50,7 +50,7 @@ public sealed record BooleanArrayReturningConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new BooleanType(), field.Type);
+        Assert.Equal(new BooleanArrayType(), field.Type);
     }
 
     [Fact]
