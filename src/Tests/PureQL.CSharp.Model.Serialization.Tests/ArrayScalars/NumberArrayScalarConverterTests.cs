@@ -34,7 +34,7 @@ public sealed record NumberArrayScalarConverterTests
         ];
 
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "type": {
                 "name": "numberArray"
@@ -64,7 +64,7 @@ public sealed record NumberArrayScalarConverterTests
         ];
 
         string expected = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "type": {
                 "name": "numberArray"

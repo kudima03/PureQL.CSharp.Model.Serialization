@@ -29,7 +29,7 @@ public sealed record UuidArrayScalarConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "type": {
                 "name": "uuidArray"
@@ -54,7 +54,7 @@ public sealed record UuidArrayScalarConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string expectedJson = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "type": {
                 "name": "uuidArray"
