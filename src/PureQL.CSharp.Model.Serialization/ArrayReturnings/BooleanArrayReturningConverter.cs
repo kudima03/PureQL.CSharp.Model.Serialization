@@ -46,11 +46,11 @@ internal sealed class BooleanArrayReturningConverter
         {
             JsonSerializer.Serialize(writer, scalar, options);
         }
-        if (value.TryPickT1(out BooleanField? field, out _))
+        else if (value.TryPickT1(out BooleanField? field, out _))
         {
             JsonSerializer.Serialize(writer, field, options);
         }
-        if (value.TryPickT2(out BooleanArrayParameter? parameter, out _))
+        else if (value.TryPickT2(out BooleanArrayParameter? parameter, out _))
         {
             JsonSerializer.Serialize(writer, parameter, options);
         }
