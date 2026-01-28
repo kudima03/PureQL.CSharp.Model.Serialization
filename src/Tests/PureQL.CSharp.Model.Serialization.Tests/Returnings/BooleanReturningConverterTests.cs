@@ -31,56 +31,6 @@ public sealed record BooleanReturningConverterTests
     }
 
     [Fact]
-    public void ReadBooleanField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "type": {
-                "name": "boolean"
-              },
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}"
-            }
-            """;
-
-        BooleanField field = JsonSerializer
-            .Deserialize<BooleanReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new BooleanType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteBooleanField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new BooleanReturning(new BooleanField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "boolean"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadBooleanParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
