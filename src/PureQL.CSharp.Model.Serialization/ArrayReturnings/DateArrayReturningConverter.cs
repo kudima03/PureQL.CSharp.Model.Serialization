@@ -47,7 +47,7 @@ internal sealed class DateArrayReturningConverter : JsonConverter<DateArrayRetur
         }
         else if (value.TryPickT2(out DateArrayScalar? scalar, out _))
         {
-            JsonSerializer.Serialize(writer, scalar, options);
+            JsonSerializer.Serialize<IDateArrayScalar>(writer, scalar, options);
         }
         else
         {
