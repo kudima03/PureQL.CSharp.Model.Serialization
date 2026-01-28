@@ -5,7 +5,6 @@ using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
 
@@ -152,12 +151,15 @@ public sealed record BooleanArrayReturningConverterTests
             {
               "name": "{{name}}",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               }
             }
             """;
 
-        string output = JsonSerializer.Serialize(new BooleanParameter(name), _options);
+        string output = JsonSerializer.Serialize(
+            new BooleanArrayReturning(new BooleanArrayParameter(name)),
+            _options
+        );
 
         Assert.Equal(expected, output);
     }
