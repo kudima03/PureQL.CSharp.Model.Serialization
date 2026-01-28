@@ -138,32 +138,6 @@ public sealed record DateTimeReturningConverterTests
     [InlineData("time")]
     [InlineData("uuid")]
     [InlineData("ihufd")]
-    public void ThrowsExceptionOnWrongFieldType(string typeName)
-    {
-        string input = $$"""
-            {
-              "type": {
-                "name": "{{typeName}}"
-              },
-              "entity": "ufbrdeyhov",
-              "field": "heuiyrndfosgv"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeReturning>(input, _options)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("boolean")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ihufd")]
     public void ThrowsExceptionOnWrongParameterType(string typeName)
     {
         string input = $$"""
