@@ -70,7 +70,7 @@ public sealed record BooleanArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               }
             }
             """;
