@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -29,56 +28,6 @@ public sealed record NumberReturningConverterTests
     }
 
     [Fact]
-    public void ReadNumberField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "type": {
-                "name": "number"
-              },
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}"
-            }
-            """;
-
-        NumberField field = JsonSerializer
-            .Deserialize<NumberReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new NumberType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteNumberField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new NumberReturning(new NumberField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "number"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadNumberParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
@@ -95,7 +44,7 @@ public sealed record NumberReturningConverterTests
 
         NumberParameter parameter = JsonSerializer
             .Deserialize<NumberReturning>(input, _options)!
-            .AsT1;
+            .AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new NumberType(), parameter.Type);
@@ -140,7 +89,7 @@ public sealed record NumberReturningConverterTests
             """;
         NumberScalar scalar = JsonSerializer
             .Deserialize<NumberReturning>(input, _options)!
-            .AsT2;
+            .AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
