@@ -189,7 +189,7 @@ public sealed record MinDateConverterTests
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
     [InlineData("dfagijhnu")]
-    public void ThrowsExceptionOnWrongScalarType()
+    public void ThrowsExceptionOnWrongScalarType(string type)
     {
         IEnumerable<DateOnly> expectedDates =
         [
@@ -207,7 +207,7 @@ public sealed record MinDateConverterTests
               "operator": "min_date",
               "arg": {
                   "type": {
-                    "name": "dateArray"
+                    "name": "{{type}}"
                   },
                   "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
                 1
