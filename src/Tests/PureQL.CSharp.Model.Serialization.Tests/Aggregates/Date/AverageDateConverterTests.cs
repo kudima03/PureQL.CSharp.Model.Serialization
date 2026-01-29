@@ -179,6 +179,13 @@ public sealed record AverageDateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -273,6 +280,13 @@ public sealed record AverageDateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -280,7 +294,7 @@ public sealed record AverageDateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
-    [InlineData("ehufry")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -357,6 +371,13 @@ public sealed record AverageDateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -364,6 +385,7 @@ public sealed record AverageDateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
