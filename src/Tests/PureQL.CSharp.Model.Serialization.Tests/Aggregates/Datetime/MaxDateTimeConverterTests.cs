@@ -182,6 +182,14 @@ public sealed record MaxDateTimeConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("datetime")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -284,6 +292,14 @@ public sealed record MaxDateTimeConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("datetime")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -291,7 +307,7 @@ public sealed record MaxDateTimeConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
-    [InlineData("ehufry")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -368,6 +384,14 @@ public sealed record MaxDateTimeConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("datetime")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -375,6 +399,7 @@ public sealed record MaxDateTimeConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
