@@ -40,7 +40,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -272,7 +272,7 @@ public sealed record MaxNumberConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -331,7 +331,7 @@ public sealed record MaxNumberConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
@@ -360,7 +360,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -427,7 +427,7 @@ public sealed record MaxNumberConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
