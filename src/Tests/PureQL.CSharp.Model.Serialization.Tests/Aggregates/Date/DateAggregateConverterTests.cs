@@ -130,6 +130,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -137,6 +144,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarTypeOnAverageDate(string type)
     {
         IEnumerable<DateOnly> expectedDates =
@@ -229,6 +237,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -236,6 +251,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterTypeOnAverageDate(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -314,6 +330,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -321,6 +344,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldTypeOnAverageDate(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -456,6 +480,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -463,7 +494,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
-    [InlineData("hiujerfndsa")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarTypeOnMaxDate(string type)
     {
         IEnumerable<DateOnly> expectedDates =
@@ -554,6 +585,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -561,7 +599,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
-    [InlineData("eharuinjfg")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterTypeOnMaxDate(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -640,6 +678,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -647,6 +692,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldTypeOnMaxDate(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -782,6 +828,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -789,7 +842,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
-    [InlineData("dfagijhnu")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarTypeOnMinDate(string type)
     {
         IEnumerable<DateOnly> expectedDates =
@@ -880,6 +933,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -887,7 +947,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
-    [InlineData("rfeagjmoi")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterTypeOnMinDate(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -966,6 +1026,13 @@ public sealed record DateAggregateConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -973,6 +1040,7 @@ public sealed record DateAggregateConverterTests
     [InlineData("stringArray")]
     [InlineData("timeArray")]
     [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldTypeOnMinDate(string type)
     {
         const string expectedEntityName = "aruhybfe";
