@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Time;
+using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.Returnings;
 
 namespace PureQL.CSharp.Model.Serialization.Aggregates.Time;
@@ -27,7 +28,7 @@ internal sealed record TimeAggregateJsonModel
     [JsonConstructor]
     public TimeAggregateJsonModel(
         TimeAggregateOperatorJsonModel @operator,
-        TimeReturning arg
+        TimeArrayReturning arg
     )
     {
         Operator = @operator;
@@ -36,5 +37,5 @@ internal sealed record TimeAggregateJsonModel
 
     public TimeAggregateOperatorJsonModel Operator { get; }
 
-    public TimeReturning Arg { get; }
+    public TimeArrayReturning Arg { get; }
 }
