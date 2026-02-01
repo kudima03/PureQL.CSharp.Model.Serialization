@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Serialization.Aggregates.Date;
 using PureQL.CSharp.Model.Serialization.Aggregates.DateTime;
 using PureQL.CSharp.Model.Serialization.Aggregates.Numeric;
 using PureQL.CSharp.Model.Serialization.Aggregates.String;
 using PureQL.CSharp.Model.Serialization.Aggregates.Time;
 using PureQL.CSharp.Model.Serialization.Arithmetics;
+using PureQL.CSharp.Model.Serialization.ArrayParameters;
+using PureQL.CSharp.Model.Serialization.ArrayReturnings;
+using PureQL.CSharp.Model.Serialization.ArrayScalars;
 using PureQL.CSharp.Model.Serialization.BooleanOperations;
 using PureQL.CSharp.Model.Serialization.Comparisons;
 using PureQL.CSharp.Model.Serialization.Equalities;
@@ -111,6 +115,38 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new TypeConverter<StringType>();
         yield return new TypeConverter<TimeType>();
         yield return new TypeConverter<UuidType>();
+        yield return new TypeConverter<BooleanArrayType>();
+        yield return new TypeConverter<DateArrayType>();
+        yield return new TypeConverter<DateTimeArrayType>();
+        yield return new TypeConverter<NullArrayType>();
+        yield return new TypeConverter<NumberArrayType>();
+        yield return new TypeConverter<StringArrayType>();
+        yield return new TypeConverter<TimeArrayType>();
+        yield return new TypeConverter<UuidArrayType>();
+        yield return new BooleanArrayScalarConverter();
+        yield return new DateArrayScalarConverter();
+        yield return new DateTimeArrayScalarConverter();
+        yield return new NullArrayScalarConverter();
+        yield return new NumberArrayScalarConverter();
+        yield return new StringArrayScalarConverter();
+        yield return new TimeArrayScalarConverter();
+        yield return new UuidArrayScalarConverter();
+        yield return new BooleanArrayParameterConverter();
+        yield return new DateArrayParameterConverter();
+        yield return new DateTimeArrayParameterConverter();
+        yield return new NullArrayParameterConverter();
+        yield return new NumberArrayParameterConverter();
+        yield return new StringArrayParameterConverter();
+        yield return new TimeArrayParameterConverter();
+        yield return new UuidArrayParameterConverter();
+        yield return new BooleanArrayReturningConverter();
+        yield return new DateArrayReturningConverter();
+        yield return new DateTimeArrayReturningConverter();
+        yield return new NumberArrayReturningConverter();
+        yield return new StringArrayReturningConverter();
+        yield return new TimeArrayReturningConverter();
+        yield return new UuidArrayReturningConverter();
+        yield return new ArrayReturningConverter();
     }
 
     IEnumerator IEnumerable.GetEnumerator()

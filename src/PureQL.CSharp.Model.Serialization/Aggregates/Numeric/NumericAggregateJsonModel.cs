@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Numeric;
-using PureQL.CSharp.Model.Returnings;
+using PureQL.CSharp.Model.ArrayReturnings;
 
 namespace PureQL.CSharp.Model.Serialization.Aggregates.Numeric;
 
@@ -32,7 +32,7 @@ internal sealed record NumericAggregateJsonModel
     [JsonConstructor]
     public NumericAggregateJsonModel(
         NumericAggregateOperatorJsonModel @operator,
-        NumberReturning arg
+        NumberArrayReturning arg
     )
     {
         Operator = @operator;
@@ -41,5 +41,5 @@ internal sealed record NumericAggregateJsonModel
 
     public NumericAggregateOperatorJsonModel Operator { get; }
 
-    public NumberReturning Arg { get; }
+    public NumberArrayReturning Arg { get; }
 }

@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Date;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.Date;
 
@@ -41,7 +41,7 @@ public sealed record DateAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -102,22 +102,31 @@ public sealed record DateAggregateConverterTests
     [Fact]
     public void ReadScalarArgumentOnAverageDate()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "average_date",
-              "arg": {
-                  "type": {
-                    "name": "date"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateScalar(now), value.AsT2.Argument.AsT2);
+        Assert.Equal(new DateArrayScalar(expectedDates), value.AsT2.Argument.AsT2);
     }
 
     [Theory]
@@ -128,18 +137,37 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarTypeOnAverageDate(string type)
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "operator": "average_date",
               "arg": {
                   "type": {
                     "name": "{{type}}"
                   },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
+                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
                 }
             }
             """;
@@ -152,22 +180,35 @@ public sealed record DateAggregateConverterTests
     [Fact]
     public void WriteScalarArgumentOnAverageDate()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string expected = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "average_date",
-              "arg": {
-                "type": {
-                  "name": "date"
-                },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
-              }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new DateAggregate(new AverageDate(new DateReturning(new DateScalar(now)))),
+            new DateAggregate(
+                new AverageDate(
+                    new DateArrayReturning(new DateArrayScalar(expectedDates))
+                )
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -185,14 +226,14 @@ public sealed record DateAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(value.AsT2.Argument.AsT1, new DateParameter(expectedParamName));
+        Assert.Equal(value.AsT2.Argument.AsT0, new DateArrayParameter(expectedParamName));
     }
 
     [Theory]
@@ -203,6 +244,14 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterTypeOnAverageDate(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -236,7 +285,7 @@ public sealed record DateAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -244,7 +293,9 @@ public sealed record DateAggregateConverterTests
 
         string value = JsonSerializer.Serialize(
             new DateAggregate(
-                new AverageDate(new DateReturning(new DateParameter(expectedParamName)))
+                new AverageDate(
+                    new DateArrayReturning(new DateArrayParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -265,7 +316,7 @@ public sealed record DateAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -273,7 +324,7 @@ public sealed record DateAggregateConverterTests
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
         Assert.Equal(
-            value.AsT2.Argument.AsT0,
+            value.AsT2.Argument.AsT1,
             new DateField(expectedEntityName, expectedFieldName)
         );
     }
@@ -286,6 +337,14 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldTypeOnAverageDate(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -324,7 +383,7 @@ public sealed record DateAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -333,7 +392,7 @@ public sealed record DateAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new DateAggregate(
                 new AverageDate(
-                    new DateReturning(
+                    new DateArrayReturning(
                         new DateField(expectedEntityName, expectedFieldName)
                     )
                 )
@@ -393,22 +452,31 @@ public sealed record DateAggregateConverterTests
     [Fact]
     public void ReadScalarArgumentOnMaxDate()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "max_date",
-              "arg": {
-                  "type": {
-                    "name": "date"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateScalar(now), value.AsT0.Argument.AsT2);
+        Assert.Equal(new DateArrayScalar(expectedDates), value.AsT0.Argument.AsT2);
     }
 
     [Theory]
@@ -419,19 +487,37 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("hiujerfndsa")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarTypeOnMaxDate(string type)
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "operator": "max_date",
               "arg": {
                   "type": {
                     "name": "{{type}}"
                   },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
+                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
                 }
             }
             """;
@@ -444,22 +530,33 @@ public sealed record DateAggregateConverterTests
     [Fact]
     public void WriteScalarArgumentOnMaxDate()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string expected = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "max_date",
-              "arg": {
-                "type": {
-                  "name": "date"
-                },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
-              }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new DateAggregate(new MaxDate(new DateReturning(new DateScalar(now)))),
+            new DateAggregate(
+                new MaxDate(new DateArrayReturning(new DateArrayScalar(expectedDates)))
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -477,14 +574,14 @@ public sealed record DateAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateParameter(expectedParamName), value.AsT0.Argument.AsT1);
+        Assert.Equal(new DateArrayParameter(expectedParamName), value.AsT0.Argument.AsT0);
     }
 
     [Theory]
@@ -495,7 +592,14 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("eharuinjfg")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterTypeOnMaxDate(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -529,7 +633,7 @@ public sealed record DateAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -537,7 +641,9 @@ public sealed record DateAggregateConverterTests
 
         string value = JsonSerializer.Serialize(
             new DateAggregate(
-                new MaxDate(new DateReturning(new DateParameter(expectedParamName)))
+                new MaxDate(
+                    new DateArrayReturning(new DateArrayParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -558,7 +664,7 @@ public sealed record DateAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -566,7 +672,7 @@ public sealed record DateAggregateConverterTests
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
         Assert.Equal(
-            value.AsT0.Argument.AsT0,
+            value.AsT0.Argument.AsT1,
             new DateField(expectedEntityName, expectedFieldName)
         );
     }
@@ -579,6 +685,14 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldTypeOnMaxDate(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -617,7 +731,7 @@ public sealed record DateAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -626,7 +740,7 @@ public sealed record DateAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new DateAggregate(
                 new MaxDate(
-                    new DateReturning(
+                    new DateArrayReturning(
                         new DateField(expectedEntityName, expectedFieldName)
                     )
                 )
@@ -686,22 +800,31 @@ public sealed record DateAggregateConverterTests
     [Fact]
     public void ReadScalarArgumentOnMinDate()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "min_date",
-              "arg": {
-                  "type": {
-                    "name": "date"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateScalar(now), value.AsT1.Argument.AsT2);
+        Assert.Equal(new DateArrayScalar(expectedDates), value.AsT1.Argument.AsT2);
     }
 
     [Theory]
@@ -712,19 +835,37 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("dfagijhnu")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarTypeOnMinDate(string type)
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
         string input = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
               "operator": "min_date",
               "arg": {
                   "type": {
                     "name": "{{type}}"
                   },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
+                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
                 }
             }
             """;
@@ -737,22 +878,33 @@ public sealed record DateAggregateConverterTests
     [Fact]
     public void WriteScalarArgumentOnMinDate()
     {
-        DateOnly now = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<DateOnly> expectedDates =
+        [
+            DateOnly.FromDateTime(DateTime.Now),
+            DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+            DateOnly.FromDateTime(DateTime.Now.AddYears(1)),
+        ];
+
+        IEnumerable<string> formattedDates = expectedDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+
         string expected = /*lang=json,strict*/
-            $$"""
+        $$"""
             {
-              "operator": "min_date",
-              "arg": {
-                "type": {
-                  "name": "date"
-                },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
-              }
+              "type": {
+                "name": "dateArray"
+              },
+              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
+                1
+            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new DateAggregate(new MinDate(new DateReturning(new DateScalar(now)))),
+            new DateAggregate(
+                new MinDate(new DateArrayReturning(new DateArrayScalar(expectedDates)))
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -770,14 +922,14 @@ public sealed record DateAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateParameter(expectedParamName), value.AsT1.Argument.AsT1);
+        Assert.Equal(new DateArrayParameter(expectedParamName), value.AsT1.Argument.AsT0);
     }
 
     [Theory]
@@ -788,7 +940,14 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("rfeagjmoi")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterTypeOnMinDate(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -822,7 +981,7 @@ public sealed record DateAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -830,7 +989,9 @@ public sealed record DateAggregateConverterTests
 
         string value = JsonSerializer.Serialize(
             new DateAggregate(
-                new MinDate(new DateReturning(new DateParameter(expectedParamName)))
+                new MinDate(
+                    new DateArrayReturning(new DateArrayParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -851,7 +1012,7 @@ public sealed record DateAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
             }
@@ -859,7 +1020,7 @@ public sealed record DateAggregateConverterTests
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
         Assert.Equal(
-            value.AsT1.Argument.AsT0,
+            value.AsT1.Argument.AsT1,
             new DateField(expectedEntityName, expectedFieldName)
         );
     }
@@ -872,6 +1033,14 @@ public sealed record DateAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldTypeOnMinDate(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -910,7 +1079,7 @@ public sealed record DateAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "date"
+                  "name": "dateArray"
                 }
               }
             }
@@ -919,7 +1088,7 @@ public sealed record DateAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new DateAggregate(
                 new MinDate(
-                    new DateReturning(
+                    new DateArrayReturning(
                         new DateField(expectedEntityName, expectedFieldName)
                     )
                 )

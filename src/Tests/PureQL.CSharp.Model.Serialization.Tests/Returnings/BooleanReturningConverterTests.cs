@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Comparisons;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -31,56 +30,6 @@ public sealed record BooleanReturningConverterTests
     }
 
     [Fact]
-    public void ReadBooleanField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "type": {
-                "name": "boolean"
-              },
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}"
-            }
-            """;
-
-        BooleanField field = JsonSerializer
-            .Deserialize<BooleanReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new BooleanType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteBooleanField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new BooleanReturning(new BooleanField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "boolean"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadBooleanParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
@@ -97,7 +46,7 @@ public sealed record BooleanReturningConverterTests
 
         BooleanParameter parameter = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
-            .AsT1;
+            .AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new BooleanType(), parameter.Type);
@@ -141,7 +90,7 @@ public sealed record BooleanReturningConverterTests
 
         BooleanScalar scalar = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
-            .AsT2;
+            .AsT1;
 
         Assert.True(scalar.Value);
     }
@@ -170,13 +119,14 @@ public sealed record BooleanReturningConverterTests
     [Fact]
     public void ReadEquality()
     {
+        const string expectedParamName = "uheayfodrbniJ";
+
         const string input = /*lang=json,strict*/
-            """
+            $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "u",
-                "field": "active",
+                "name": "{{expectedParamName}}",
                 "type": {
                   "name": "boolean"
                 }
@@ -192,23 +142,24 @@ public sealed record BooleanReturningConverterTests
 
         BooleanEquality equality = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
-            .AsT3.AsT0;
+            .AsT2.AsT0.AsT0;
 
-        Assert.Equal(new BooleanField("u", "active"), equality.Left.AsT0);
-        Assert.Equal(new BooleanScalar(true), equality.Right.AsT2);
+        Assert.Equal(new BooleanParameter(expectedParamName), equality.Left.AsT0);
+        Assert.Equal(new BooleanScalar(true), equality.Right.AsT1);
     }
 
     [Fact]
     public void ReadBooleanOperator()
     {
+        const string expectedParamName = "uheayfodrbniJ";
+
         const string input = /*lang=json,strict*/
-            """
+            $$"""
             {
               "operator": "and",
               "conditions": [
                 {
-                  "entity": "u",
-                  "field": "active",
+                  "name": "{{expectedParamName}}",
                   "type": {
                     "name": "boolean"
                   }
@@ -228,28 +179,27 @@ public sealed record BooleanReturningConverterTests
             _options
         )!;
 
-        AndOperator andOperator = booleanReturning.AsT4.AsT0;
+        AndOperator andOperator = booleanReturning.AsT3.AsT0;
 
         Assert.Equal(
-            new BooleanField("u", "active"),
-            andOperator.Conditions.First().AsT0
+            new BooleanParameter(expectedParamName),
+            andOperator.Conditions.AsT0.First().AsT0
         );
-        Assert.Equal(new BooleanScalar(true), andOperator.Conditions.Last().AsT2);
+        Assert.Equal(new BooleanScalar(true), andOperator.Conditions.AsT0.Last().AsT1);
     }
 
     [Fact]
     public void ReadComparison()
     {
-        const string expectedEntity = "erfhduibgn";
-        const string expectedField = "efrnijk";
+        const string expectedParamName = "uheayfodrbniJ";
+
         const ushort rightValue = 12;
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "greaterThan",
               "left": {
-                "entity": "{{expectedEntity}}",
-                "field": "{{expectedField}}",
+                "name": "{{expectedParamName}}",
                 "type": {
                   "name": "number"
                 }
@@ -265,12 +215,12 @@ public sealed record BooleanReturningConverterTests
 
         NumberComparison comparison = JsonSerializer
             .Deserialize<BooleanReturning>(input, _options)!
-            .AsT5.AsT2;
+            .AsT4.AsT2;
 
         Assert.Equal(
             new NumberComparison(
                 ComparisonOperator.GreaterThan,
-                new NumberReturning(new NumberField(expectedEntity, expectedField)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
                 new NumberReturning(new NumberScalar(rightValue))
             ),
             comparison
@@ -280,16 +230,15 @@ public sealed record BooleanReturningConverterTests
     [Fact]
     public void WriteComparison()
     {
-        const string expectedEntity = "erfhduibgn";
-        const string expectedField = "efrnijk";
+        const string expectedParamName = "uheayfodrbniJ";
+
         const ushort rightValue = 12;
         string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "greaterThan",
               "left": {
-                "entity": "{{expectedEntity}}",
-                "field": "{{expectedField}}",
+                "name": "{{expectedParamName}}",
                 "type": {
                   "name": "number"
                 }
@@ -308,9 +257,7 @@ public sealed record BooleanReturningConverterTests
                 new Comparison(
                     new NumberComparison(
                         ComparisonOperator.GreaterThan,
-                        new NumberReturning(
-                            new NumberField(expectedEntity, expectedField)
-                        ),
+                        new NumberReturning(new NumberParameter(expectedParamName)),
                         new NumberReturning(new NumberScalar(rightValue))
                     )
                 )
@@ -328,32 +275,6 @@ public sealed record BooleanReturningConverterTests
     [InlineData(" ")]
     public void ThrowsExceptionOnBadFormat(string input)
     {
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanReturning>(input, _options)
-        );
-    }
-
-    [Theory]
-    [InlineData("datetime")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ihufd")]
-    public void ThrowsExceptionOnWrongFieldType(string typeName)
-    {
-        string input = $$"""
-            {
-              "type": {
-                "name": "{{typeName}}"
-              },
-              "entity": "ufbrdeyhov",
-              "field": "heuiyrndfosgv"
-            }
-            """;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<BooleanReturning>(input, _options)
         );

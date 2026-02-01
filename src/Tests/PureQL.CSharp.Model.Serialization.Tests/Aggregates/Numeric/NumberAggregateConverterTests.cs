@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Numeric;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.Numeric;
 
@@ -29,7 +29,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsence()
+    public void ThrowsExceptionOnOperatorNameAbsenceOnAverage()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -41,7 +41,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -53,7 +53,32 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnInvalidOperatorName()
+    public void ThrowsExceptionOnOtherOperatorNameOnAverage()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidOperatorNameOnAverage()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -66,7 +91,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -78,7 +103,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnUndefinedArgument()
+    public void ThrowsExceptionOnUndefinedArgumentOnAverage()
     {
         const string input = /*lang=json,strict*/
             """
@@ -93,7 +118,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnNullArgument()
+    public void ThrowsExceptionOnNullArgumentOnAverage()
     {
         const string input = /*lang=json,strict*/
             """
@@ -109,7 +134,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnArgumentWrongType()
+    public void ThrowsExceptionOnArgumentWrongTypeOnAverage()
     {
         const string input = /*lang=json,strict*/
             """
@@ -125,19 +150,29 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ReadScalarArgumentOnAverageNumber()
+    public void ReadScalarArgumentOnAverage()
     {
-        double number = Random.Shared.NextDouble();
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_number",
               "arg": {
-                  "type": {
-                    "name": "number"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
             }
             """;
 
@@ -145,7 +180,7 @@ public sealed record NumberAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new NumberScalar(number), value.AsT0.Argument.AsT2);
+        Assert.Equal(new NumberArrayScalar(values), value.AsT0.Argument.AsT2);
     }
 
     [Theory]
@@ -156,20 +191,37 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnAverageNumber(string type)
+    public void ThrowsExceptionOnWrongScalarTypeOnAverage(string type)
     {
-        DateOnly number = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_number",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
             }
             """;
 
@@ -179,25 +231,35 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void WriteScalarArgumentOnAverageNumber()
+    public void WriteScalarArgumentOnAverage()
     {
-        double number = Random.Shared.NextDouble();
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
         string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_number",
               "arg": {
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 },
-                "value": {{number.ToString(CultureInfo.InvariantCulture)}}
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
             new NumberAggregate(
-                new AverageNumber(new NumberReturning(new NumberScalar(number)))
+                new AverageNumber(new NumberArrayReturning(new NumberArrayScalar(values)))
             ),
             _options
         );
@@ -205,7 +267,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ReadParameterArgumentOnAverageNumber()
+    public void ReadParameterArgumentOnAverage()
     {
         const string expectedParamName = "ashjlbd";
 
@@ -216,93 +278,7 @@ public sealed record NumberAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "number"
-                  }
-                }
-            }
-            """;
-
-        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
-            input,
-            _options
-        )!;
-        Assert.Equal(new NumberParameter(expectedParamName), value.AsT0.Argument.AsT1);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnAverageNumber(string type)
-    {
-        const string expectedParamName = "ashjlbd";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_number",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteParameterArgumentOnAverageNumber()
-    {
-        const string expectedParamName = "ashjlbd";
-
-        const string expected = $$"""
-            {
-              "operator": "average_number",
-              "arg": {
-                "name": "{{expectedParamName}}",
-                "type": {
-                  "name": "number"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new AverageNumber(
-                    new NumberReturning(new NumberParameter(expectedParamName))
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadFieldArgumentOnAverageNumber()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_number",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -313,7 +289,7 @@ public sealed record NumberAggregateConverterTests
             _options
         )!;
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
+            new NumberArrayParameter(expectedParamName),
             value.AsT0.Argument.AsT0
         );
     }
@@ -326,7 +302,111 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnAverageNumber(string type)
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongParameterTypeOnAverage(string type)
+    {
+        const string expectedParamName = "ashjlbd";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteParameterArgumentOnAverage()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string expected = $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                "name": "{{expectedParamName}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new AverageNumber(
+                    new NumberArrayReturning(new NumberArrayParameter(expectedParamName))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadFieldArgumentOnAverage()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.AsT0.Argument.AsT1
+        );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongFieldTypeOnAverage(string type)
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -351,7 +431,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void WriteFieldArgumentOnAverageNumber()
+    public void WriteFieldArgumentOnAverage()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -364,7 +444,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
@@ -373,7 +453,7 @@ public sealed record NumberAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new NumberAggregate(
                 new AverageNumber(
-                    new NumberReturning(
+                    new NumberArrayReturning(
                         new NumberField(expectedEntityName, expectedFieldName)
                     )
                 )
@@ -384,131 +464,19 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ReadScalarArgumentOnMaxNumber()
+    public void ThrowsExceptionOnOperatorNameAbsenceOnMax()
     {
-        double number = Random.Shared.NextDouble();
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                  "type": {
-                    "name": "number"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
-            }
-            """;
-
-        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
-            input,
-            _options
-        )!;
-        Assert.Equal(new NumberScalar(number), value.AsT1.Argument.AsT2);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnMaxNumber(string type)
-    {
-        DateOnly number = DateOnly.FromDateTime(DateTime.Now);
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteScalarArgumentOnMaxNumber()
-    {
-        double number = Random.Shared.NextDouble();
-        string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                "type": {
-                  "name": "number"
-                },
-                "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new MaxNumber(new NumberReturning(new NumberScalar(number)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadParameterArgumentOnMaxNumber()
-    {
-        const string expectedParamName = "ashjlbd";
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
 
         const string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "max_number",
               "arg": {
-                  "name": "{{expectedParamName}}",
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
-                  }
-                }
-            }
-            """;
-
-        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
-            input,
-            _options
-        )!;
-        Assert.Equal(new NumberParameter(expectedParamName), value.AsT1.Argument.AsT1);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnMaxNumber(string type)
-    {
-        const string expectedParamName = "ashjlbd";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "{{type}}"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -520,33 +488,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void WriteParameterArgumentOnMaxNumber()
-    {
-        const string expectedParamName = "ashjlbd";
-
-        const string expected = $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                "name": "{{expectedParamName}}",
-                "type": {
-                  "name": "number"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new MaxNumber(new NumberReturning(new NumberParameter(expectedParamName)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadFieldArgumentOnMaxNumber()
+    public void ThrowsExceptionOnOtherOperatorNameOnMax()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -559,7 +501,219 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidOperatorNameOnMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "euhwyrfdbuyeghrfdb",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnUndefinedArgumentOnMax()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "max_number"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullArgumentOnMax()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "max_number",
+              "arg": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnArgumentWrongTypeOnMax()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "max_number",
+              "arg": []
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ReadScalarArgumentOnMax()
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(new NumberArrayScalar(values), value.AsT1.Argument.AsT2);
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongScalarTypeOnMax(string type)
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteScalarArgumentOnMax()
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new MaxNumber(new NumberArrayReturning(new NumberArrayScalar(values)))
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadParameterArgumentOnMax()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "numberArray"
                   }
                 }
             }
@@ -570,7 +724,7 @@ public sealed record NumberAggregateConverterTests
             _options
         )!;
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
+            new NumberArrayParameter(expectedParamName),
             value.AsT1.Argument.AsT0
         );
     }
@@ -583,7 +737,111 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnMaxNumber(string type)
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongParameterTypeOnMax(string type)
+    {
+        const string expectedParamName = "ashjlbd";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteParameterArgument()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string expected = $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                "name": "{{expectedParamName}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new MaxNumber(
+                    new NumberArrayReturning(new NumberArrayParameter(expectedParamName))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadFieldArgumentOnMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.AsT1.Argument.AsT1
+        );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongFieldTypeOnMax(string type)
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -608,7 +866,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void WriteFieldArgumentOnMaxNumber()
+    public void WriteFieldArgumentOnMax()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -621,7 +879,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
@@ -630,7 +888,7 @@ public sealed record NumberAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new NumberAggregate(
                 new MaxNumber(
-                    new NumberReturning(
+                    new NumberArrayReturning(
                         new NumberField(expectedEntityName, expectedFieldName)
                     )
                 )
@@ -641,19 +899,150 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ReadScalarArgumentOnMinNumber()
+    public void ThrowsExceptionOnOperatorNameAbsenceOnMin()
     {
-        double number = Random.Shared.NextDouble();
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnOtherOperatorNameOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidOperatorNameOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "euhwyrfdbuyeghrfdb",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnUndefinedArgumentOnMin()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "min_number"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullArgumentOnMin()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "min_number",
+              "arg": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnArgumentWrongTypeOnMin()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "min_number",
+              "arg": []
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ReadScalarArgumentOnMin()
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "min_number",
               "arg": {
-                  "type": {
-                    "name": "number"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
             }
             """;
 
@@ -661,7 +1050,7 @@ public sealed record NumberAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new NumberScalar(number), value.AsT2.Argument.AsT2);
+        Assert.Equal(new NumberArrayScalar(values), value.AsT2.Argument.AsT2);
     }
 
     [Theory]
@@ -672,8 +1061,15 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnMinNumber(string type)
+    public void ThrowsExceptionOnWrongScalarTypeOnMin(string type)
     {
         DateOnly number = DateOnly.FromDateTime(DateTime.Now);
         string input = /*lang=json,strict*/
@@ -695,25 +1091,35 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void WriteScalarArgumentOnMinNumber()
+    public void WriteScalarArgumentOnMin()
     {
-        double number = Random.Shared.NextDouble();
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
         string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "min_number",
+              "operator": "max_number",
               "arg": {
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 },
-                "value": {{number.ToString(CultureInfo.InvariantCulture)}}
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
             new NumberAggregate(
-                new MinNumber(new NumberReturning(new NumberScalar(number)))
+                new MinNumber(new NumberArrayReturning(new NumberArrayScalar(values)))
             ),
             _options
         );
@@ -721,7 +1127,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ReadParameterArgumentOnMinNumber()
+    public void ReadParameterArgumentOnMin()
     {
         const string expectedParamName = "ashjlbd";
 
@@ -732,91 +1138,7 @@ public sealed record NumberAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "number"
-                  }
-                }
-            }
-            """;
-
-        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
-            input,
-            _options
-        )!;
-        Assert.Equal(new NumberParameter(expectedParamName), value.AsT2.Argument.AsT1);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnMinNumber(string type)
-    {
-        const string expectedParamName = "ashjlbd";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_number",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteParameterArgumentOnMinNumber()
-    {
-        const string expectedParamName = "ashjlbd";
-
-        const string expected = $$"""
-            {
-              "operator": "min_number",
-              "arg": {
-                "name": "{{expectedParamName}}",
-                "type": {
-                  "name": "number"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new MinNumber(new NumberReturning(new NumberParameter(expectedParamName)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadFieldArgumentOnMinNumber()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_number",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -827,7 +1149,7 @@ public sealed record NumberAggregateConverterTests
             _options
         )!;
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
+            new NumberArrayParameter(expectedParamName),
             value.AsT2.Argument.AsT0
         );
     }
@@ -840,18 +1162,24 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnMinNumber(string type)
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongParameterTypeOnMin(string type)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "min_number",
               "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
+                  "name": "{{expectedParamName}}",
                   "type": {
                     "name": "{{type}}"
                   }
@@ -865,20 +1193,17 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void WriteFieldArgumentOnMinNumber()
+    public void WriteParameterArgumentOnMin()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        const string expectedParamName = "ashjlbd";
 
-        const string expected = /*lang=json,strict*/
-            $$"""
+        const string expected = $$"""
             {
               "operator": "min_number",
               "arg": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
+                "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
@@ -887,9 +1212,7 @@ public sealed record NumberAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new NumberAggregate(
                 new MinNumber(
-                    new NumberReturning(
-                        new NumberField(expectedEntityName, expectedFieldName)
-                    )
+                    new NumberArrayReturning(new NumberArrayParameter(expectedParamName))
                 )
             ),
             _options
@@ -898,169 +1221,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ReadScalarArgumentOnSumNumber()
-    {
-        double number = Random.Shared.NextDouble();
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "sum",
-              "arg": {
-                  "type": {
-                    "name": "number"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
-            }
-            """;
-
-        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
-            input,
-            _options
-        )!;
-        Assert.Equal(new NumberScalar(number), value.AsT3.Argument.AsT2);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnSumNumber(string type)
-    {
-        DateOnly number = DateOnly.FromDateTime(DateTime.Now);
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "sum",
-              "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteScalarArgumentOnSumNumber()
-    {
-        double number = Random.Shared.NextDouble();
-        string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "sum",
-              "arg": {
-                "type": {
-                  "name": "number"
-                },
-                "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new SumNumber(new NumberReturning(new NumberScalar(number)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadParameterArgumentOnSumNumber()
-    {
-        const string expectedParamName = "ashjlbd";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "sum",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-            }
-            """;
-
-        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
-            input,
-            _options
-        )!;
-        Assert.Equal(new NumberParameter(expectedParamName), value.AsT3.Argument.AsT1);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnSumNumber(string type)
-    {
-        const string expectedParamName = "ashjlbd";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "sum",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteParameterArgumentOnSumNumber()
-    {
-        const string expectedParamName = "ashjlbd";
-
-        const string expected = $$"""
-            {
-              "operator": "sum",
-              "arg": {
-                "name": "{{expectedParamName}}",
-                "type": {
-                  "name": "number"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new SumNumber(new NumberReturning(new NumberParameter(expectedParamName)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadFieldArgumentOnSumNumber()
+    public void ReadFieldArgumentOnMin()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -1068,12 +1229,12 @@ public sealed record NumberAggregateConverterTests
         const string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "sum",
+              "operator": "min_number",
               "arg": {
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -1085,7 +1246,7 @@ public sealed record NumberAggregateConverterTests
         )!;
         Assert.Equal(
             new NumberField(expectedEntityName, expectedFieldName),
-            value.AsT3.Argument.AsT0
+            value.AsT2.Argument.AsT1
         );
     }
 
@@ -1097,7 +1258,434 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnSumNumber(string type)
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongFieldTypeOnMin(string type)
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_number",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteFieldArgumentOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new MinNumber(
+                    new NumberArrayReturning(
+                        new NumberField(expectedEntityName, expectedFieldName)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnOperatorNameAbsenceOnSum()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnOtherOperatorNameOnSum()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidOperatorNameOnSum()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "euhwyrfdbuyeghrfdb",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnUndefinedArgumentOnSum()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "sum"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullArgumentOnSum()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "sum",
+              "arg": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnArgumentWrongTypeOnSum()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "sum",
+              "arg": []
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ReadScalarArgument()
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
+            }
+            """;
+
+        SumNumber value = JsonSerializer.Deserialize<SumNumber>(input, _options)!;
+        Assert.Equal(new NumberArrayScalar(values), value.Argument.AsT2);
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongScalarTypeOnSum(string type)
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteScalarArgumentOnSum()
+    {
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{values.First()}},
+                  {{values.Skip(1).First()}},
+                  {{values.Skip(2).First()}}
+                ]
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new SumNumber(new NumberArrayReturning(new NumberArrayScalar(values))),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadParameterArgumentOnSum()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        SumNumber value = JsonSerializer.Deserialize<SumNumber>(input, _options)!;
+        Assert.Equal(new NumberArrayParameter(expectedParamName), value.Argument.AsT0);
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongParameterTypeOnSum(string type)
+    {
+        const string expectedParamName = "ashjlbd";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteParameterArgumentOnSum()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string expected = $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "name": "{{expectedParamName}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new SumNumber(
+                new NumberArrayReturning(new NumberArrayParameter(expectedParamName))
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadFieldArgumentOnSum()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "numberArray"
+                  }
+                }
+            }
+            """;
+
+        SumNumber value = JsonSerializer.Deserialize<SumNumber>(input, _options)!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.Argument.AsT1
+        );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongFieldTypeOnSum(string type)
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -1117,12 +1705,12 @@ public sealed record NumberAggregateConverterTests
             """;
 
         _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
+            JsonSerializer.Deserialize<SumNumber>(input, _options)
         );
     }
 
     [Fact]
-    public void WriteFieldArgumentOnSumNumber()
+    public void WriteFieldArgumentOnSum()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -1135,18 +1723,16 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new NumberAggregate(
-                new SumNumber(
-                    new NumberReturning(
-                        new NumberField(expectedEntityName, expectedFieldName)
-                    )
+            new SumNumber(
+                new NumberArrayReturning(
+                    new NumberField(expectedEntityName, expectedFieldName)
                 )
             ),
             _options

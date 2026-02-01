@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.String;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.String;
 
@@ -151,7 +151,6 @@ public sealed record MinStringConverterTests
     [Fact]
     public void ReadScalarArgument()
     {
-        const string str = "aeiwnfhsubdrj";
         const string input = /*lang=json,strict*/
             $$"""
             {
@@ -160,13 +159,16 @@ public sealed record MinStringConverterTests
                   "type": {
                     "name": "string"
                   },
-                  "value": "{{str}}"
+                  "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
                 }
             }
             """;
 
         MinString value = JsonSerializer.Deserialize<MinString>(input, _options)!;
-        Assert.Equal(new StringScalar(str), value.Argument.AsT2);
+        Assert.Equal(
+            new StringArrayScalar(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]),
+            value.Argument.AsT2
+        );
     }
 
     [Theory]
@@ -177,6 +179,13 @@ public sealed record MinStringConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
@@ -202,7 +211,6 @@ public sealed record MinStringConverterTests
     [Fact]
     public void WriteScalarArgument()
     {
-        const string str = "aeiwnfhsubdrj";
         const string expected = /*lang=json,strict*/
             $$"""
             {
@@ -211,13 +219,19 @@ public sealed record MinStringConverterTests
                 "type": {
                   "name": "string"
                 },
-                "value": "{{str}}"
+                "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new MinString(new StringReturning(new StringScalar(str))),
+            new MinString(
+                new StringArrayReturning(
+                    new StringArrayScalar(
+                        ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
+                    )
+                )
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -242,7 +256,7 @@ public sealed record MinStringConverterTests
             """;
 
         MinString value = JsonSerializer.Deserialize<MinString>(input, _options)!;
-        Assert.Equal(new StringParameter(expectedParamName), value.Argument.AsT1);
+        Assert.Equal(new StringArrayParameter(expectedParamName), value.Argument.AsT0);
     }
 
     [Theory]
@@ -253,7 +267,14 @@ public sealed record MinStringConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("ehufry")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -294,7 +315,9 @@ public sealed record MinStringConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new MinString(new StringReturning(new StringParameter(expectedParamName))),
+            new MinString(
+                new StringArrayReturning(new StringArrayParameter(expectedParamName))
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -323,7 +346,7 @@ public sealed record MinStringConverterTests
         MinString value = JsonSerializer.Deserialize<MinString>(input, _options)!;
         Assert.Equal(
             new StringField(expectedEntityName, expectedFieldName),
-            value.Argument.AsT0
+            value.Argument.AsT1
         );
     }
 
@@ -335,6 +358,14 @@ public sealed record MinStringConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -381,7 +412,7 @@ public sealed record MinStringConverterTests
 
         string value = JsonSerializer.Serialize(
             new MinString(
-                new StringReturning(
+                new StringArrayReturning(
                     new StringField(expectedEntityName, expectedFieldName)
                 )
             ),
