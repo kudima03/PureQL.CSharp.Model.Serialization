@@ -1,6 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Time;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -151,22 +154,36 @@ public sealed record AverageTimeConverterTests
     [Fact]
     public void ReadScalarArgument()
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_time",
               "arg": {
-                  "type": {
-                    "name": "time"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+                "type": {
+                  "name": "timeArray"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         AverageTime value = JsonSerializer.Deserialize<AverageTime>(input, _options)!;
-        Assert.Equal(new TimeScalar(now), value.Argument.AsT2);
+        Assert.Equal(new TimeArrayScalar(expectedValues), value.Argument.AsT2);
     }
 
     [Theory]
@@ -177,20 +194,41 @@ public sealed record AverageTimeConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_time",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -202,22 +240,36 @@ public sealed record AverageTimeConverterTests
     [Fact]
     public void WriteScalarArgument()
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_time",
               "arg": {
                 "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new AverageTime(new TimeReturning(new TimeScalar(now))),
+            new AverageTime(new TimeArrayReturning(new TimeArrayScalar(expectedValues))),
             _options
         );
         Assert.Equal(expected, value);
@@ -242,7 +294,7 @@ public sealed record AverageTimeConverterTests
             """;
 
         AverageTime value = JsonSerializer.Deserialize<AverageTime>(input, _options)!;
-        Assert.Equal(new TimeParameter(expectedParamName), value.Argument.AsT1);
+        Assert.Equal(new TimeArrayParameter(expectedParamName), value.Argument.AsT0);
     }
 
     [Theory]
@@ -253,7 +305,13 @@ public sealed record AverageTimeConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
-    [InlineData("ehufry")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -294,7 +352,9 @@ public sealed record AverageTimeConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new AverageTime(new TimeReturning(new TimeParameter(expectedParamName))),
+            new AverageTime(
+                new TimeArrayReturning(new TimeArrayParameter(expectedParamName))
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -323,7 +383,7 @@ public sealed record AverageTimeConverterTests
         AverageTime value = JsonSerializer.Deserialize<AverageTime>(input, _options)!;
         Assert.Equal(
             new TimeField(expectedEntityName, expectedFieldName),
-            value.Argument.AsT0
+            value.Argument.AsT1
         );
     }
 
@@ -335,6 +395,13 @@ public sealed record AverageTimeConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -381,7 +448,9 @@ public sealed record AverageTimeConverterTests
 
         string value = JsonSerializer.Serialize(
             new AverageTime(
-                new TimeReturning(new TimeField(expectedEntityName, expectedFieldName))
+                new TimeArrayReturning(
+                    new TimeField(expectedEntityName, expectedFieldName)
+                )
             ),
             _options
         );
