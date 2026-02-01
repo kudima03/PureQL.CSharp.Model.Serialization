@@ -199,7 +199,7 @@ public sealed record MaxTimeConverterTests
     [InlineData("dateArray")]
     [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarType()
+    public void ThrowsExceptionOnWrongScalarType(string type)
     {
         IEnumerable<TimeOnly> expectedValues =
         [
@@ -218,7 +218,7 @@ public sealed record MaxTimeConverterTests
               "operator": "max_time",
               "arg": {
                 "type": {
-                  "name": "timeArray"
+                  "name": "{{type}}"
                 },
                 "value": [
                   "{{formattedTimes.First()}}",
