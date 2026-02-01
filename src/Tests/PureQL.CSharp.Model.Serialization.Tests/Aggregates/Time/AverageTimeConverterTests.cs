@@ -43,7 +43,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -68,7 +68,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -93,7 +93,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -287,7 +287,7 @@ public sealed record AverageTimeConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -345,7 +345,7 @@ public sealed record AverageTimeConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 }
               }
             }
@@ -374,7 +374,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -440,7 +440,7 @@ public sealed record AverageTimeConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 }
               }
             }
