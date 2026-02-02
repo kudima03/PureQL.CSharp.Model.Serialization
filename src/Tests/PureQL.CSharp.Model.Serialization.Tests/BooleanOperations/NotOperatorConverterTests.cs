@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -154,7 +153,7 @@ public sealed record NotOperatorConverterTests
             """;
 
         NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
-        Assert.Equal(value.Condition.AsT2, new BooleanScalar(true));
+        Assert.Equal(value.Condition.AsT1, new BooleanScalar(true));
     }
 
     [Theory]
@@ -227,7 +226,7 @@ public sealed record NotOperatorConverterTests
             """;
 
         NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
-        Assert.Equal(value.Condition.AsT1, new BooleanParameter(expectedParamName));
+        Assert.Equal(value.Condition.AsT0, new BooleanParameter(expectedParamName));
     }
 
     [Theory]
@@ -288,96 +287,6 @@ public sealed record NotOperatorConverterTests
     }
 
     [Fact]
-    public void ReadFieldcondition()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "not",
-              "condition": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                }
-            }
-            """;
-
-        NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
-        Assert.Equal(
-            value.Condition.AsT0,
-            new BooleanField(expectedEntityName, expectedFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "not",
-              "condition": {
-                  "entity": "{{expectedEntityName}}"
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NotOperator>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldcondition()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "not",
-              "condition": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
-                "type": {
-                  "name": "boolean"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new NotOperator(
-                new BooleanReturning(
-                    new BooleanField(expectedEntityName, expectedFieldName)
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadEqualityCondition()
     {
         const string input = /*lang=json,strict*/
@@ -404,11 +313,13 @@ public sealed record NotOperatorConverterTests
 
         NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
         Assert.Equal(
-            value.Condition.AsT3,
+            value.Condition.AsT2,
             new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
+                new SingleValueEquality(
+                    new BooleanEquality(
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true))
+                    )
                 )
             )
         );
@@ -480,9 +391,11 @@ public sealed record NotOperatorConverterTests
             new NotOperator(
                 new BooleanReturning(
                     new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
                     )
                 )
@@ -526,7 +439,7 @@ public sealed record NotOperatorConverterTests
 
         NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
         Assert.Equal(
-            value.Condition.AsT4,
+            value.Condition.AsT3,
             new BooleanOperator(
                 new OrOperator(
                     [
@@ -620,9 +533,11 @@ public sealed record NotOperatorConverterTests
             new NotOperator(
                 new BooleanReturning(
                     new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
                     )
                 )
