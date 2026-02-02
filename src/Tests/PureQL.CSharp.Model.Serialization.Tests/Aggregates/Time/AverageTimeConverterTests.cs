@@ -5,9 +5,6 @@ using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.Time;
 
