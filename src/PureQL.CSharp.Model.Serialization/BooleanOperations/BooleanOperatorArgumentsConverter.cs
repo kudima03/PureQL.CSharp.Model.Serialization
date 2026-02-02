@@ -23,14 +23,20 @@ internal sealed class BooleanOperatorArgumentsConverter
                 options,
                 out BooleanArrayReturning? booleanArray
             )
-                ? OneOf<IEnumerable<BooleanReturning>, BooleanArrayReturning>.FromT1(booleanArray!)
+                ? OneOf<IEnumerable<BooleanReturning>, BooleanArrayReturning>.FromT1(
+                    booleanArray!
+                )
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out IEnumerable<BooleanReturning>? returnings
             )
-                ? OneOf<IEnumerable<BooleanReturning>, BooleanArrayReturning>.FromT0(returnings!) :
-             throw new JsonException("Unable to determine BooleanOperatorArguments type.");
+                ? OneOf<IEnumerable<BooleanReturning>, BooleanArrayReturning>.FromT0(
+                    returnings!
+                )
+            : throw new JsonException(
+                "Unable to determine BooleanOperatorArguments type."
+            );
     }
 
     public override void Write(
