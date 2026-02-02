@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -134,7 +133,7 @@ public sealed record OrOperatorConverterTests
             """;
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
-        Assert.Empty(value.Conditions);
+        Assert.Empty(value.Conditions.AsT0);
     }
 
     [Fact]
@@ -177,8 +176,8 @@ public sealed record OrOperatorConverterTests
             """;
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
-        Assert.Equal(value.Conditions.First().AsT2, new BooleanScalar(true));
-        Assert.Equal(value.Conditions.Last().AsT2, new BooleanScalar(false));
+        Assert.Equal(value.Conditions.AsT0.First().AsT1, new BooleanScalar(true));
+        Assert.Equal(value.Conditions.AsT0.Last().AsT1, new BooleanScalar(false));
     }
 
     [Theory(Skip = "NotImplemented")]
@@ -287,11 +286,11 @@ public sealed record OrOperatorConverterTests
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT1,
+            value.Conditions.AsT0.First().AsT0,
             new BooleanParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.Conditions.Last().AsT1,
+            value.Conditions.AsT0.Last().AsT0,
             new BooleanParameter(expectedSecondParamName)
         );
     }
@@ -379,151 +378,6 @@ public sealed record OrOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact]
-    public void ReadFieldConditions()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "or",
-              "conditions": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                }
-              ]
-            }
-            """;
-
-        OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
-        Assert.Equal(
-            value.Conditions.First().AsT0,
-            new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Conditions.Last().AsT0,
-            new BooleanField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "or",
-              "conditions": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<OrOperator>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldConditions()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "or",
-              "conditions": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new OrOperator(
-                [
-                    new BooleanReturning(
-                        new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-                    ),
-                    new BooleanReturning(
-                        new BooleanField(
-                            expectedSecondEntityName,
-                            expectedSecondFieldName
-                        )
-                    ),
-                ]
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
     [Fact(Skip = "NotImplemented")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Usage",
@@ -573,20 +427,24 @@ public sealed record OrOperatorConverterTests
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT3,
+            value.Conditions.AsT0.First().AsT2,
             new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
+                new SingleValueEquality(
+                    new BooleanEquality(
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true))
+                    )
                 )
             )
         );
         Assert.Equal(
-            value.Conditions.Last().AsT3,
+            value.Conditions.AsT0.Last().AsT2,
             new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
+                new SingleValueEquality(
+                    new BooleanEquality(
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true))
+                    )
                 )
             )
         );
@@ -705,17 +563,21 @@ public sealed record OrOperatorConverterTests
                 [
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
@@ -779,7 +641,7 @@ public sealed record OrOperatorConverterTests
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT4,
+            value.Conditions.AsT0.First().AsT3,
             new BooleanOperator(
                 new OrOperator(
                     [
@@ -790,7 +652,7 @@ public sealed record OrOperatorConverterTests
             )
         );
         Assert.Equal(
-            value.Conditions.Last().AsT4,
+            value.Conditions.AsT0.Last().AsT3,
             new BooleanOperator(
                 new OrOperator(
                     [
@@ -923,17 +785,21 @@ public sealed record OrOperatorConverterTests
                 [
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
@@ -952,8 +818,6 @@ public sealed record OrOperatorConverterTests
     )]
     public void ReadMixedConditions()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -985,13 +849,6 @@ public sealed record OrOperatorConverterTests
                   "value": true
                 },
                 {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
                   "name": "{{expectedParamName}}",
                   "type": {
                     "name": "boolean"
@@ -1020,7 +877,7 @@ public sealed record OrOperatorConverterTests
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT4,
+            value.Conditions.AsT0.First().AsT3,
             new BooleanOperator(
                 new OrOperator(
                     [
@@ -1030,21 +887,19 @@ public sealed record OrOperatorConverterTests
                 )
             )
         );
-        Assert.Equal(value.Conditions.Skip(1).First().AsT2, new BooleanScalar(true));
+        Assert.Equal(value.Conditions.AsT0.Skip(1).First().AsT1, new BooleanScalar(true));
         Assert.Equal(
-            value.Conditions.Skip(2).First().AsT0,
-            new BooleanField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(
-            value.Conditions.Skip(3).First().AsT1,
+            value.Conditions.AsT0.Skip(3).First().AsT0,
             new BooleanParameter(expectedParamName)
         );
         Assert.Equal(
-            value.Conditions.Skip(4).First().AsT3,
+            value.Conditions.AsT0.Skip(4).First().AsT2,
             new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(new BooleanScalar(false))
+                new SingleValueEquality(
+                    new BooleanEquality(
+                        new BooleanReturning(new BooleanScalar(true)),
+                        new BooleanReturning(new BooleanScalar(false))
+                    )
                 )
             )
         );
@@ -1094,13 +949,6 @@ public sealed record OrOperatorConverterTests
                   "value": true
                 },
                 {
-                  "entity": "arefdjhubn",
-                  "field": "fdevihjn",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
                   "name": "swdefiujhnr",
                   "type": {
                     "name": "{{type}}"
@@ -1142,8 +990,6 @@ public sealed record OrOperatorConverterTests
     )]
     public void WriteMixedConditions()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         const string expected = /*lang=json,strict*/
@@ -1173,13 +1019,6 @@ public sealed record OrOperatorConverterTests
                     "name": "boolean"
                   },
                   "value": true
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -1222,15 +1061,14 @@ public sealed record OrOperatorConverterTests
                         )
                     ),
                     new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(
-                        new BooleanField(expectedEntityName, expectedFieldName)
-                    ),
                     new BooleanReturning(new BooleanParameter(expectedParamName)),
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(true)),
-                                new BooleanReturning(new BooleanScalar(false))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(true)),
+                                    new BooleanReturning(new BooleanScalar(false))
+                                )
                             )
                         )
                     ),
