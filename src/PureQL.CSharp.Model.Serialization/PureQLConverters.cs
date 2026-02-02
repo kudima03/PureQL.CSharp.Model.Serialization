@@ -32,6 +32,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new BooleanOperatorConverter();
         yield return new NotOperatorConverter();
         yield return new OrOperatorConverter();
+        yield return new BooleanOperatorArgumentsConverter();
         yield return new BooleanEqualityConverter();
         yield return new DateEqualityConverter();
         yield return new DateTimeEqualityConverter();
