@@ -37,15 +37,17 @@ public sealed record TimeArrayScalarConverterTests
 
         string input = /*lang=json,strict*/
         $$"""
-            {
-              "type": {
-                "name": "timeArray"
-              },
-              "value": [{{formattedTimes.First()}}, {{formattedTimes.Skip(
-                1
-            ).First()}}, {{formattedTimes.Skip(2).First()}}]
-            }
-            """;
+        {
+          "type": {
+            "name": "timeArray"
+          },
+          "value": [
+            "{{formattedTimes.First()}}",
+            "{{formattedTimes.Skip(1).First()}}",
+            "{{formattedTimes.Skip(2).First()}}"
+          ]
+        }
+        """;
 
         ITimeArrayScalar scalar = JsonSerializer.Deserialize<ITimeArrayScalar>(
             input,
@@ -71,15 +73,17 @@ public sealed record TimeArrayScalarConverterTests
 
         string expected = /*lang=json,strict*/
         $$"""
-            {
-              "type": {
-                "name": "timeArray"
-              },
-              "value": [{{formattedTimes.First()}}, {{formattedTimes.Skip(
-                1
-            ).First()}}, {{formattedTimes.Skip(2).First()}}]
-            }
-            """;
+        {
+          "type": {
+            "name": "timeArray"
+          },
+          "value": [
+            "{{formattedTimes.First()}}",
+            "{{formattedTimes.Skip(1).First()}}",
+            "{{formattedTimes.Skip(2).First()}}"
+          ]
+        }
+        """;
 
         string output = JsonSerializer.Serialize<ITimeArrayScalar>(
             new TimeArrayScalar(expectedValues),
@@ -146,6 +150,13 @@ public sealed record TimeArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -153,6 +164,7 @@ public sealed record TimeArrayScalarConverterTests
     [InlineData("datetimeArray")]
     [InlineData("stringArray")]
     [InlineData("uuidArray")]
+    [InlineData("rsdftghbstgh")]
     [InlineData("")]
     public void ThrowsExceptionOnWrongType(string type)
     {
@@ -161,7 +173,9 @@ public sealed record TimeArrayScalarConverterTests
               "type": {
                 "name": "{{type}}"
               },
-              "value": ["14:30"]
+              "value": [
+                "14:30"
+              ]
             }
             """;
         _ = Assert.Throws<JsonException>(() =>
