@@ -422,7 +422,7 @@ public sealed record AddConverterTests
         Add value = JsonSerializer.Deserialize<Add>(input, _options)!;
         Assert.Equal(new NumberScalar(expectedValue), value.Arguments.First().AsT1);
         Assert.Equal(
-            value.Arguments.Skip(2).First().AsT0,
+            value.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
