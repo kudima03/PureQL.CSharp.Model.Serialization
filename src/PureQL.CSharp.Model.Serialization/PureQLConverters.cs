@@ -158,6 +158,7 @@ public sealed record PureQLConverters : IEnumerable<JsonConverter>
         yield return new UuidArrayReturningConverter();
         yield return new ArrayReturningConverter();
         yield return new SingleValueReturningConverter();
+        yield return new EqualityConverter();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
