@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
@@ -87,15 +88,21 @@ public sealed record NumberArrayReturningConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "numberArray"
               },
-              "value": [{{values.First()}}, {{values.Skip(1).First()}}, {{values.Skip(
-                2
-            ).First()}}]
+              "value": [
+                {{formattedValues.First()}},
+                {{formattedValues.Skip(1).First()}},
+                {{formattedValues.Skip(2).First()}}
+              ]
             }
             """;
 
@@ -116,15 +123,21 @@ public sealed record NumberArrayReturningConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "numberArray"
               },
-              "value": [{{values.First()}}, {{values.Skip(1).First()}}, {{values.Skip(
-                2
-            ).First()}}]
+              "value": [
+                {{formattedValues.First()}},
+                {{formattedValues.Skip(1).First()}},
+                {{formattedValues.Skip(2).First()}}
+              ]
             }
             """;
 
