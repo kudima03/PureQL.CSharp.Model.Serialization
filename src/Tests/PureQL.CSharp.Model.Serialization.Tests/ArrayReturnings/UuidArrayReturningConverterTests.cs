@@ -36,7 +36,7 @@ public sealed record UuidArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -69,7 +69,7 @@ public sealed record UuidArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               }
             }
             """;
@@ -83,14 +83,16 @@ public sealed record UuidArrayReturningConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "uuidArray"
               },
-              "value": ["{{expected.First()}}", "{{expected.Skip(
-                1
-            ).First()}}", "{{expected.Skip(2).First()}}"]
+              "value": [
+                "{{expected.First()}}",
+                "{{expected.Skip(1).First()}}",
+                "{{expected.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -107,14 +109,16 @@ public sealed record UuidArrayReturningConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string expectedJson = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "uuidArray"
               },
-              "value": ["{{expected.First()}}", "{{expected.Skip(
-                1
-            ).First()}}", "{{expected.Skip(2).First()}}"]
+              "value": [
+                "{{expected.First()}}",
+                "{{expected.Skip(1).First()}}",
+                "{{expected.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -135,7 +139,7 @@ public sealed record UuidArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               },
               "name": "{{expected}}"
             }
@@ -158,7 +162,7 @@ public sealed record UuidArrayReturningConverterTests
             {
               "name": "{{name}}",
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               }
             }
             """;
