@@ -86,7 +86,10 @@ public sealed record StringArrayReturningConverterTests
               "type": {
                 "name": "stringArray"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
 
@@ -106,7 +109,10 @@ public sealed record StringArrayReturningConverterTests
               "type": {
                 "name": "stringArray"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
 
