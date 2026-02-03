@@ -29,18 +29,18 @@ public sealed record UuidArrayScalarConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string input = /*lang=json,strict*/
-        $$"""
-        {
-          "type": {
-            "name": "uuidArray"
-          },
-          "value": [
-            "{{expected.First()}}",
-            "{{expected.Skip(1).First()}}",
-            "{{expected.Skip(2).First()}}"
-          ]
-        }
-        """;
+            $$"""
+            {
+              "type": {
+                "name": "uuidArray"
+              },
+              "value": [
+                "{{expected.First()}}",
+                "{{expected.Skip(1).First()}}",
+                "{{expected.Skip(2).First()}}"
+              ]
+            }
+            """;
 
         IUuidArrayScalar scalar = JsonSerializer.Deserialize<IUuidArrayScalar>(
             input,
@@ -56,7 +56,7 @@ public sealed record UuidArrayScalarConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string expectedJson = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "uuidArray"

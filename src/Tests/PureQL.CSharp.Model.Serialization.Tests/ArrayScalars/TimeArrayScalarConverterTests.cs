@@ -36,18 +36,18 @@ public sealed record TimeArrayScalarConverterTests
         IEnumerable<string> formattedTimes = expected.Select(x => x.ToString("HH:mm:ss"));
 
         string input = /*lang=json,strict*/
-        $$"""
-        {
-          "type": {
-            "name": "timeArray"
-          },
-          "value": [
-            "{{formattedTimes.First()}}",
-            "{{formattedTimes.Skip(1).First()}}",
-            "{{formattedTimes.Skip(2).First()}}"
-          ]
-        }
-        """;
+            $$"""
+            {
+              "type": {
+                "name": "timeArray"
+              },
+              "value": [
+                "{{formattedTimes.First()}}",
+                "{{formattedTimes.Skip(1).First()}}",
+                "{{formattedTimes.Skip(2).First()}}"
+              ]
+            }
+            """;
 
         ITimeArrayScalar scalar = JsonSerializer.Deserialize<ITimeArrayScalar>(
             input,
@@ -72,18 +72,18 @@ public sealed record TimeArrayScalarConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
-        {
-          "type": {
-            "name": "timeArray"
-          },
-          "value": [
-            "{{formattedTimes.First()}}",
-            "{{formattedTimes.Skip(1).First()}}",
-            "{{formattedTimes.Skip(2).First()}}"
-          ]
-        }
-        """;
+            $$"""
+            {
+              "type": {
+                "name": "timeArray"
+              },
+              "value": [
+                "{{formattedTimes.First()}}",
+                "{{formattedTimes.Skip(1).First()}}",
+                "{{formattedTimes.Skip(2).First()}}"
+              ]
+            }
+            """;
 
         string output = JsonSerializer.Serialize<ITimeArrayScalar>(
             new TimeArrayScalar(expectedValues),
