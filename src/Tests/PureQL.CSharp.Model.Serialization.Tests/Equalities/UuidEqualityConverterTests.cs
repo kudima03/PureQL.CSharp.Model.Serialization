@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -316,8 +315,8 @@ public sealed record UuidEqualityConverterTests
             """;
 
         UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT2, new UuidScalar(guid));
-        Assert.Equal(value.Right.AsT2, new UuidScalar(guid));
+        Assert.Equal(value.Left.AsT1, new UuidScalar(guid));
+        Assert.Equal(value.Right.AsT1, new UuidScalar(guid));
     }
 
     [Theory]
@@ -414,8 +413,8 @@ public sealed record UuidEqualityConverterTests
             """;
 
         UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new UuidParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT1, new UuidParameter(expectedSecondParamName));
+        Assert.Equal(value.Left.AsT0, new UuidParameter(expectedFirstParamName));
+        Assert.Equal(value.Right.AsT0, new UuidParameter(expectedSecondParamName));
     }
 
     [Theory]
@@ -491,148 +490,19 @@ public sealed record UuidEqualityConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "uuid"
-                }
-              },
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "uuid"
-                }
-              }
-            }
-            """;
-
-        UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(
-            value.Right.AsT0,
-            new UuidField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Left.AsT0,
-            new UuidField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("number")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              },
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<UuidEquality>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "uuid"
-                }
-              },
-              "right": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "uuid"
-                }
-              }
-            }
-            """;
-        string value = JsonSerializer.Serialize(
-            new UuidEquality(
-                new UuidReturning(
-                    new UuidField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new UuidReturning(
-                    new UuidField(expectedSecondEntityName, expectedSecondFieldName)
-                )
-            ),
-            _options
-        );
-
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        Guid expected = Guid.NewGuid();
         const string expectedParamName = "ashjlbd";
 
-        const string input = $$"""
+        string input = $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "uuid"
-                }
+                },
+                "value": "{{expected}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -644,11 +514,8 @@ public sealed record UuidEqualityConverterTests
             """;
 
         UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(
-            value.Left.AsT0,
-            new UuidField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(value.Right.AsT1, new UuidParameter(expectedParamName));
+        Assert.Equal(value.Left.AsT1, new UuidScalar(expected));
+        Assert.Equal(value.Right.AsT0, new UuidParameter(expectedParamName));
     }
 
     [Theory]
@@ -661,8 +528,7 @@ public sealed record UuidEqualityConverterTests
     [InlineData("number")]
     public void ThrowsExceptionOnWrongConditionType(string type)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        Guid expected = Guid.NewGuid();
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -670,11 +536,10 @@ public sealed record UuidEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "{{type}}"
-                }
+                },
+                "value": "{{expected}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -693,20 +558,18 @@ public sealed record UuidEqualityConverterTests
     [Fact]
     public void WriteMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        Guid expectedValue = Guid.NewGuid();
         const string expectedParamName = "ashjlbd";
 
-        const string expected = /*lang=json,strict*/
+        string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "uuid"
-                }
+                },
+                "value": "{{expectedValue}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -719,7 +582,7 @@ public sealed record UuidEqualityConverterTests
 
         string value = JsonSerializer.Serialize(
             new UuidEquality(
-                new UuidReturning(new UuidField(expectedEntityName, expectedFieldName)),
+                new UuidReturning(new UuidScalar(expectedValue)),
                 new UuidReturning(new UuidParameter(expectedParamName))
             ),
             _options
