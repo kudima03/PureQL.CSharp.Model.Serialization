@@ -426,7 +426,7 @@ public sealed record ArithmeticConverterTests
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(new NumberScalar(expectedValue), value.AsT0.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT0.Arguments.Skip(2).First().AsT0,
+            value.AsT0.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -547,7 +547,7 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Empty(value.AsT0.Arguments);
+        Assert.Empty(value.AsT1.Arguments);
     }
 
     [Fact]
@@ -706,11 +706,11 @@ public sealed record ArithmeticConverterTests
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT0.Arguments.First().AsT0,
+            value.AsT1.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.AsT0.Arguments.Last().AsT0,
+            value.AsT1.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -833,7 +833,7 @@ public sealed record ArithmeticConverterTests
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(new NumberScalar(expectedValue), value.AsT1.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT0.Arguments.Skip(2).First().AsT0,
+            value.AsT1.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -939,7 +939,7 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Empty(value.AsT0.Arguments);
+        Assert.Empty(value.AsT2.Arguments);
     }
 
     [Fact]
@@ -988,8 +988,8 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT3.Arguments.First().AsT1, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT3.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
+        Assert.Equal(value.AsT2.Arguments.First().AsT1, new NumberScalar(expectedValue1));
+        Assert.Equal(value.AsT2.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
     }
 
     [Theory]
@@ -1108,11 +1108,11 @@ public sealed record ArithmeticConverterTests
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT0.Arguments.First().AsT0,
+            value.AsT2.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.AsT0.Arguments.Last().AsT0,
+            value.AsT2.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -1208,9 +1208,6 @@ public sealed record ArithmeticConverterTests
     public void ReadMixedArgumentsOnMultiply()
     {
         double expectedValue = Random.Shared.NextDouble();
-
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -1225,13 +1222,6 @@ public sealed record ArithmeticConverterTests
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
                 },
                 {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
                   "name": "{{expectedParamName}}",
                   "type": {
                     "name": "number"
@@ -1242,9 +1232,9 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT3.Arguments.First().AsT1);
+        Assert.Equal(new NumberScalar(expectedValue), value.AsT2.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT0.Arguments.Skip(2).First().AsT0,
+            value.AsT2.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -1646,7 +1636,7 @@ public sealed record ArithmeticConverterTests
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(new NumberScalar(expectedValue), value.AsT3.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT3.Arguments.Skip(2).First().AsT0,
+            value.AsT3.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
