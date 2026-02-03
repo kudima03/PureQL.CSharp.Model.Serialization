@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -308,8 +307,8 @@ public sealed record BooleanEqualityConverterTests
             input,
             _options
         )!;
-        Assert.Equal(value.Left.AsT2, new BooleanScalar(true));
-        Assert.Equal(value.Right.AsT2, new BooleanScalar(false));
+        Assert.Equal(value.Left.AsT1, new BooleanScalar(true));
+        Assert.Equal(value.Right.AsT1, new BooleanScalar(false));
     }
 
     [Theory]
@@ -407,8 +406,8 @@ public sealed record BooleanEqualityConverterTests
             input,
             _options
         )!;
-        Assert.Equal(value.Left.AsT1, new BooleanParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT1, new BooleanParameter(expectedSecondParamName));
+        Assert.Equal(value.Left.AsT0, new BooleanParameter(expectedFirstParamName));
+        Assert.Equal(value.Right.AsT0, new BooleanParameter(expectedSecondParamName));
     }
 
     [Theory]
@@ -484,136 +483,6 @@ public sealed record BooleanEqualityConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "boolean"
-                }
-              },
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "boolean"
-                }
-              }
-            }
-            """;
-
-        BooleanEquality value = JsonSerializer.Deserialize<BooleanEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(
-            value.Right.AsT0,
-            new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Left.AsT0,
-            new BooleanField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              },
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BooleanEquality>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "boolean"
-                }
-              },
-              "right": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "boolean"
-                }
-              }
-            }
-            """;
-        string value = JsonSerializer.Serialize(
-            new BooleanEquality(
-                new BooleanReturning(
-                    new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new BooleanReturning(
-                    new BooleanField(expectedSecondEntityName, expectedSecondFieldName)
-                )
-            ),
-            _options
-        );
-
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadEqualityArgs()
     {
         const string input = /*lang=json,strict*/
@@ -658,20 +527,24 @@ public sealed record BooleanEqualityConverterTests
             _options
         )!;
         Assert.Equal(
-            value.Left.AsT3,
+            value.Left.AsT2,
             new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
+                new SingleValueEquality(
+                    new BooleanEquality(
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true))
+                    )
                 )
             )
         );
         Assert.Equal(
-            value.Right.AsT3,
+            value.Right.AsT2,
             new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
+                new SingleValueEquality(
+                    new BooleanEquality(
+                        new BooleanReturning(new BooleanScalar(false)),
+                        new BooleanReturning(new BooleanScalar(true))
+                    )
                 )
             )
         );
@@ -773,17 +646,21 @@ public sealed record BooleanEqualityConverterTests
             new BooleanEquality(
                 new BooleanReturning(
                     new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
                     )
                 ),
                 new BooleanReturning(
                     new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
                     )
                 )
@@ -974,17 +851,21 @@ public sealed record BooleanEqualityConverterTests
             new BooleanEquality(
                 new BooleanReturning(
                     new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
                     )
                 ),
                 new BooleanReturning(
                     new Equality(
-                        new BooleanEquality(
-                            new BooleanReturning(new BooleanScalar(false)),
-                            new BooleanReturning(new BooleanScalar(true))
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
                         )
                     )
                 )
@@ -997,19 +878,16 @@ public sealed record BooleanEqualityConverterTests
     [Fact]
     public void ReadMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         const string input = $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "boolean"
-                }
+                },
+                "value": false
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -1027,9 +905,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(
             value,
             new BooleanEquality(
-                new BooleanReturning(
-                    new BooleanField(expectedEntityName, expectedFieldName)
-                ),
+                new BooleanReturning(new BooleanScalar(false)),
                 new BooleanReturning(new BooleanParameter(expectedParamName))
             )
         );
@@ -1077,8 +953,6 @@ public sealed record BooleanEqualityConverterTests
     [Fact]
     public void WriteMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         const string expected = /*lang=json,strict*/
@@ -1086,11 +960,10 @@ public sealed record BooleanEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "boolean"
-                }
+                },
+                "value": false
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -1103,9 +976,7 @@ public sealed record BooleanEqualityConverterTests
 
         string value = JsonSerializer.Serialize(
             new BooleanEquality(
-                new BooleanReturning(
-                    new BooleanField(expectedEntityName, expectedFieldName)
-                ),
+                new BooleanReturning(new BooleanScalar(false)),
                 new BooleanReturning(new BooleanParameter(expectedParamName))
             ),
             _options
