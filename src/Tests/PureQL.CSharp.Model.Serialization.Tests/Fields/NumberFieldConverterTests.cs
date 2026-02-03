@@ -32,7 +32,7 @@ public sealed record NumberFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "number"
+                "name": "numberArray"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record NumberFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "number"
+                "name": "numberArray"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record NumberFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record NumberFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "number"
+                "name": "numberArray"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record NumberFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "number"
+                "name": "numberArray"
               }
             }
             """;
@@ -142,7 +142,15 @@ public sealed record NumberFieldConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("booleanArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("")]
+    [InlineData("asdasdasdasdasd")]
     public void ThrowsExceptionOnWrongType(string type)
     {
         string input = $$"""
