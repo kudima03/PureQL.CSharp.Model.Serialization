@@ -38,14 +38,16 @@ public sealed record DateArrayScalarConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "dateArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -72,14 +74,16 @@ public sealed record DateArrayScalarConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "dateArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -102,7 +106,9 @@ public sealed record DateArrayScalarConverterTests
               "type": {
                 "name": "dateArray"
               },
-              "value": ["2000-01-01-01"]
+              "value": [
+                "2000-01-01-01"
+              ]
             }
             """
     )]
@@ -148,6 +154,13 @@ public sealed record DateArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -163,7 +176,9 @@ public sealed record DateArrayScalarConverterTests
               "type": {
                 "name": "{{type}}"
               },
-              "value": ["2000-01-01"]
+              "value": [
+                "2000-01-01"
+              ]
             }
             """;
         _ = Assert.Throws<JsonException>(() =>
