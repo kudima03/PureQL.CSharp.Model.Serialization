@@ -32,7 +32,7 @@ public sealed record TimeFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "time"
+                "name": "timeArray"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record TimeFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "time"
+                "name": "timeArray"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record TimeFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record TimeFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "time"
+                "name": "timeArray"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record TimeFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "time"
+                "name": "timeArray"
               }
             }
             """;
@@ -142,6 +142,14 @@ public sealed record TimeFieldConverterTests
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("booleanArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("uuidArray")]
+    [InlineData("trgfuhnijblo")]
     [InlineData("")]
     public void ThrowsExceptionOnWrongType(string type)
     {
