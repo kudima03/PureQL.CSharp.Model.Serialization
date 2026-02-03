@@ -32,7 +32,7 @@ public sealed record UuidFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record UuidFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record UuidFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "uuid"
+                    "name": "uuidArray"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record UuidFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record UuidFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               }
             }
             """;
@@ -142,6 +142,14 @@ public sealed record UuidFieldConverterTests
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
+    [InlineData("dateArray")]
+    [InlineData("booleanArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("gfrdtinhujlb")]
     [InlineData("")]
     public void ThrowsExceptionOnWrongType(string type)
     {
