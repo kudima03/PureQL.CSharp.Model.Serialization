@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -316,8 +315,8 @@ public sealed record TimeEqualityConverterTests
             """;
 
         TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT2, new TimeScalar(now));
-        Assert.Equal(value.Right.AsT2, new TimeScalar(now));
+        Assert.Equal(value.Left.AsT1, new TimeScalar(now));
+        Assert.Equal(value.Right.AsT1, new TimeScalar(now));
     }
 
     [Theory]
@@ -414,8 +413,8 @@ public sealed record TimeEqualityConverterTests
             """;
 
         TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new TimeParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT1, new TimeParameter(expectedSecondParamName));
+        Assert.Equal(value.Left.AsT0, new TimeParameter(expectedFirstParamName));
+        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedSecondParamName));
     }
 
     [Theory]
@@ -491,148 +490,19 @@ public sealed record TimeEqualityConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              },
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-
-        TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(
-            value.Right.AsT0,
-            new TimeField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Left.AsT0,
-            new TimeField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("datetime")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              },
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeEquality>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              },
-              "right": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-        string value = JsonSerializer.Serialize(
-            new TimeEquality(
-                new TimeReturning(
-                    new TimeField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new TimeReturning(
-                    new TimeField(expectedSecondEntityName, expectedSecondFieldName)
-                )
-            ),
-            _options
-        );
-
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        TimeOnly expected = new TimeOnly(14, 30, 15);
         const string expectedParamName = "ashjlbd";
 
-        const string input = $$"""
+        string input = $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "time"
-                }
+                },
+                "value": "{{expected:HH:mm:ss}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -644,11 +514,8 @@ public sealed record TimeEqualityConverterTests
             """;
 
         TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(
-            value.Left.AsT0,
-            new TimeField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(value.Right.AsT1, new TimeParameter(expectedParamName));
+        Assert.Equal(value.Left.AsT1, new TimeScalar(expected));
+        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedParamName));
     }
 
     [Theory]
@@ -661,8 +528,7 @@ public sealed record TimeEqualityConverterTests
     [InlineData("uuid")]
     public void ThrowsExceptionOnWrongConditionType(string type)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        TimeOnly expected = new TimeOnly(14, 30, 15);
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -670,11 +536,10 @@ public sealed record TimeEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "{{type}}"
-                }
+                },
+                "value": "{{expected:HH:mm:ss}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -693,20 +558,18 @@ public sealed record TimeEqualityConverterTests
     [Fact]
     public void WriteMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        TimeOnly expectedValue = new TimeOnly(14, 30, 15);
         const string expectedParamName = "ashjlbd";
 
-        const string expected = /*lang=json,strict*/
+        string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "time"
-                }
+                },
+                "value": "{{expectedValue:HH:mm:ss}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -719,7 +582,7 @@ public sealed record TimeEqualityConverterTests
 
         string value = JsonSerializer.Serialize(
             new TimeEquality(
-                new TimeReturning(new TimeField(expectedEntityName, expectedFieldName)),
+                new TimeReturning(new TimeScalar(expectedValue)),
                 new TimeReturning(new TimeParameter(expectedParamName))
             ),
             _options
