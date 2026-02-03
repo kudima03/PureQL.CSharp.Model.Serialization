@@ -36,14 +36,16 @@ public sealed record DateTimeArrayScalarConverterTests
         IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "datetimeArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -68,14 +70,16 @@ public sealed record DateTimeArrayScalarConverterTests
         IEnumerable<string> formattedDates = expectedValues.Select(x => x.ToString("O"));
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "datetimeArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -144,6 +148,13 @@ public sealed record DateTimeArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -159,7 +170,9 @@ public sealed record DateTimeArrayScalarConverterTests
               "type": {
                 "name": "{{type}}"
               },
-              "value": ["22.12.2025 9:52:31"]
+              "value": [
+                "22.12.2025 9:52:31"
+              ]
             }
             """;
         _ = Assert.Throws<JsonException>(() =>
