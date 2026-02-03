@@ -32,7 +32,10 @@ public sealed record StringArrayScalarConverterTests
               "type": {
                 "name": "stringArray"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
 
@@ -53,7 +56,10 @@ public sealed record StringArrayScalarConverterTests
               "type": {
                 "name": "stringArray"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
 
@@ -94,6 +100,13 @@ public sealed record StringArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("datetime")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -109,7 +122,10 @@ public sealed record StringArrayScalarConverterTests
               "type": {
                 "name": "{{type}}"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
         _ = Assert.Throws<JsonException>(() =>
