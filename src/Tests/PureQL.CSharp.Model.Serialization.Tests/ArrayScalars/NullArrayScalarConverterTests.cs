@@ -32,7 +32,11 @@ public sealed record NullArrayScalarConverterTests
               "type": {
                 "name": "nullArray"
               },
-              "value": [null, null, null]
+              "value": [
+                null,
+                null,
+                null
+              ]
             }
             """;
 
@@ -53,7 +57,11 @@ public sealed record NullArrayScalarConverterTests
               "type": {
                 "name": "nullArray"
               },
-              "value": [null, null, null]
+              "value": [
+                null,
+                null,
+                null
+              ]
             }
             """;
 
@@ -74,7 +82,11 @@ public sealed record NullArrayScalarConverterTests
               "type": {
                 "name": "nullArray"
               },
-              "value": [null, 10, "dgefrknij"]
+              "value": [
+                null,
+                10,
+                "dgefrknij"
+              ]
             }
             """;
 
@@ -96,6 +108,13 @@ public sealed record NullArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("datetimeArray")]
@@ -111,7 +130,11 @@ public sealed record NullArrayScalarConverterTests
               "type": {
                 "name": "{{type}}"
               },
-              "value": [null, null, null]
+              "value": [
+                null,
+                null,
+                null
+              ]
             }
             """;
 
