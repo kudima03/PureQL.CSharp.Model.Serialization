@@ -92,14 +92,16 @@ public sealed record DateArrayReturningConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "dateArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -125,14 +127,16 @@ public sealed record DateArrayReturningConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "dateArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
