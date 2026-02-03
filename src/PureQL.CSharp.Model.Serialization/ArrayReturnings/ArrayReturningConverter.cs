@@ -48,7 +48,7 @@ internal sealed class ArrayReturningConverter : JsonConverter<ArrayReturning>
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
-                out BooleanArrayReturning? timeArray
+                out TimeArrayReturning? timeArray
             )
                 ? new ArrayReturning(timeArray!)
             : JsonExtensions.TryDeserialize(
