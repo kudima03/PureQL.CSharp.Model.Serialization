@@ -90,14 +90,16 @@ public sealed record DateTimeArrayReturningConverterTests
         IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "datetimeArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -121,14 +123,16 @@ public sealed record DateTimeArrayReturningConverterTests
         IEnumerable<string> formattedDates = expectedValues.Select(x => x.ToString("O"));
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "datetimeArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
