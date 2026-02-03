@@ -1,17 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
 internal sealed record DateFieldJsonModel
 {
     public DateFieldJsonModel(DateField field)
-        : this(field.Entity, field.Field, (DateType)field.Type) { }
+        : this(field.Entity, field.Field, (DateArrayType)field.Type) { }
 
     [JsonConstructor]
-    public DateFieldJsonModel(string entity, string field, DateType type)
+    public DateFieldJsonModel(string entity, string field, DateArrayType type)
     {
         Entity = entity ?? throw new JsonException();
         Field = field ?? throw new JsonException();
@@ -22,7 +22,7 @@ internal sealed record DateFieldJsonModel
 
     public string Field { get; }
 
-    public DateType Type { get; }
+    public DateArrayType Type { get; }
 }
 
 internal sealed class DateFieldConverter : JsonConverter<DateField>
