@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Arithmetics;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -180,8 +179,8 @@ public sealed record MultiplyConverterTests
             """;
 
         Multiply value = JsonSerializer.Deserialize<Multiply>(input, _options)!;
-        Assert.Equal(value.Arguments.First().AsT2, new NumberScalar(expectedValue1));
-        Assert.Equal(value.Arguments.Last().AsT2, new NumberScalar(expectedValue2));
+        Assert.Equal(value.Arguments.First().AsT1, new NumberScalar(expectedValue1));
+        Assert.Equal(value.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
     }
 
     [Theory]
@@ -192,6 +191,13 @@ public sealed record MultiplyConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
         double expectedValue1 = Random.Shared.NextDouble();
@@ -291,11 +297,11 @@ public sealed record MultiplyConverterTests
 
         Multiply value = JsonSerializer.Deserialize<Multiply>(input, _options)!;
         Assert.Equal(
-            value.Arguments.First().AsT1,
+            value.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.Arguments.Last().AsT1,
+            value.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -308,6 +314,13 @@ public sealed record MultiplyConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -379,147 +392,10 @@ public sealed record MultiplyConverterTests
     }
 
     [Fact]
-    public void ReadFieldArguments()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "multiply",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        Multiply value = JsonSerializer.Deserialize<Multiply>(input, _options)!;
-        Assert.Equal(
-            value.Arguments.First().AsT0,
-            new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Arguments.Last().AsT0,
-            new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("boolean")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "multiply",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<Multiply>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArguments()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "multiply",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new Multiply(
-                [
-                    new NumberReturning(
-                        new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-                    ),
-                    new NumberReturning(
-                        new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-                    ),
-                ]
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArguments()
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -532,13 +408,6 @@ public sealed record MultiplyConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -551,13 +420,9 @@ public sealed record MultiplyConverterTests
             """;
 
         Multiply value = JsonSerializer.Deserialize<Multiply>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.Arguments.First().AsT2);
+        Assert.Equal(new NumberScalar(expectedValue), value.Arguments.First().AsT1);
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
-            value.Arguments.Skip(1).First().AsT0
-        );
-        Assert.Equal(
-            value.Arguments.Skip(2).First().AsT1,
+            value.Arguments.Skip(2).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -567,8 +432,6 @@ public sealed record MultiplyConverterTests
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string expected = /*lang=json,strict*/
@@ -581,13 +444,6 @@ public sealed record MultiplyConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -603,9 +459,6 @@ public sealed record MultiplyConverterTests
             new Multiply(
                 [
                     new NumberReturning(new NumberScalar(expectedValue)),
-                    new NumberReturning(
-                        new NumberField(expectedEntityName, expectedFieldName)
-                    ),
                     new NumberReturning(new NumberParameter(expectedParamName)),
                 ]
             ),
