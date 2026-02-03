@@ -86,7 +86,11 @@ public sealed record BooleanArrayReturningConverterTests
               "type": {
                 "name": "booleanArray"
               },
-              "value": [true, false, true]
+              "value": [
+                true,
+                false,
+                true
+              ]
             }
             """;
 
@@ -107,7 +111,11 @@ public sealed record BooleanArrayReturningConverterTests
                   "type": {
                     "name": "booleanArray"
                   },
-                  "value": [true, false, true]
+                  "value": [
+                    true,
+                    false,
+                    true
+                  ]
                 }
                 """;
 
