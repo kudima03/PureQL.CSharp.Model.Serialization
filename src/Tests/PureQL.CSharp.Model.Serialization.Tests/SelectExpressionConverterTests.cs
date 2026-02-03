@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -44,7 +45,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -57,7 +58,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new BooleanType(), field.Type);
+        Assert.Equal(new BooleanArrayType(), field.Type);
     }
 
     [Fact]
@@ -83,7 +84,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               }
             }
             """;
@@ -327,7 +328,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateType(), field.Type);
+        Assert.Equal(new DateArrayType(), field.Type);
     }
 
     [Fact]
@@ -485,7 +486,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -498,7 +499,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateTimeType(), field.Type);
+        Assert.Equal(new DateTimeArrayType(), field.Type);
     }
 
     [Fact]
@@ -524,7 +525,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               }
             }
             """;
@@ -663,7 +664,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "number"
+                "name": "numberArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -676,7 +677,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new NumberType(), field.Type);
+        Assert.Equal(new NumberArrayType(), field.Type);
     }
 
     [Fact]
@@ -702,7 +703,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "number"
+                "name": "numberArray"
               }
             }
             """;
@@ -841,7 +842,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "string"
+                "name": "stringArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -854,7 +855,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new StringType(), field.Type);
+        Assert.Equal(new StringArrayType(), field.Type);
     }
 
     [Fact]
@@ -880,7 +881,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "string"
+                "name": "stringArray"
               }
             }
             """;
@@ -1017,7 +1018,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "time"
+                "name": "timeArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -1030,7 +1031,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new TimeType(), field.Type);
+        Assert.Equal(new TimeArrayType(), field.Type);
     }
 
     [Fact]
@@ -1054,7 +1055,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "time"
+                "name": "timeArray"
               }
             }
             """;
@@ -1230,7 +1231,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               }
             }
             """;
