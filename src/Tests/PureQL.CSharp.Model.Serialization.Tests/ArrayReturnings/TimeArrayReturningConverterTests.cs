@@ -90,14 +90,16 @@ public sealed record TimeArrayReturningConverterTests
         IEnumerable<string> formattedTimes = expected.Select(x => x.ToString("HH:mm:ss"));
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "timeArray"
               },
-              "value": [{{formattedTimes.First()}}, {{formattedTimes.Skip(
-                1
-            ).First()}}, {{formattedTimes.Skip(2).First()}}]
+              "value": [
+                "{{formattedTimes.First()}}",
+                "{{formattedTimes.Skip(1).First()}}",
+                "{{formattedTimes.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -123,14 +125,16 @@ public sealed record TimeArrayReturningConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "timeArray"
               },
-              "value": [{{formattedTimes.First()}}, {{formattedTimes.Skip(
-                1
-            ).First()}}, {{formattedTimes.Skip(2).First()}}]
+              "value": [
+                "{{formattedTimes.First()}}",
+                "{{formattedTimes.Skip(1).First()}}",
+                "{{formattedTimes.Skip(2).First()}}"
+              ]
             }
             """;
 
