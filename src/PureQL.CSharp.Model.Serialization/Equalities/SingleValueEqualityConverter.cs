@@ -4,9 +4,9 @@ using PureQL.CSharp.Model.Equalities;
 
 namespace PureQL.CSharp.Model.Serialization.Equalities;
 
-internal sealed class EqualityConverter : JsonConverter<Equality>
+internal sealed class SingleValueEqualityConverter : JsonConverter<SingleValueEquality>
 {
-    public override Equality Read(
+    public override SingleValueEquality Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options
@@ -20,37 +20,37 @@ internal sealed class EqualityConverter : JsonConverter<Equality>
                 options,
                 out BooleanEquality? booleanEquality
             )
-                ? new Equality(booleanEquality!)
+                ? new SingleValueEquality(booleanEquality!)
             : JsonExtensions.TryDeserialize(root, options, out DateEquality? dateEquality)
-                ? new Equality(dateEquality!)
+                ? new SingleValueEquality(dateEquality!)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out DateTimeEquality? dateTimeEquality
             )
-                ? new Equality(dateTimeEquality!)
+                ? new SingleValueEquality(dateTimeEquality!)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out NumberEquality? numberEquality
             )
-                ? new Equality(numberEquality!)
+                ? new SingleValueEquality(numberEquality!)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out StringEquality? stringEquality
             )
-                ? new Equality(stringEquality!)
+                ? new SingleValueEquality(stringEquality!)
             : JsonExtensions.TryDeserialize(root, options, out TimeEquality? timeEquality)
-                ? new Equality(timeEquality!)
+                ? new SingleValueEquality(timeEquality!)
             : JsonExtensions.TryDeserialize(root, options, out UuidEquality? uuidEquality)
-                ? new Equality(uuidEquality!)
-            : throw new JsonException("Unable to determine Equality type.");
+                ? new SingleValueEquality(uuidEquality!)
+            : throw new JsonException("Unable to determine SingleValueEquality type.");
     }
 
     public override void Write(
         Utf8JsonWriter writer,
-        Equality value,
+        SingleValueEquality value,
         JsonSerializerOptions options
     )
     {
@@ -84,7 +84,7 @@ internal sealed class EqualityConverter : JsonConverter<Equality>
         }
         else
         {
-            throw new JsonException("Unable to determine Equality type.");
+            throw new JsonException("Unable to determine SingleValueEquality type.");
         }
     }
 }
