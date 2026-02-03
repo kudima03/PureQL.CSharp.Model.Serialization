@@ -30,15 +30,17 @@ public sealed record UuidArrayScalarConverterTests
 
         string input = /*lang=json,strict*/
         $$"""
-            {
-              "type": {
-                "name": "uuidArray"
-              },
-              "value": ["{{expected.First()}}", "{{expected.Skip(
-                1
-            ).First()}}", "{{expected.Skip(2).First()}}"]
-            }
-            """;
+        {
+          "type": {
+            "name": "uuidArray"
+          },
+          "value": [
+            "{{expected.First()}}",
+            "{{expected.Skip(1).First()}}",
+            "{{expected.Skip(2).First()}}"
+          ]
+        }
+        """;
 
         IUuidArrayScalar scalar = JsonSerializer.Deserialize<IUuidArrayScalar>(
             input,
@@ -59,9 +61,11 @@ public sealed record UuidArrayScalarConverterTests
               "type": {
                 "name": "uuidArray"
               },
-              "value": ["{{expected.First()}}", "{{expected.Skip(
-                1
-            ).First()}}", "{{expected.Skip(2).First()}}"]
+              "value": [
+                "{{expected.First()}}",
+                "{{expected.Skip(1).First()}}",
+                "{{expected.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -84,7 +88,9 @@ public sealed record UuidArrayScalarConverterTests
               "type": {
                 "name": "uuidArray"
               },
-              "value": ["afdkjgnhajlkhisfdbng"]
+              "value": [
+                "afdkjgnhajlkhisfdbng"
+              ]
             }
             """
     )]
@@ -130,6 +136,13 @@ public sealed record UuidArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("boolean")]
+    [InlineData("date")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("datetime")]
+    [InlineData("string")]
+    [InlineData("time")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
