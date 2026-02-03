@@ -32,7 +32,11 @@ public sealed record BooleanArrayScalarConverterTests
               "type": {
                 "name": "booleanArray"
               },
-              "value": [true, false, true]
+              "value": [
+                true,
+                false,
+                true
+              ]
             }
             """;
 
@@ -54,7 +58,11 @@ public sealed record BooleanArrayScalarConverterTests
                   "type": {
                     "name": "booleanArray"
                   },
-                  "value": [true, false, true]
+                  "value": [
+                    true,
+                    false,
+                    true
+                  ]
                 }
                 """;
 
@@ -113,6 +121,13 @@ public sealed record BooleanArrayScalarConverterTests
     }
 
     [Theory]
+    [InlineData("date")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("string")]
+    [InlineData("number")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     [InlineData("dateArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -128,7 +143,11 @@ public sealed record BooleanArrayScalarConverterTests
               "type": {
                 "name": "{{type}}"
               },
-              "value": [true, false, true]
+              "value": [
+                true,
+                false,
+                true
+              ]
             }
             """;
         _ = Assert.Throws<JsonException>(() =>
