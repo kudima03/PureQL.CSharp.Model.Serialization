@@ -1,17 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
 internal sealed record UuidFieldJsonModel
 {
     public UuidFieldJsonModel(UuidField field)
-        : this(field.Entity, field.Field, (UuidType)field.Type) { }
+        : this(field.Entity, field.Field, (UuidArrayType)field.Type) { }
 
     [JsonConstructor]
-    public UuidFieldJsonModel(string entity, string field, UuidType type)
+    public UuidFieldJsonModel(string entity, string field, UuidArrayType type)
     {
         Entity = entity ?? throw new JsonException();
         Field = field ?? throw new JsonException();
@@ -22,7 +22,7 @@ internal sealed record UuidFieldJsonModel
 
     public string Field { get; }
 
-    public UuidType Type { get; }
+    public UuidArrayType Type { get; }
 }
 
 internal sealed class UuidFieldConverter : JsonConverter<UuidField>
