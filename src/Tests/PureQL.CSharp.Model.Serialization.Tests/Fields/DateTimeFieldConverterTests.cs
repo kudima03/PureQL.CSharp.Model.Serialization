@@ -32,7 +32,7 @@ public sealed record DateTimeFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record DateTimeFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record DateTimeFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "datetime"
+                    "name": "datetimeArray"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record DateTimeFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record DateTimeFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               }
             }
             """;
@@ -142,7 +142,15 @@ public sealed record DateTimeFieldConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("booleanArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("")]
+    [InlineData("asdasdasdasd")]
     public void ThrowsExceptionOnWrongType(string type)
     {
         string input = $$"""
