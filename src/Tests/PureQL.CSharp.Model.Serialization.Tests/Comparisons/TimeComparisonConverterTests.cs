@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Comparisons;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -358,8 +357,8 @@ public sealed record TimeComparisonConverterTests
             _options
         )!;
         Assert.Equal(@operator, comparison.Operator);
-        Assert.Equal(new TimeScalar(now), comparison.Left.AsT2);
-        Assert.Equal(new TimeScalar(now), comparison.Right.AsT2);
+        Assert.Equal(new TimeScalar(now), comparison.Left.AsT1);
+        Assert.Equal(new TimeScalar(now), comparison.Right.AsT1);
     }
 
     [Theory]
@@ -493,8 +492,8 @@ public sealed record TimeComparisonConverterTests
             _options
         )!;
         Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new TimeParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT1, new TimeParameter(expectedSecondParamName));
+        Assert.Equal(value.Left.AsT0, new TimeParameter(expectedFirstParamName));
+        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedSecondParamName));
     }
 
     [Theory]
@@ -603,182 +602,19 @@ public sealed record TimeComparisonConverterTests
     [InlineData(ComparisonOperator.GreaterThanOrEqual)]
     [InlineData(ComparisonOperator.LessThan)]
     [InlineData(ComparisonOperator.LessThanOrEqual)]
-    public void ReadFieldArgs(ComparisonOperator @operator)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              },
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-
-        TimeComparison value = JsonSerializer.Deserialize<TimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(
-            value.Right.AsT0,
-            new TimeField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Left.AsT0,
-            new TimeField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean", ComparisonOperator.GreaterThan)]
-    [InlineData("date", ComparisonOperator.GreaterThan)]
-    [InlineData("null", ComparisonOperator.GreaterThan)]
-    [InlineData("datetime", ComparisonOperator.GreaterThan)]
-    [InlineData("number", ComparisonOperator.GreaterThan)]
-    [InlineData("string", ComparisonOperator.GreaterThan)]
-    [InlineData("uuid", ComparisonOperator.GreaterThan)]
-    [InlineData("boolean", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("date", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("null", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("datetime", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("number", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("string", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("uuid", ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData("boolean", ComparisonOperator.LessThan)]
-    [InlineData("date", ComparisonOperator.LessThan)]
-    [InlineData("null", ComparisonOperator.LessThan)]
-    [InlineData("datetime", ComparisonOperator.LessThan)]
-    [InlineData("number", ComparisonOperator.LessThan)]
-    [InlineData("string", ComparisonOperator.LessThan)]
-    [InlineData("uuid", ComparisonOperator.LessThan)]
-    [InlineData("boolean", ComparisonOperator.LessThanOrEqual)]
-    [InlineData("date", ComparisonOperator.LessThanOrEqual)]
-    [InlineData("null", ComparisonOperator.LessThanOrEqual)]
-    [InlineData("datetime", ComparisonOperator.LessThanOrEqual)]
-    [InlineData("number", ComparisonOperator.LessThanOrEqual)]
-    [InlineData("string", ComparisonOperator.LessThanOrEqual)]
-    [InlineData("uuid", ComparisonOperator.LessThanOrEqual)]
-    public void ThrowsExceptionOnWrongFieldType(string type, ComparisonOperator @operator)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              },
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeComparison>(input, _options)
-        );
-    }
-
-    [Theory]
-    [InlineData(ComparisonOperator.GreaterThan)]
-    [InlineData(ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData(ComparisonOperator.LessThan)]
-    [InlineData(ComparisonOperator.LessThanOrEqual)]
-    public void WriteFieldArgs(ComparisonOperator @operator)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
-              "left": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              },
-              "right": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-        string value = JsonSerializer.Serialize(
-            new TimeComparison(
-                @operator,
-                new TimeReturning(
-                    new TimeField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new TimeReturning(
-                    new TimeField(expectedSecondEntityName, expectedSecondFieldName)
-                )
-            ),
-            _options
-        );
-
-        Assert.Equal(expected, value);
-    }
-
-    [Theory]
-    [InlineData(ComparisonOperator.GreaterThan)]
-    [InlineData(ComparisonOperator.GreaterThanOrEqual)]
-    [InlineData(ComparisonOperator.LessThan)]
-    [InlineData(ComparisonOperator.LessThanOrEqual)]
     public void ReadMixedArgs(ComparisonOperator @operator)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        TimeOnly expected = new TimeOnly(14, 30, 15);
         const string expectedParamName = "ashjlbd";
 
         string input = $$"""
             {
               "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "time"
-                }
+                },
+                "value": "{{expected:HH:mm:ss}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -794,11 +630,8 @@ public sealed record TimeComparisonConverterTests
             _options
         )!;
         Assert.Equal(@operator, value.Operator);
-        Assert.Equal(
-            value.Left.AsT0,
-            new TimeField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(value.Right.AsT1, new TimeParameter(expectedParamName));
+        Assert.Equal(value.Left.AsT1, new TimeScalar(expected));
+        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedParamName));
     }
 
     [Theory]
@@ -835,8 +668,7 @@ public sealed record TimeComparisonConverterTests
         ComparisonOperator @operator
     )
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        TimeOnly expected = new TimeOnly(14, 30, 15);
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -844,11 +676,10 @@ public sealed record TimeComparisonConverterTests
             {
               "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "{{type}}"
-                }
+                },
+                "value": "{{expected:HH:mm:ss}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -871,8 +702,7 @@ public sealed record TimeComparisonConverterTests
     [InlineData(ComparisonOperator.LessThanOrEqual)]
     public void WriteMixedArgs(ComparisonOperator @operator)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        TimeOnly expectedValue = new TimeOnly(14, 30, 15);
         const string expectedParamName = "ashjlbd";
 
         string expected = /*lang=json,strict*/
@@ -880,11 +710,10 @@ public sealed record TimeComparisonConverterTests
             {
               "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "time"
-                }
+                },
+                "value": "{{expectedValue:HH:mm:ss}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -898,7 +727,7 @@ public sealed record TimeComparisonConverterTests
         string value = JsonSerializer.Serialize(
             new TimeComparison(
                 @operator,
-                new TimeReturning(new TimeField(expectedEntityName, expectedFieldName)),
+                new TimeReturning(new TimeScalar(expectedValue)),
                 new TimeReturning(new TimeParameter(expectedParamName))
             ),
             _options
