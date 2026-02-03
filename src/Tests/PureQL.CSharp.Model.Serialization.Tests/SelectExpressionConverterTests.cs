@@ -1,8 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.BooleanOperations;
-using PureQL.CSharp.Model.Equalities;
+using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -54,7 +53,7 @@ public sealed record SelectExpressionConverterTests
 
         BooleanField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT0.AsT0;
+            .AsT1.AsT0.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -69,7 +68,11 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new BooleanReturning(new BooleanField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new BooleanArrayReturning(
+                        new BooleanField(expectedEntity, expectedField)
+                    )
+                )
             ),
             _options
         );
@@ -105,7 +108,7 @@ public sealed record SelectExpressionConverterTests
 
         BooleanParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT0.AsT1;
+            .AsT0.AsT0.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new BooleanType(), parameter.Type);
@@ -118,7 +121,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new BooleanReturning(new BooleanParameter(expectedParamName))
+                new SingleValueReturning(
+                    new BooleanReturning(new BooleanParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -151,7 +156,7 @@ public sealed record SelectExpressionConverterTests
 
         BooleanScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT0.AsT2;
+            .AsT0.AsT0.AsT1;
 
         Assert.True(scalar.Value);
     }
@@ -170,81 +175,13 @@ public sealed record SelectExpressionConverterTests
             """;
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new BooleanReturning(new BooleanScalar(true))),
+            new SelectExpression(
+                new SingleValueReturning(new BooleanReturning(new BooleanScalar(true)))
+            ),
             _options
         );
 
         Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
-    public void ReadEquality()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "u",
-                "field": "active",
-                "type": {
-                  "name": "boolean"
-                }
-              },
-              "right": {
-                "type": {
-                  "name": "boolean"
-                },
-                "value": true
-              }
-            }
-            """;
-
-        BooleanEquality equality = JsonSerializer
-            .Deserialize<SelectExpression>(input, _options)!
-            .AsT0.AsT3.AsT0;
-
-        Assert.Equal(new BooleanField("u", "active"), equality.Left.AsT0);
-        Assert.Equal(new BooleanScalar(true), equality.Right.AsT2);
-    }
-
-    [Fact]
-    public void ReadBooleanOperator()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "and",
-              "conditions": [
-                {
-                  "entity": "u",
-                  "field": "active",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "type": {
-                    "name": "boolean"
-                  },
-                  "value": true
-                }
-              ]
-            }
-            """;
-
-        SelectExpression booleanReturning = JsonSerializer.Deserialize<SelectExpression>(
-            input,
-            _options
-        )!;
-
-        AndOperator andOperator = booleanReturning.AsT0.AsT4.AsT0;
-
-        Assert.Equal(
-            new BooleanField("u", "active"),
-            andOperator.Conditions.First().AsT0
-        );
-        Assert.Equal(new BooleanScalar(true), andOperator.Conditions.Last().AsT2);
     }
 
     [Theory]
@@ -323,7 +260,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               },
               "alias": "{{expectedAlias}}"
             }
@@ -331,7 +268,11 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new BooleanReturning(new BooleanField(expectedEntity, expectedField)),
+                new ArrayReturning(
+                    new BooleanArrayReturning(
+                        new BooleanField(expectedEntity, expectedField)
+                    )
+                ),
                 expectedAlias
             ),
             _options
@@ -373,7 +314,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "date"
+                "name": "dateArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -382,7 +323,7 @@ public sealed record SelectExpressionConverterTests
 
         DateField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT3.AsT0;
+            .AsT1.AsT1.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -397,7 +338,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new DateReturning(new DateField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new DateArrayReturning(new DateField(expectedEntity, expectedField))
+                )
             ),
             _options
         );
@@ -408,7 +351,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "date"
+                "name": "dateArray"
               }
             }
             """;
@@ -433,7 +376,7 @@ public sealed record SelectExpressionConverterTests
 
         DateParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT3.AsT1;
+            .AsT0.AsT1.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new DateType(), parameter.Type);
@@ -445,7 +388,11 @@ public sealed record SelectExpressionConverterTests
         const string expectedParamName = "uheayfodrbniJ";
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new DateReturning(new DateParameter(expectedParamName))),
+            new SelectExpression(
+                new SingleValueReturning(
+                    new DateReturning(new DateParameter(expectedParamName))
+                )
+            ),
             _options
         );
 
@@ -477,7 +424,7 @@ public sealed record SelectExpressionConverterTests
 
         DateScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT3.AsT2;
+            .AsT0.AsT1.AsT1;
 
         Assert.Equal(DateOnly.FromDateTime(DateTime.Now), scalar.Value);
     }
@@ -497,7 +444,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new DateReturning(new DateScalar(DateOnly.FromDateTime(DateTime.Now)))
+                new SingleValueReturning(
+                    new DateReturning(new DateScalar(DateOnly.FromDateTime(DateTime.Now)))
+                )
             ),
             _options
         );
@@ -545,7 +494,7 @@ public sealed record SelectExpressionConverterTests
 
         DateTimeField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT5.AsT0;
+            .AsT1.AsT2.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -560,7 +509,11 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new DateTimeReturning(new DateTimeField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new DateTimeArrayReturning(
+                        new DateTimeField(expectedEntity, expectedField)
+                    )
+                )
             ),
             _options
         );
@@ -596,7 +549,7 @@ public sealed record SelectExpressionConverterTests
 
         DateTimeParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT5.AsT1;
+            .AsT0.AsT2.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new DateTimeType(), parameter.Type);
@@ -609,7 +562,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new DateTimeReturning(new DateTimeParameter(expectedParamName))
+                new SingleValueReturning(
+                    new DateTimeReturning(new DateTimeParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -644,7 +599,7 @@ public sealed record SelectExpressionConverterTests
 
         DateTimeScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT5.AsT2;
+            .AsT0.AsT2.AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -666,7 +621,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new DateTimeReturning(new DateTimeScalar(expectedValue))
+                new SingleValueReturning(
+                    new DateTimeReturning(new DateTimeScalar(expectedValue))
+                )
             ),
             _options
         );
@@ -715,7 +672,7 @@ public sealed record SelectExpressionConverterTests
 
         NumberField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT1.AsT0;
+            .AsT1.AsT3.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -730,7 +687,11 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new NumberReturning(new NumberField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new NumberArrayReturning(
+                        new NumberField(expectedEntity, expectedField)
+                    )
+                )
             ),
             _options
         );
@@ -766,7 +727,7 @@ public sealed record SelectExpressionConverterTests
 
         NumberParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT1.AsT1;
+            .AsT0.AsT3.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new NumberType(), parameter.Type);
@@ -779,7 +740,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new NumberReturning(new NumberParameter(expectedParamName))
+                new SingleValueReturning(
+                    new NumberReturning(new NumberParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -813,7 +776,7 @@ public sealed record SelectExpressionConverterTests
             """;
         NumberScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT1.AsT2;
+            .AsT0.AsT3.AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -834,7 +797,11 @@ public sealed record SelectExpressionConverterTests
             """;
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new NumberReturning(new NumberScalar(expectedValue))),
+            new SelectExpression(
+                new SingleValueReturning(
+                    new NumberReturning(new NumberScalar(expectedValue))
+                )
+            ),
             _options
         );
 
@@ -883,7 +850,7 @@ public sealed record SelectExpressionConverterTests
 
         StringField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT2.AsT0;
+            .AsT1.AsT4.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -898,7 +865,11 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new StringReturning(new StringField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new StringArrayReturning(
+                        new StringField(expectedEntity, expectedField)
+                    )
+                )
             ),
             _options
         );
@@ -934,7 +905,7 @@ public sealed record SelectExpressionConverterTests
 
         StringParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT2.AsT1;
+            .AsT0.AsT4.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new StringType(), parameter.Type);
@@ -947,7 +918,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new StringReturning(new StringParameter(expectedParamName))
+                new SingleValueReturning(
+                    new StringReturning(new StringParameter(expectedParamName))
+                )
             ),
             _options
         );
@@ -980,7 +953,7 @@ public sealed record SelectExpressionConverterTests
             """;
         StringScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT2.AsT2;
+            .AsT0.AsT4.AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -1000,7 +973,11 @@ public sealed record SelectExpressionConverterTests
             """;
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new StringReturning(new StringScalar(expectedValue))),
+            new SelectExpression(
+                new SingleValueReturning(
+                    new StringReturning(new StringScalar(expectedValue))
+                )
+            ),
             _options
         );
 
@@ -1049,7 +1026,7 @@ public sealed record SelectExpressionConverterTests
 
         TimeField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT4.AsT0;
+            .AsT1.AsT5.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -1064,7 +1041,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new TimeReturning(new TimeField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new TimeArrayReturning(new TimeField(expectedEntity, expectedField))
+                )
             ),
             _options
         );
@@ -1100,7 +1079,7 @@ public sealed record SelectExpressionConverterTests
 
         TimeParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT4.AsT1;
+            .AsT0.AsT5.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new TimeType(), parameter.Type);
@@ -1112,7 +1091,11 @@ public sealed record SelectExpressionConverterTests
         const string expectedParamName = "uheayfodrbniJ";
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new TimeReturning(new TimeParameter(expectedParamName))),
+            new SelectExpression(
+                new SingleValueReturning(
+                    new TimeReturning(new TimeParameter(expectedParamName))
+                )
+            ),
             _options
         );
 
@@ -1142,9 +1125,10 @@ public sealed record SelectExpressionConverterTests
               "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
             }
             """;
+
         TimeScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT4.AsT2;
+            .AsT0.AsT5.AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -1164,7 +1148,9 @@ public sealed record SelectExpressionConverterTests
             """;
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new TimeReturning(new TimeScalar(expectedValue))),
+            new SelectExpression(
+                new SingleValueReturning(new TimeReturning(new TimeScalar(expectedValue)))
+            ),
             _options
         );
 
@@ -1216,7 +1202,7 @@ public sealed record SelectExpressionConverterTests
 
         UuidField field = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT6.AsT0;
+            .AsT1.AsT6.AsT1;
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
@@ -1231,7 +1217,9 @@ public sealed record SelectExpressionConverterTests
 
         string output = JsonSerializer.Serialize(
             new SelectExpression(
-                new UuidReturning(new UuidField(expectedEntity, expectedField))
+                new ArrayReturning(
+                    new UuidArrayReturning(new UuidField(expectedEntity, expectedField))
+                )
             ),
             _options
         );
@@ -1267,7 +1255,7 @@ public sealed record SelectExpressionConverterTests
 
         UuidParameter parameter = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT6.AsT1;
+            .AsT0.AsT6.AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new UuidType(), parameter.Type);
@@ -1279,7 +1267,11 @@ public sealed record SelectExpressionConverterTests
         const string expectedParamName = "uheayfodrbniJ";
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new UuidReturning(new UuidParameter(expectedParamName))),
+            new SelectExpression(
+                new SingleValueReturning(
+                    new UuidReturning(new UuidParameter(expectedParamName))
+                )
+            ),
             _options
         );
 
@@ -1309,9 +1301,10 @@ public sealed record SelectExpressionConverterTests
               "value": "{{expectedValue}}"
             }
             """;
+
         UuidScalar scalar = JsonSerializer
             .Deserialize<SelectExpression>(input, _options)!
-            .AsT6.AsT2;
+            .AsT0.AsT6.AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -1331,7 +1324,9 @@ public sealed record SelectExpressionConverterTests
             """;
 
         string output = JsonSerializer.Serialize(
-            new SelectExpression(new UuidReturning(new UuidScalar(expectedValue))),
+            new SelectExpression(
+                new SingleValueReturning(new UuidReturning(new UuidScalar(expectedValue)))
+            ),
             _options
         );
 
