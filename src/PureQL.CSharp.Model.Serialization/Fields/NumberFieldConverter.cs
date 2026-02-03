@@ -1,17 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
 internal sealed record NumberFieldJsonModel
 {
     public NumberFieldJsonModel(NumberField field)
-        : this(field.Entity, field.Field, (NumberType)field.Type) { }
+        : this(field.Entity, field.Field, (NumberArrayType)field.Type) { }
 
     [JsonConstructor]
-    public NumberFieldJsonModel(string entity, string field, NumberType type)
+    public NumberFieldJsonModel(string entity, string field, NumberArrayType type)
     {
         Entity = entity ?? throw new JsonException();
         Field = field ?? throw new JsonException();
@@ -22,7 +22,7 @@ internal sealed record NumberFieldJsonModel
 
     public string Field { get; }
 
-    public NumberType Type { get; }
+    public NumberArrayType Type { get; }
 }
 
 internal sealed class NumberFieldConverter : JsonConverter<NumberField>
