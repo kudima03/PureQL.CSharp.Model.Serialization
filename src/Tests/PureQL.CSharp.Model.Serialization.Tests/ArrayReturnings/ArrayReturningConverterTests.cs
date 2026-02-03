@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
@@ -88,7 +89,11 @@ public sealed record ArrayReturningConverterTests
               "type": {
                 "name": "booleanArray"
               },
-              "value": [true, false, true]
+              "value": [
+                true,
+                false,
+                true
+              ]
             }
             """;
 
@@ -109,7 +114,11 @@ public sealed record ArrayReturningConverterTests
                   "type": {
                     "name": "booleanArray"
                   },
-                  "value": [true, false, true]
+                  "value": [
+                    true,
+                    false,
+                    true
+                  ]
                 }
                 """;
 
@@ -237,14 +246,16 @@ public sealed record ArrayReturningConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "dateArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -270,14 +281,16 @@ public sealed record ArrayReturningConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "dateArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -403,14 +416,16 @@ public sealed record ArrayReturningConverterTests
         IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "datetimeArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -434,14 +449,16 @@ public sealed record ArrayReturningConverterTests
         IEnumerable<string> formattedDates = expectedValues.Select(x => x.ToString("O"));
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "datetimeArray"
               },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "value": [
+                "{{formattedDates.First()}}",
+                "{{formattedDates.Skip(1).First()}}",
+                "{{formattedDates.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -564,15 +581,21 @@ public sealed record ArrayReturningConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "numberArray"
               },
-              "value": [{{values.First()}}, {{values.Skip(1).First()}}, {{values.Skip(
-                2
-            ).First()}}]
+              "value": [
+                {{formattedValues.First()}},
+                {{formattedValues.Skip(1).First()}},
+                {{formattedValues.Skip(2).First()}}
+              ]
             }
             """;
 
@@ -593,15 +616,21 @@ public sealed record ArrayReturningConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "numberArray"
               },
-              "value": [{{values.First()}}, {{values.Skip(1).First()}}, {{values.Skip(
-                2
-            ).First()}}]
+              "value": [
+                {{formattedValues.First()}},
+                {{formattedValues.Skip(1).First()}},
+                {{formattedValues.Skip(2).First()}}
+              ]
             }
             """;
 
@@ -719,7 +748,10 @@ public sealed record ArrayReturningConverterTests
               "type": {
                 "name": "stringArray"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
 
@@ -739,7 +771,10 @@ public sealed record ArrayReturningConverterTests
               "type": {
                 "name": "stringArray"
               },
-              "value": ["ianhuedrfiuhaerfd", "sdkfnjilhnsjkd"]
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
             }
             """;
 
@@ -865,14 +900,16 @@ public sealed record ArrayReturningConverterTests
         IEnumerable<string> formattedTimes = expected.Select(x => x.ToString("HH:mm:ss"));
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "timeArray"
               },
-              "value": [{{formattedTimes.First()}}, {{formattedTimes.Skip(
-                1
-            ).First()}}, {{formattedTimes.Skip(2).First()}}]
+              "value": [
+                "{{formattedTimes.First()}}",
+                "{{formattedTimes.Skip(1).First()}}",
+                "{{formattedTimes.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -898,14 +935,16 @@ public sealed record ArrayReturningConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "timeArray"
               },
-              "value": [{{formattedTimes.First()}}, {{formattedTimes.Skip(
-                1
-            ).First()}}, {{formattedTimes.Skip(2).First()}}]
+              "value": [
+                "{{formattedTimes.First()}}",
+                "{{formattedTimes.Skip(1).First()}}",
+                "{{formattedTimes.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -973,7 +1012,7 @@ public sealed record ArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -1008,7 +1047,7 @@ public sealed record ArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               }
             }
             """;
@@ -1022,14 +1061,16 @@ public sealed record ArrayReturningConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "uuidArray"
               },
-              "value": ["{{expected.First()}}", "{{expected.Skip(
-                1
-            ).First()}}", "{{expected.Skip(2).First()}}"]
+              "value": [
+                "{{expected.First()}}",
+                "{{expected.Skip(1).First()}}",
+                "{{expected.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -1046,14 +1087,16 @@ public sealed record ArrayReturningConverterTests
         IEnumerable<Guid> expected = [Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()];
 
         string expectedJson = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "type": {
                 "name": "uuidArray"
               },
-              "value": ["{{expected.First()}}", "{{expected.Skip(
-                1
-            ).First()}}", "{{expected.Skip(2).First()}}"]
+              "value": [
+                "{{expected.First()}}",
+                "{{expected.Skip(1).First()}}",
+                "{{expected.Skip(2).First()}}"
+              ]
             }
             """;
 
@@ -1074,7 +1117,7 @@ public sealed record ArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               },
               "name": "{{expected}}"
             }
@@ -1097,7 +1140,7 @@ public sealed record ArrayReturningConverterTests
             {
               "name": "{{name}}",
               "type": {
-                "name": "guidArray"
+                "name": "uuidArray"
               }
             }
             """;
