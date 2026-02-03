@@ -32,7 +32,7 @@ public sealed record DateFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "date"
+                "name": "dateArray"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record DateFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "date"
+                "name": "dateArray"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record DateFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "date"
+                    "name": "dateArray"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record DateFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "date"
+                "name": "dateArray"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record DateFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "date"
+                "name": "dateArray"
               }
             }
             """;
@@ -142,6 +142,13 @@ public sealed record DateFieldConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("datetimeArray")]
+    [InlineData("booleanArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("")]
     public void ThrowsExceptionOnWrongType(string type)
     {
