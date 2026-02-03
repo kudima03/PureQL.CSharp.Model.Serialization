@@ -32,7 +32,7 @@ public sealed record BooleanFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record BooleanFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record BooleanFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "boolean"
+                    "name": "booleanArray"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record BooleanFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record BooleanFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               }
             }
             """;
