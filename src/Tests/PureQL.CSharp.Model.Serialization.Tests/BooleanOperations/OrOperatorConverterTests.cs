@@ -948,12 +948,7 @@ public sealed record OrOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteMixedConditions()
     {
         const string expectedParamName = "ashjlbd";
@@ -994,20 +989,18 @@ public sealed record OrOperatorConverterTests
                 },
                 {
                   "operator": "equal",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
@@ -1032,8 +1025,8 @@ public sealed record OrOperatorConverterTests
                         new Equality(
                             new SingleValueEquality(
                                 new BooleanEquality(
-                                    new BooleanReturning(new BooleanScalar(true)),
-                                    new BooleanReturning(new BooleanScalar(false))
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
                                 )
                             )
                         )
