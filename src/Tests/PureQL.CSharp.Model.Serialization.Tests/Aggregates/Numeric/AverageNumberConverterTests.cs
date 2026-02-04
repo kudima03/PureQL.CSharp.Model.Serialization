@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Numeric;
@@ -158,6 +159,10 @@ public sealed record AverageNumberConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
@@ -167,16 +172,16 @@ public sealed record AverageNumberConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
             """;
 
         AverageNumber value = JsonSerializer.Deserialize<AverageNumber>(input, _options)!;
-        Assert.Equal(new NumberArrayScalar(values), value.Argument.AsT2);
+        Assert.Equal(values, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -204,6 +209,10 @@ public sealed record AverageNumberConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
@@ -213,9 +222,9 @@ public sealed record AverageNumberConverterTests
                   "name": "{{type}}"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -236,6 +245,10 @@ public sealed record AverageNumberConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
@@ -245,9 +258,9 @@ public sealed record AverageNumberConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
