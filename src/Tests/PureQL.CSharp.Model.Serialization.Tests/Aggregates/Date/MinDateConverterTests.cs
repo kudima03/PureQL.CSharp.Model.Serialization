@@ -162,22 +162,24 @@ public sealed record MinDateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "min_date",
               "arg": {
-                  "type": {
-                    "name": "dateArray"
-                  },
-                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
-                }
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         MinDate value = JsonSerializer.Deserialize<MinDate>(input, _options)!;
-        Assert.Equal(new DateArrayScalar(expectedDates), value.Argument.AsT2);
+        Assert.Equal(expectedDates, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -209,17 +211,19 @@ public sealed record MinDateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "min_date",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -242,17 +246,19 @@ public sealed record MinDateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "min_date",
               "arg": {
-                  "type": {
-                    "name": "dateArray"
-                  },
-                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
-                }
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
