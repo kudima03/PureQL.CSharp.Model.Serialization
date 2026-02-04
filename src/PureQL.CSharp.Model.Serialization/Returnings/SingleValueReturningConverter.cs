@@ -25,18 +25,18 @@ internal sealed class SingleValueReturningConverter : JsonConverter<SingleValueR
                 out DateTimeReturning? dateTime
             )
                 ? new SingleValueReturning(dateTime!)
+            : JsonExtensions.TryDeserialize(root, options, out TimeReturning? time)
+                ? new SingleValueReturning(time!)
             : JsonExtensions.TryDeserialize(root, options, out NumberReturning? number)
                 ? new SingleValueReturning(number!)
+            : JsonExtensions.TryDeserialize(root, options, out UuidReturning? uuid)
+                ? new SingleValueReturning(uuid!)
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out StringReturning? stringValue
             )
                 ? new SingleValueReturning(stringValue!)
-            : JsonExtensions.TryDeserialize(root, options, out BooleanReturning? time)
-                ? new SingleValueReturning(time!)
-            : JsonExtensions.TryDeserialize(root, options, out UuidReturning? uuid)
-                ? new SingleValueReturning(uuid!)
             : throw new JsonException("Unable to determine SingleValueReturning type.");
     }
 
