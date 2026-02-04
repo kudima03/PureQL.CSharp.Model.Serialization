@@ -439,12 +439,7 @@ public sealed record OrOperatorConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -452,6 +447,15 @@ public sealed record OrOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("rfgdjnblh")]
     public void ThrowsExceptionOnWrongEqualityType(string type)
     {
         string input = /*lang=json,strict*/
@@ -492,8 +496,6 @@ public sealed record OrOperatorConverterTests
               ]
             }
             """;
-
-        OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<OrOperator>(input, _options)
