@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -670,11 +669,7 @@ public sealed record BooleanEqualityConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "Equality not implemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped"
-    )]
+    [Fact]
     public void ReadBooleanOperatorArgs()
     {
         const string input = /*lang=json,strict*/
@@ -705,13 +700,13 @@ public sealed record BooleanEqualityConverterTests
                     "type": {
                       "name": "boolean"
                     },
-                    "value": false
+                    "value": true
                   },
                   {
                     "type": {
                       "name": "boolean"
                     },
-                    "value": true
+                    "value": false
                   }
                 ]
               }
@@ -723,29 +718,19 @@ public sealed record BooleanEqualityConverterTests
             _options
         )!;
         Assert.Equal(
-            new BooleanEquality(
-                new BooleanReturning(
-                    new BooleanOperator(
-                        new AndOperator(
-                            [
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true)),
-                            ]
-                        )
-                    )
-                ),
-                new BooleanReturning(
-                    new BooleanOperator(
-                        new AndOperator(
-                            [
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true)),
-                            ]
-                        )
-                    )
-                )
-            ),
-            value
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ],
+            value.Left.AsT3.AsT0.Conditions.AsT0
+        );
+
+        Assert.Equal(
+            [
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanScalar(false)),
+            ],
+            value.Right.AsT3.AsT0.Conditions.AsT0
         );
     }
 
