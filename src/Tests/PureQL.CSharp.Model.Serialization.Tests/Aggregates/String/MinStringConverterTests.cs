@@ -40,7 +40,7 @@ public sealed record MinStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record MinStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record MinStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -157,7 +157,7 @@ public sealed record MinStringConverterTests
               "operator": "min_string",
               "arg": {
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   },
                   "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
                 }
@@ -166,8 +166,8 @@ public sealed record MinStringConverterTests
 
         MinString value = JsonSerializer.Deserialize<MinString>(input, _options)!;
         Assert.Equal(
-            new StringArrayScalar(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]),
-            value.Argument.AsT2
+            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
+            value.Argument.AsT2.Value
         );
     }
 
@@ -217,9 +217,13 @@ public sealed record MinStringConverterTests
               "operator": "min_string",
               "arg": {
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 },
-                "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
+                "value": [
+                  "afirndhujvr",
+                  "sahbjndfashbndfj",
+                  "dnfjkanjkf"
+                ]
               }
             }
             """;
@@ -249,7 +253,7 @@ public sealed record MinStringConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -308,7 +312,7 @@ public sealed record MinStringConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 }
               }
             }
@@ -337,7 +341,7 @@ public sealed record MinStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -404,7 +408,7 @@ public sealed record MinStringConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 }
               }
             }
