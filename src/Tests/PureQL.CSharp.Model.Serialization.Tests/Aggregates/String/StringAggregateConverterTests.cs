@@ -28,7 +28,7 @@ public sealed record StringAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnMax()
+    public void ThrowsExceptionOnOperatorNameAbsence()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -52,32 +52,7 @@ public sealed record StringAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnMax()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_string",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "stringArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnMax()
+    public void ThrowsExceptionOnInvalidOperatorName()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -102,7 +77,7 @@ public sealed record StringAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnMax()
+    public void ThrowsExceptionOnUndefinedArgument()
     {
         const string input = /*lang=json,strict*/
             """
@@ -117,7 +92,7 @@ public sealed record StringAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnNullArgumentOnMax()
+    public void ThrowsExceptionOnNullArgument()
     {
         const string input = /*lang=json,strict*/
             """
@@ -133,7 +108,7 @@ public sealed record StringAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnMax()
+    public void ThrowsExceptionOnArgumentWrongType()
     {
         const string input = /*lang=json,strict*/
             """
@@ -169,8 +144,8 @@ public sealed record StringAggregateConverterTests
             _options
         )!;
         Assert.Equal(
-            new StringArrayScalar(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]),
-            value.AsT0.Argument.AsT2
+            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
+            value.AsT0.Argument.AsT2.Value
         );
     }
 
@@ -222,7 +197,11 @@ public sealed record StringAggregateConverterTests
                 "type": {
                   "name": "stringArray"
                 },
-                "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
+                "value": [
+                  "afirndhujvr",
+                  "sahbjndfashbndfj",
+                  "dnfjkanjkf"
+                ]
               }
             }
             """;
@@ -452,106 +431,9 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_string",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "string"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "euhwyrfdbuyeghrfdb",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "string"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_string"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullArgumentOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_string",
-              "arg": null
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_string",
-              "arg": []
             }
             """;
 
@@ -569,7 +451,7 @@ public sealed record StringAggregateConverterTests
               "operator": "min_string",
               "arg": {
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   },
                   "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
                 }
@@ -581,8 +463,8 @@ public sealed record StringAggregateConverterTests
             _options
         )!;
         Assert.Equal(
-            new StringArrayScalar(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]),
-            value.AsT1.Argument.AsT2
+            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
+            value.AsT1.Argument.AsT2.Value
         );
     }
 
@@ -632,9 +514,13 @@ public sealed record StringAggregateConverterTests
               "operator": "min_string",
               "arg": {
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 },
-                "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
+                "value": [
+                  "afirndhujvr",
+                  "sahbjndfashbndfj",
+                  "dnfjkanjkf"
+                ]
               }
             }
             """;
@@ -666,7 +552,7 @@ public sealed record StringAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -731,7 +617,7 @@ public sealed record StringAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 }
               }
             }
@@ -762,7 +648,7 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -832,7 +718,7 @@ public sealed record StringAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 }
               }
             }
