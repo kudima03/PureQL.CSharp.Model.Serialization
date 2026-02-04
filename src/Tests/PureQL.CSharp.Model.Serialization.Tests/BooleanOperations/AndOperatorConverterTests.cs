@@ -706,12 +706,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteBooleanOperatorConditions()
     {
         const string expected = /*lang=json,strict*/
@@ -720,38 +715,34 @@ public sealed record AndOperatorConverterTests
               "operator": "and",
               "conditions": [
                 {
-                  "operator": "and",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "operator": "equal",
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 },
                 {
-                  "operator": "and",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "operator": "equal",
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
