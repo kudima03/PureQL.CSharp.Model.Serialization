@@ -180,7 +180,7 @@ public sealed record MinTimeConverterTests
             """;
 
         MinTime value = JsonSerializer.Deserialize<MinTime>(input, _options)!;
-        Assert.Equal(new TimeArrayScalar(expectedValues), value.Argument.AsT2);
+        Assert.Equal(expectedValues, value.Argument.AsT2.Value);
     }
 
     [Theory]
