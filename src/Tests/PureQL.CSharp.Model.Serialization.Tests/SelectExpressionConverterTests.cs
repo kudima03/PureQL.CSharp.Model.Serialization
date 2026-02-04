@@ -217,13 +217,13 @@ public sealed record SelectExpressionConverterTests
     }
 
     [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("date")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("dateArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ReadAlias(string typeName)
     {
         const string expectedEntity = "sadiJUNFH";
@@ -1194,7 +1194,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -1207,7 +1207,7 @@ public sealed record SelectExpressionConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new UuidType(), field.Type);
+        Assert.Equal(new UuidArrayType(), field.Type);
     }
 
     [Fact]
