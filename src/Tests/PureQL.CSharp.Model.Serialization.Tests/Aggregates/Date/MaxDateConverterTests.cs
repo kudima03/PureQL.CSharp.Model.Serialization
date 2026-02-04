@@ -165,17 +165,22 @@ public sealed record MaxDateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "max_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         MaxDate value = JsonSerializer.Deserialize<MaxDate>(input, _options)!;
-        Assert.Equal(new DateArrayScalar(expectedDates), value.Argument.AsT2);
+        Assert.Equal(expectedDates, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -210,12 +215,17 @@ public sealed record MaxDateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "{{type}}"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "max_date",
+              "arg": {
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -245,9 +255,11 @@ public sealed record MaxDateConverterTests
                 "type": {
                   "name": "dateArray"
                 },
-                "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
               }
             }
             """;
