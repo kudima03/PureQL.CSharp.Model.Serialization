@@ -435,10 +435,10 @@ public sealed record NotOperatorConverterTests
         NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
         Assert.Equal(
             value.Condition.AsT3.AsT1.Conditions.AsT0,
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ]
         );
     }
 
@@ -490,47 +490,42 @@ public sealed record NotOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
-    public void WriteBooleanOperatorcondition()
+    [Fact]
+    public void WriteBooleanOperatorCondition()
     {
         const string expected = /*lang=json,strict*/
             """
             {
               "operator": "not",
               "condition": {
-                  "operator": "or",
-                  "condition": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                "operator": "or",
+                "conditions": [
+                  {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
-                }
+                    "value": false
+                  },
+                  {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
+                ]
+              }
             }
             """;
 
         string value = JsonSerializer.Serialize(
             new NotOperator(
                 new BooleanReturning(
-                    new Equality(
-                        new SingleValueEquality(
-                            new BooleanEquality(
+                    new BooleanOperator(
+                        new OrOperator(
+                            [
                                 new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+                                new BooleanReturning(new BooleanScalar(true)),
+                            ]
                         )
                     )
                 )
