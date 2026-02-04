@@ -578,7 +578,7 @@ public sealed record DateTimeEqualityConverterTests
                 "type": {
                   "name": "datetime"
                 },
-                "value": "{{expectedValue:O}}"
+                "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
               },
               "right": {
                 "name": "{{expectedParamName}}",
