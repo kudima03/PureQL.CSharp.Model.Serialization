@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -134,7 +133,7 @@ public sealed record AndOperatorConverterTests
             """;
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-        Assert.Empty(value.Conditions);
+        Assert.Empty(value.Conditions.AsT0);
     }
 
     [Fact]
@@ -177,16 +176,11 @@ public sealed record AndOperatorConverterTests
             """;
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-        Assert.Equal(value.Conditions.First().AsT2, new BooleanScalar(true));
-        Assert.Equal(value.Conditions.Last().AsT2, new BooleanScalar(false));
+        Assert.Equal(value.Conditions.AsT0.First().AsT1, new BooleanScalar(true));
+        Assert.Equal(value.Conditions.AsT0.Last().AsT1, new BooleanScalar(false));
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -194,6 +188,15 @@ public sealed record AndOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("dfrgvijuhn")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
         string input = /*lang=json,strict*/
@@ -287,21 +290,16 @@ public sealed record AndOperatorConverterTests
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT1,
+            value.Conditions.AsT0.First().AsT0,
             new BooleanParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.Conditions.Last().AsT1,
+            value.Conditions.AsT0.Last().AsT0,
             new BooleanParameter(expectedSecondParamName)
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -309,6 +307,15 @@ public sealed record AndOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("drftgihnuj")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -380,156 +387,6 @@ public sealed record AndOperatorConverterTests
     }
 
     [Fact]
-    public void ReadFieldConditions()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "and",
-              "conditions": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                }
-              ]
-            }
-            """;
-
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-        Assert.Equal(
-            value.Conditions.First().AsT0,
-            new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Conditions.Last().AsT0,
-            new BooleanField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "and",
-              "conditions": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<AndOperator>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldConditions()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "and",
-              "conditions": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new AndOperator(
-                [
-                    new BooleanReturning(
-                        new BooleanField(expectedFirstEntityName, expectedFirstFieldName)
-                    ),
-                    new BooleanReturning(
-                        new BooleanField(
-                            expectedSecondEntityName,
-                            expectedSecondFieldName
-                        )
-                    ),
-                ]
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
     public void ReadEqualityConditions()
     {
         const string input = /*lang=json,strict*/
@@ -573,31 +430,27 @@ public sealed record AndOperatorConverterTests
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT3,
-            new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )
-            )
+            value.Conditions.AsT0.First().AsT2.AsT0.AsT0.Left,
+            new BooleanReturning(new BooleanScalar(false))
         );
+
         Assert.Equal(
-            value.Conditions.Last().AsT3,
-            new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )
-            )
+            value.Conditions.AsT0.First().AsT2.AsT0.AsT0.Right,
+            new BooleanReturning(new BooleanScalar(true))
+        );
+
+        Assert.Equal(
+            value.Conditions.AsT0.Last().AsT2.AsT0.AsT0.Left,
+            new BooleanReturning(new BooleanScalar(false))
+        );
+
+        Assert.Equal(
+            value.Conditions.AsT0.Last().AsT2.AsT0.AsT0.Right,
+            new BooleanReturning(new BooleanScalar(true))
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -605,6 +458,15 @@ public sealed record AndOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("rfsedjinup")]
     public void ThrowsExceptionOnWrongEqualityType(string type)
     {
         string input = /*lang=json,strict*/
@@ -646,19 +508,12 @@ public sealed record AndOperatorConverterTests
             }
             """;
 
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<AndOperator>(input, _options)
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteEqualityConditions()
     {
         const string expected = /*lang=json,strict*/
@@ -705,17 +560,21 @@ public sealed record AndOperatorConverterTests
                 [
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
@@ -726,12 +585,7 @@ public sealed record AndOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadBooleanOperatorConditions()
     {
         const string input = /*lang=json,strict*/
@@ -779,26 +633,18 @@ public sealed record AndOperatorConverterTests
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT4,
-            new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
-            )
+            value.Conditions.AsT0.First().AsT3.AsT0.Conditions.AsT0,
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ]
         );
         Assert.Equal(
-            value.Conditions.Last().AsT4,
-            new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
-            )
+            value.Conditions.AsT0.Last().AsT3.AsT0.Conditions.AsT0,
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ]
         );
     }
 
@@ -860,12 +706,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteBooleanOperatorConditions()
     {
         const string expected = /*lang=json,strict*/
@@ -874,38 +715,34 @@ public sealed record AndOperatorConverterTests
               "operator": "and",
               "conditions": [
                 {
-                  "operator": "and",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "operator": "equal",
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 },
                 {
-                  "operator": "and",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "operator": "equal",
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
@@ -916,17 +753,21 @@ public sealed record AndOperatorConverterTests
                 [
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(false)),
+                                    new BooleanReturning(new BooleanScalar(true))
+                                )
                             )
                         )
                     ),
@@ -937,16 +778,9 @@ public sealed record AndOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadMixedConditions()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -978,13 +812,6 @@ public sealed record AndOperatorConverterTests
                   "value": true
                 },
                 {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
-                },
-                {
                   "name": "{{expectedParamName}}",
                   "type": {
                     "name": "boolean"
@@ -992,20 +819,18 @@ public sealed record AndOperatorConverterTests
                 },
                 {
                   "operator": "equal",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
@@ -1013,42 +838,28 @@ public sealed record AndOperatorConverterTests
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.First().AsT4,
-            new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
-            )
+            value.Conditions.AsT0.First().AsT3.AsT0.Conditions.AsT0,
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ]
         );
-        Assert.Equal(value.Conditions.Skip(1).First().AsT2, new BooleanScalar(true));
+        Assert.Equal(value.Conditions.AsT0.Skip(1).First().AsT1, new BooleanScalar(true));
         Assert.Equal(
-            value.Conditions.Skip(2).First().AsT0,
-            new BooleanField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(
-            value.Conditions.Skip(3).First().AsT1,
+            value.Conditions.AsT0.Skip(2).First().AsT0,
             new BooleanParameter(expectedParamName)
         );
         Assert.Equal(
-            value.Conditions.Skip(4).First().AsT3,
-            new Equality(
-                new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(new BooleanScalar(false))
-                )
-            )
+            value.Conditions.AsT0.Skip(3).First().AsT2.AsT0.AsT0.Left,
+            new BooleanReturning(new BooleanScalar(false))
+        );
+        Assert.Equal(
+            value.Conditions.AsT0.Skip(3).First().AsT2.AsT0.AsT0.Right,
+            new BooleanReturning(new BooleanScalar(true))
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -1056,6 +867,15 @@ public sealed record AndOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("rtgfdnhiju")]
     public void ThrowsExceptionOnWrongConditionType(string type)
     {
         string input = /*lang=json,strict*/
@@ -1087,13 +907,6 @@ public sealed record AndOperatorConverterTests
                   "value": true
                 },
                 {
-                  "entity": "arefdjhubn",
-                  "field": "fdevihjn",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
                   "name": "swdefiujhnr",
                   "type": {
                     "name": "{{type}}"
@@ -1101,26 +914,22 @@ public sealed record AndOperatorConverterTests
                 },
                 {
                   "operator": "equal",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "{{type}}"
-                      },
-                      "value": false
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "{{type}}"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
             """;
-
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<AndOperator>(input, _options)
@@ -1130,8 +939,6 @@ public sealed record AndOperatorConverterTests
     [Fact]
     public void WriteMixedConditions()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         const string expected = /*lang=json,strict*/
@@ -1161,13 +968,6 @@ public sealed record AndOperatorConverterTests
                     "name": "boolean"
                   },
                   "value": true
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "boolean"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -1208,15 +1008,14 @@ public sealed record AndOperatorConverterTests
                         )
                     ),
                     new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(
-                        new BooleanField(expectedEntityName, expectedFieldName)
-                    ),
                     new BooleanReturning(new BooleanParameter(expectedParamName)),
                     new BooleanReturning(
                         new Equality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(true)),
-                                new BooleanReturning(new BooleanScalar(false))
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(true)),
+                                    new BooleanReturning(new BooleanScalar(false))
+                                )
                             )
                         )
                     ),

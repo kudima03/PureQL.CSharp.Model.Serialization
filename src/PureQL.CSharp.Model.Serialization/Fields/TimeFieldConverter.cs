@@ -1,17 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
 internal sealed record TimeFieldJsonModel
 {
     public TimeFieldJsonModel(TimeField field)
-        : this(field.Entity, field.Field, (TimeType)field.Type) { }
+        : this(field.Entity, field.Field, (TimeArrayType)field.Type) { }
 
     [JsonConstructor]
-    public TimeFieldJsonModel(string entity, string field, TimeType type)
+    public TimeFieldJsonModel(string entity, string field, TimeArrayType type)
     {
         Entity = entity ?? throw new JsonException();
         Field = field ?? throw new JsonException();
@@ -22,7 +22,7 @@ internal sealed record TimeFieldJsonModel
 
     public string Field { get; }
 
-    public TimeType Type { get; }
+    public TimeArrayType Type { get; }
 }
 
 internal sealed class TimeFieldConverter : JsonConverter<TimeField>

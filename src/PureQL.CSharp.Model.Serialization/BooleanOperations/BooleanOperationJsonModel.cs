@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneOf;
+using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Returnings;
 
@@ -24,7 +26,7 @@ internal sealed record BooleanOperationJsonModel
     [JsonConstructor]
     public BooleanOperationJsonModel(
         BooleanOperator @operator,
-        IEnumerable<BooleanReturning> conditions
+        OneOf<IEnumerable<BooleanReturning>, BooleanArrayReturning>? conditions
     )
     {
         Operator =
@@ -34,5 +36,9 @@ internal sealed record BooleanOperationJsonModel
 
     public BooleanOperator Operator { get; }
 
-    public IEnumerable<BooleanReturning> Conditions { get; }
+    public OneOf<
+        IEnumerable<BooleanReturning>,
+        BooleanArrayReturning
+    >? Conditions
+    { get; }
 }

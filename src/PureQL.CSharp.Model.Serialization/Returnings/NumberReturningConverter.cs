@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -18,13 +17,15 @@ internal sealed class NumberReturningConverter : JsonConverter<NumberReturning>
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return JsonExtensions.TryDeserialize(root, options, out NumberField? field)
-                ? new NumberReturning(field!)
-            : JsonExtensions.TryDeserialize(root, options, out NumberParameter? parameter)
+        return JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out NumberParameter? parameter
+            )
                 ? new NumberReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out INumberScalar? scalar)
                 ? new NumberReturning(new NumberScalar(scalar!.Value))
-            : throw new JsonException("Unable to determine BooleanReturning type.");
+            : throw new JsonException("Unable to determine NumberReturning type.");
     }
 
     public override void Write(
@@ -33,21 +34,17 @@ internal sealed class NumberReturningConverter : JsonConverter<NumberReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.IsT0)
+        if (value.TryPickT0(out NumberParameter? parameter, out _))
         {
-            JsonSerializer.Serialize(writer, value.AsT0, options);
+            JsonSerializer.Serialize(writer, parameter, options);
         }
-        else if (value.IsT1)
+        else if (value.TryPickT1(out NumberScalar? scalar, out _))
         {
-            JsonSerializer.Serialize(writer, value.AsT1, options);
-        }
-        else if (value.IsT2)
-        {
-            JsonSerializer.Serialize<INumberScalar>(writer, value.AsT2, options);
+            JsonSerializer.Serialize<INumberScalar>(writer, scalar, options);
         }
         else
         {
-            throw new JsonException();
+            throw new JsonException("Unable to determine NumberReturning type.");
         }
     }
 }

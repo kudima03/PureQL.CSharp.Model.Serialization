@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -316,8 +315,8 @@ public sealed record DateEqualityConverterTests
             """;
 
         DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT2, new DateScalar(now));
-        Assert.Equal(value.Right.AsT2, new DateScalar(now));
+        Assert.Equal(value.Left.AsT1, new DateScalar(now));
+        Assert.Equal(value.Right.AsT1, new DateScalar(now));
     }
 
     [Theory]
@@ -414,8 +413,8 @@ public sealed record DateEqualityConverterTests
             """;
 
         DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new DateParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT1, new DateParameter(expectedSecondParamName));
+        Assert.Equal(value.Left.AsT0, new DateParameter(expectedFirstParamName));
+        Assert.Equal(value.Right.AsT0, new DateParameter(expectedSecondParamName));
     }
 
     [Theory]
@@ -491,148 +490,19 @@ public sealed record DateEqualityConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "date"
-                }
-              },
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "date"
-                }
-              }
-            }
-            """;
-
-        DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(
-            value.Right.AsT0,
-            new DateField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Left.AsT0,
-            new DateField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              },
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateEquality>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "date"
-                }
-              },
-              "right": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "date"
-                }
-              }
-            }
-            """;
-        string value = JsonSerializer.Serialize(
-            new DateEquality(
-                new DateReturning(
-                    new DateField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new DateReturning(
-                    new DateField(expectedSecondEntityName, expectedSecondFieldName)
-                )
-            ),
-            _options
-        );
-
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        DateOnly expectedDate = DateOnly.FromDateTime(DateTime.Now);
         const string expectedParamName = "ashjlbd";
 
-        const string input = $$"""
+        string input = $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "date"
-                }
+                },
+                "value": "{{expectedDate:yyyy-MM-dd}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -644,11 +514,8 @@ public sealed record DateEqualityConverterTests
             """;
 
         DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(
-            value.Left.AsT0,
-            new DateField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(value.Right.AsT1, new DateParameter(expectedParamName));
+        Assert.Equal(value.Left.AsT1, new DateScalar(expectedDate));
+        Assert.Equal(value.Right.AsT0, new DateParameter(expectedParamName));
     }
 
     [Theory]
@@ -661,8 +528,7 @@ public sealed record DateEqualityConverterTests
     [InlineData("uuid")]
     public void ThrowsExceptionOnWrongConditionType(string type)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        DateOnly expectedDate = DateOnly.FromDateTime(DateTime.Now);
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -670,11 +536,10 @@ public sealed record DateEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "{{type}}"
-                }
+                },
+                "value": "{{expectedDate:yyyy-MM-dd}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -693,20 +558,19 @@ public sealed record DateEqualityConverterTests
     [Fact]
     public void WriteMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        DateOnly expectedDate = DateOnly.FromDateTime(DateTime.Now);
+
         const string expectedParamName = "ashjlbd";
 
-        const string expected = /*lang=json,strict*/
+        string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "date"
-                }
+                },
+                "value": "{{expectedDate:yyyy-MM-dd}}"
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -719,7 +583,7 @@ public sealed record DateEqualityConverterTests
 
         string value = JsonSerializer.Serialize(
             new DateEquality(
-                new DateReturning(new DateField(expectedEntityName, expectedFieldName)),
+                new DateReturning(new DateScalar(expectedDate)),
                 new DateReturning(new DateParameter(expectedParamName))
             ),
             _options

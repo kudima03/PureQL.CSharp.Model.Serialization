@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -319,8 +318,8 @@ public sealed record NumberEqualityConverterTests
             input,
             _options
         )!;
-        Assert.Equal(value.Left.AsT2, new NumberScalar(number));
-        Assert.Equal(value.Right.AsT2, new NumberScalar(number));
+        Assert.Equal(value.Left.AsT1, new NumberScalar(number));
+        Assert.Equal(value.Right.AsT1, new NumberScalar(number));
     }
 
     [Theory]
@@ -420,8 +419,8 @@ public sealed record NumberEqualityConverterTests
             input,
             _options
         )!;
-        Assert.Equal(value.Left.AsT1, new NumberParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT1, new NumberParameter(expectedSecondParamName));
+        Assert.Equal(value.Left.AsT0, new NumberParameter(expectedFirstParamName));
+        Assert.Equal(value.Right.AsT0, new NumberParameter(expectedSecondParamName));
     }
 
     [Theory]
@@ -497,151 +496,18 @@ public sealed record NumberEqualityConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "number"
-                }
-              },
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "number"
-                }
-              }
-            }
-            """;
-
-        NumberEquality value = JsonSerializer.Deserialize<NumberEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(
-            value.Right.AsT0,
-            new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.Left.AsT0,
-            new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("date")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldType(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              },
-              "right": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "{{type}}"
-                }
-              }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberEquality>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgs()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "equal",
-              "left": {
-                "entity": "{{expectedFirstEntityName}}",
-                "field": "{{expectedFirstFieldName}}",
-                "type": {
-                  "name": "number"
-                }
-              },
-              "right": {
-                "entity": "{{expectedSecondEntityName}}",
-                "field": "{{expectedSecondFieldName}}",
-                "type": {
-                  "name": "number"
-                }
-              }
-            }
-            """;
-        string value = JsonSerializer.Serialize(
-            new NumberEquality(
-                new NumberReturning(
-                    new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-                ),
-                new NumberReturning(
-                    new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-                )
-            ),
-            _options
-        );
-
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         const string input = $$"""
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "number"
-                }
+                },
+                "value": 0.5800537796011547
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -656,11 +522,8 @@ public sealed record NumberEqualityConverterTests
             input,
             _options
         )!;
-        Assert.Equal(
-            value.Left.AsT0,
-            new NumberField(expectedEntityName, expectedFieldName)
-        );
-        Assert.Equal(value.Right.AsT1, new NumberParameter(expectedParamName));
+        Assert.Equal(value.Left.AsT1, new NumberScalar(0.5800537796011547));
+        Assert.Equal(value.Right.AsT0, new NumberParameter(expectedParamName));
     }
 
     [Theory]
@@ -673,8 +536,6 @@ public sealed record NumberEqualityConverterTests
     [InlineData("uuid")]
     public void ThrowsExceptionOnWrongConditionType(string type)
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -682,11 +543,10 @@ public sealed record NumberEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "{{type}}"
-                }
+                },
+                "value": 0.5800537796011547
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -705,8 +565,6 @@ public sealed record NumberEqualityConverterTests
     [Fact]
     public void WriteMixedArgs()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         const string expected = /*lang=json,strict*/
@@ -714,11 +572,10 @@ public sealed record NumberEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
                 "type": {
                   "name": "number"
-                }
+                },
+                "value": 0.5800537796011547
               },
               "right": {
                 "name": "{{expectedParamName}}",
@@ -731,9 +588,7 @@ public sealed record NumberEqualityConverterTests
 
         string value = JsonSerializer.Serialize(
             new NumberEquality(
-                new NumberReturning(
-                    new NumberField(expectedEntityName, expectedFieldName)
-                ),
+                new NumberReturning(new NumberScalar(0.5800537796011547)),
                 new NumberReturning(new NumberParameter(expectedParamName))
             ),
             _options

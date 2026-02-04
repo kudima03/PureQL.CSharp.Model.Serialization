@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Numeric;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.Numeric;
 
@@ -41,7 +41,7 @@ public sealed record AverageNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -66,7 +66,7 @@ public sealed record AverageNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -91,7 +91,7 @@ public sealed record AverageNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -152,22 +152,36 @@ public sealed record AverageNumberConverterTests
     [Fact]
     public void ReadScalarArgument()
     {
-        double number = Random.Shared.NextDouble();
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_number",
               "arg": {
-                  "type": {
-                    "name": "number"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
+                "type": {
+                  "name": "numberArray"
+                },
+                "value": [
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
+                ]
+              }
             }
             """;
 
         AverageNumber value = JsonSerializer.Deserialize<AverageNumber>(input, _options)!;
-        Assert.Equal(new NumberScalar(number), value.Argument.AsT2);
+        Assert.Equal(values, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -178,20 +192,41 @@ public sealed record AverageNumberConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
-        DateOnly number = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_number",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
+                ]
+              }
             }
             """;
 
@@ -203,22 +238,36 @@ public sealed record AverageNumberConverterTests
     [Fact]
     public void WriteScalarArgument()
     {
-        double number = Random.Shared.NextDouble();
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "average_number",
               "arg": {
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 },
-                "value": {{number.ToString(CultureInfo.InvariantCulture)}}
+                "value": [
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new AverageNumber(new NumberReturning(new NumberScalar(number))),
+            new AverageNumber(new NumberArrayReturning(new NumberArrayScalar(values))),
             _options
         );
         Assert.Equal(expected, value);
@@ -236,14 +285,14 @@ public sealed record AverageNumberConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
             """;
 
         AverageNumber value = JsonSerializer.Deserialize<AverageNumber>(input, _options)!;
-        Assert.Equal(new NumberParameter(expectedParamName), value.Argument.AsT1);
+        Assert.Equal(new NumberArrayParameter(expectedParamName), value.Argument.AsT0);
     }
 
     [Theory]
@@ -254,7 +303,14 @@ public sealed record AverageNumberConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("ehufry")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -288,7 +344,7 @@ public sealed record AverageNumberConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
@@ -296,7 +352,7 @@ public sealed record AverageNumberConverterTests
 
         string value = JsonSerializer.Serialize(
             new AverageNumber(
-                new NumberReturning(new NumberParameter(expectedParamName))
+                new NumberArrayReturning(new NumberArrayParameter(expectedParamName))
             ),
             _options
         );
@@ -317,7 +373,7 @@ public sealed record AverageNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "number"
+                    "name": "numberArray"
                   }
                 }
             }
@@ -326,7 +382,7 @@ public sealed record AverageNumberConverterTests
         AverageNumber value = JsonSerializer.Deserialize<AverageNumber>(input, _options)!;
         Assert.Equal(
             new NumberField(expectedEntityName, expectedFieldName),
-            value.Argument.AsT0
+            value.Argument.AsT1
         );
     }
 
@@ -338,6 +394,14 @@ public sealed record AverageNumberConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -376,7 +440,7 @@ public sealed record AverageNumberConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "number"
+                  "name": "numberArray"
                 }
               }
             }
@@ -384,7 +448,7 @@ public sealed record AverageNumberConverterTests
 
         string value = JsonSerializer.Serialize(
             new AverageNumber(
-                new NumberReturning(
+                new NumberArrayReturning(
                     new NumberField(expectedEntityName, expectedFieldName)
                 )
             ),

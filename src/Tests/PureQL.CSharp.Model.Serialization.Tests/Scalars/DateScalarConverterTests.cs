@@ -95,7 +95,7 @@ public sealed record DateScalarConverterTests
             """
             {
               "type": {
-                "name": "datetime"
+                "name": "date"
               },
               "value": ""
             }
@@ -113,7 +113,7 @@ public sealed record DateScalarConverterTests
             """
             {
               "type": {
-                "name": "datetime"
+                "name": "date"
               }
             }
             """;

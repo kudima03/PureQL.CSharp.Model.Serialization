@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -28,56 +27,6 @@ public sealed record DateTimeReturningConverterTests
     }
 
     [Fact]
-    public void ReadDateTimeField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "type": {
-                "name": "datetime"
-              },
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}"
-            }
-            """;
-
-        DateTimeField field = JsonSerializer
-            .Deserialize<DateTimeReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateTimeType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteDateTimeField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new DateTimeReturning(new DateTimeField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "datetime"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadDateTimeParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
@@ -94,7 +43,7 @@ public sealed record DateTimeReturningConverterTests
 
         DateTimeParameter parameter = JsonSerializer
             .Deserialize<DateTimeReturning>(input, _options)!
-            .AsT1;
+            .AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new DateTimeType(), parameter.Type);
@@ -140,7 +89,7 @@ public sealed record DateTimeReturningConverterTests
 
         DateTimeScalar scalar = JsonSerializer
             .Deserialize<DateTimeReturning>(input, _options)!
-            .AsT2;
+            .AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -175,32 +124,6 @@ public sealed record DateTimeReturningConverterTests
     [InlineData(" ")]
     public void ThrowsExceptionOnBadFormat(string input)
     {
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeReturning>(input, _options)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("boolean")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    [InlineData("ihufd")]
-    public void ThrowsExceptionOnWrongFieldType(string typeName)
-    {
-        string input = $$"""
-            {
-              "type": {
-                "name": "{{typeName}}"
-              },
-              "entity": "ufbrdeyhov",
-              "field": "heuiyrndfosgv"
-            }
-            """;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateTimeReturning>(input, _options)
         );

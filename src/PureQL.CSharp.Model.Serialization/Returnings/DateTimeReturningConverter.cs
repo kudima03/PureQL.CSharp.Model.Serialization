@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -18,9 +17,7 @@ internal sealed class DateTimeReturningConverter : JsonConverter<DateTimeReturni
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return JsonExtensions.TryDeserialize(root, options, out DateTimeField? field)
-                ? new DateTimeReturning(field!)
-            : JsonExtensions.TryDeserialize(
+        return JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out DateTimeParameter? parameter
@@ -28,7 +25,7 @@ internal sealed class DateTimeReturningConverter : JsonConverter<DateTimeReturni
                 ? new DateTimeReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out IDateTimeScalar? scalar)
                 ? new DateTimeReturning(new DateTimeScalar(scalar!.Value))
-            : throw new JsonException("Unable to determine BooleanReturning type.");
+            : throw new JsonException("Unable to determine DateTimeReturning type.");
     }
 
     public override void Write(
@@ -43,15 +40,11 @@ internal sealed class DateTimeReturningConverter : JsonConverter<DateTimeReturni
         }
         else if (value.IsT1)
         {
-            JsonSerializer.Serialize(writer, value.AsT1, options);
-        }
-        else if (value.IsT2)
-        {
-            JsonSerializer.Serialize<IDateTimeScalar>(writer, value.AsT2, options);
+            JsonSerializer.Serialize<IDateTimeScalar>(writer, value.AsT1, options);
         }
         else
         {
-            throw new JsonException();
+            throw new JsonException("Unable to determine DateTimeReturning type.");
         }
     }
 }

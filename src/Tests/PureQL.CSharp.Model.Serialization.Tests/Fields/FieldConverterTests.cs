@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Fields;
 
@@ -35,7 +35,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -46,7 +46,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new BooleanType(), field.Type);
+        Assert.Equal(new BooleanArrayType(), field.Type);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "boolean"
+                "name": "booleanArray"
               }
             }
             """;
@@ -86,7 +86,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "date"
+                "name": "dateArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -97,7 +97,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateType(), field.Type);
+        Assert.Equal(new DateArrayType(), field.Type);
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "date"
+                "name": "dateArray"
               }
             }
             """;
@@ -137,7 +137,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -148,7 +148,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateTimeType(), field.Type);
+        Assert.Equal(new DateTimeArrayType(), field.Type);
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "datetime"
+                "name": "datetimeArray"
               }
             }
             """;
@@ -188,7 +188,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "number"
+                "name": "numberArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -199,7 +199,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new NumberType(), field.Type);
+        Assert.Equal(new NumberArrayType(), field.Type);
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "number"
+                "name": "numberArray"
               }
             }
             """;
@@ -239,7 +239,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "time"
+                "name": "timeArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -250,7 +250,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new TimeType(), field.Type);
+        Assert.Equal(new TimeArrayType(), field.Type);
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "time"
+                "name": "timeArray"
               }
             }
             """;
@@ -290,7 +290,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -301,7 +301,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new UuidType(), field.Type);
+        Assert.Equal(new UuidArrayType(), field.Type);
     }
 
     [Fact]
@@ -317,7 +317,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "uuid"
+                "name": "uuidArray"
               }
             }
             """;
@@ -341,7 +341,7 @@ public sealed record FieldConverterTests
             $$"""
             {
               "type": {
-                "name": "string"
+                "name": "stringArray"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -352,7 +352,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(expectedEntity, field.Entity);
         Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new StringType(), field.Type);
+        Assert.Equal(new StringArrayType(), field.Type);
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public sealed record FieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "string"
+                "name": "stringArray"
               }
             }
             """;

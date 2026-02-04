@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -18,13 +17,11 @@ internal sealed class TimeReturningConverter : JsonConverter<TimeReturning>
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return JsonExtensions.TryDeserialize(root, options, out TimeField? field)
-                ? new TimeReturning(field!)
-            : JsonExtensions.TryDeserialize(root, options, out TimeParameter? parameter)
+        return JsonExtensions.TryDeserialize(root, options, out TimeParameter? parameter)
                 ? new TimeReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out ITimeScalar? scalar)
                 ? new TimeReturning(new TimeScalar(scalar!.Value))
-            : throw new JsonException("Unable to determine BooleanReturning type.");
+            : throw new JsonException("Unable to determine TimeReturning type.");
     }
 
     public override void Write(
@@ -33,21 +30,17 @@ internal sealed class TimeReturningConverter : JsonConverter<TimeReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.IsT0)
+        if (value.TryPickT0(out TimeParameter? parameter, out _))
         {
-            JsonSerializer.Serialize(writer, value.AsT0, options);
+            JsonSerializer.Serialize(writer, parameter, options);
         }
-        else if (value.IsT1)
+        else if (value.TryPickT1(out TimeScalar? scalar, out _))
         {
-            JsonSerializer.Serialize(writer, value.AsT1, options);
-        }
-        else if (value.IsT2)
-        {
-            JsonSerializer.Serialize<ITimeScalar>(writer, value.AsT2, options);
+            JsonSerializer.Serialize<ITimeScalar>(writer, scalar, options);
         }
         else
         {
-            throw new JsonException();
+            throw new JsonException("Unable to determine TimeReturning type.");
         }
     }
 }

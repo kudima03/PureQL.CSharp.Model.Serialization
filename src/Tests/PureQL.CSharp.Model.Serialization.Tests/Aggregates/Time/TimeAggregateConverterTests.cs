@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Time;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.Time;
 
@@ -28,7 +28,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsence()
+    public void ThrowsExceptionOnOperatorNameAbsenceOnAverage()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -40,7 +40,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -52,7 +52,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOtherOperatorName()
+    public void ThrowsExceptionOnOtherOperatorNameOnAverage()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -60,12 +60,12 @@ public sealed record TimeAggregateConverterTests
         const string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "max_date",
+              "operator": "min_date",
               "arg": {
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -77,7 +77,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnInvalidOperatorName()
+    public void ThrowsExceptionOnInvalidOperatorNameOnAverage()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -90,7 +90,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -102,7 +102,442 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnUndefinedArgument()
+    public void ThrowsExceptionOnUndefinedArgumentOnAverage()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "min_date"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullArgumentOnAverage()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "average_time",
+              "arg": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnArgumentWrongTypeOnAverage()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "average_time",
+              "arg": []
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ReadScalarArgumentOnAverage()
+    {
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                "type": {
+                  "name": "timeArray"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
+            }
+            """;
+
+        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
+        Assert.Equal(expectedValues, value.AsT2.Argument.AsT2.Value);
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("date")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongScalarTypeOnAverage(string type)
+    {
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteScalarArgumentOnAverage()
+    {
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                "type": {
+                  "name": "timeArray"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new TimeAggregate(
+                new AverageTime(
+                    new TimeArrayReturning(new TimeArrayScalar(expectedValues))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadParameterArgumentOnAverage()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
+        Assert.Equal(new TimeArrayParameter(expectedParamName), value.AsT2.Argument.AsT0);
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("date")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    public void ThrowsExceptionOnWrongParameterTypeOnAverage(string type)
+    {
+        const string expectedParamName = "ashjlbd";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                  "name": "{{expectedParamName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteParameterArgumentOnAverage()
+    {
+        const string expectedParamName = "ashjlbd";
+
+        const string expected = $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                "name": "{{expectedParamName}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new TimeAggregate(
+                new AverageTime(
+                    new TimeArrayReturning(new TimeArrayParameter(expectedParamName))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadFieldArgumentOnAverage()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
+        Assert.Equal(
+            new TimeField(expectedEntityName, expectedFieldName),
+            value.AsT2.Argument.AsT1
+        );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("date")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    public void ThrowsExceptionOnWrongFieldTypeOnAverage(string type)
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteFieldArgumentOnAverage()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_time",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new TimeAggregate(
+                new AverageTime(
+                    new TimeArrayReturning(
+                        new TimeField(expectedEntityName, expectedFieldName)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnOperatorNameAbsenceOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnOtherOperatorNameOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_date",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidOperatorNameOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "euhwyrfdbuyeghrfdb",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnUndefinedArgumentOnMin()
     {
         const string input = /*lang=json,strict*/
             """
@@ -117,7 +552,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnNullArgument()
+    public void ThrowsExceptionOnNullArgumentOnMin()
     {
         const string input = /*lang=json,strict*/
             """
@@ -133,7 +568,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnArgumentWrongType()
+    public void ThrowsExceptionOnArgumentWrongTypeOnMin()
     {
         const string input = /*lang=json,strict*/
             """
@@ -149,24 +584,38 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ReadScalarArgumentOnMinTime()
+    public void ReadScalarArgumentOnMin()
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "min_time",
               "arg": {
-                  "type": {
-                    "name": "time"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+                "type": {
+                  "name": "timeArray"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeScalar(now), value.AsT1.Argument.AsT2);
+        Assert.Equal(expectedValues, value.AsT1.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -177,20 +626,41 @@ public sealed record TimeAggregateConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnMinTime(string type)
+    public void ThrowsExceptionOnWrongScalarTypeOnMin(string type)
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "min_time",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -200,31 +670,47 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void WriteScalarArgumentOnMinTime()
+    public void WriteScalarArgumentOnMin()
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "min_time",
               "arg": {
                 "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new TimeAggregate(new MinTime(new TimeReturning(new TimeScalar(now)))),
+            new TimeAggregate(
+                new MinTime(new TimeArrayReturning(new TimeArrayScalar(expectedValues)))
+            ),
             _options
         );
         Assert.Equal(expected, value);
     }
 
     [Fact]
-    public void ReadParameterArgumentOnMinTime()
+    public void ReadParameterArgumentOnMin()
     {
         const string expectedParamName = "ashjlbd";
 
@@ -235,14 +721,14 @@ public sealed record TimeAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeParameter(expectedParamName), value.AsT1.Argument.AsT1);
+        Assert.Equal(new TimeArrayParameter(expectedParamName), value.AsT1.Argument.AsT0);
     }
 
     [Theory]
@@ -253,8 +739,15 @@ public sealed record TimeAggregateConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnMinTime(string type)
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongParameterTypeOnMin(string type)
     {
         const string expectedParamName = "ashjlbd";
 
@@ -277,7 +770,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void WriteParameterArgumentOnMinTime()
+    public void WriteParameterArgumentOnMin()
     {
         const string expectedParamName = "ashjlbd";
 
@@ -287,95 +780,7 @@ public sealed record TimeAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new TimeAggregate(
-                new MinTime(new TimeReturning(new TimeParameter(expectedParamName)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadFieldArgumentOnMinTime()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_time",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "time"
-                  }
-                }
-            }
-            """;
-
-        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(
-            new TimeField(expectedEntityName, expectedFieldName),
-            value.AsT1.Argument.AsT0
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("date")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnMinTime(string type)
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_time",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentOnMinTime()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_time",
-              "arg": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
-                "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 }
               }
             }
@@ -384,7 +789,105 @@ public sealed record TimeAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new TimeAggregate(
                 new MinTime(
-                    new TimeReturning(
+                    new TimeArrayReturning(new TimeArrayParameter(expectedParamName))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadFieldArgumentOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_time",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
+        Assert.Equal(
+            new TimeField(expectedEntityName, expectedFieldName),
+            value.AsT1.Argument.AsT1
+        );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("date")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongFieldTypeOnMin(string type)
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_time",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteFieldArgumentOnMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_time",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new TimeAggregate(
+                new MinTime(
+                    new TimeArrayReturning(
                         new TimeField(expectedEntityName, expectedFieldName)
                     )
                 )
@@ -395,123 +898,19 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ReadScalarArgumentOnAverageTime()
+    public void ThrowsExceptionOnOperatorNameAbsenceOnMax()
     {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_time",
-              "arg": {
-                  "type": {
-                    "name": "time"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
-            }
-            """;
-
-        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeScalar(now), value.AsT2.Argument.AsT2);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("date")]
-    [InlineData("uuid")]
-    [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnAverageTime(string type)
-    {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_time",
-              "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteScalarArgumentOnAverageTime()
-    {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
-        string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_time",
-              "arg": {
-                "type": {
-                  "name": "time"
-                },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new TimeAggregate(new AverageTime(new TimeReturning(new TimeScalar(now)))),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadParameterArgumentOnAverageTime()
-    {
-        const string expectedParamName = "ashjlbd";
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
 
         const string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "average_time",
               "arg": {
-                  "name": "{{expectedParamName}}",
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
-                  }
-                }
-            }
-            """;
-
-        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeParameter(expectedParamName), value.AsT2.Argument.AsT1);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("date")]
-    [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnAverageTime(string type)
-    {
-        const string expectedParamName = "ashjlbd";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_time",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "{{type}}"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -523,25 +922,222 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void WriteParameterArgumentOnAverageTime()
+    public void ThrowsExceptionOnOtherOperatorNameOnMax()
     {
-        const string expectedParamName = "ashjlbd";
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
 
-        const string expected = $$"""
+        const string input = /*lang=json,strict*/
+            $$"""
             {
-              "operator": "average_time",
+              "operator": "max_date",
               "arg": {
-                "name": "{{expectedParamName}}",
-                "type": {
-                  "name": "time"
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
                 }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidOperatorNameOnMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "euhwyrfdbuyeghrfdb",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnUndefinedArgumentOnMax()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "max_date"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullArgumentOnMax()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "max_time",
+              "arg": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnArgumentWrongTypeOnMax()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "max_time",
+              "arg": []
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ReadScalarArgumentOnMax()
+    {
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_time",
+              "arg": {
+                "type": {
+                  "name": "timeArray"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
+            }
+            """;
+
+        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
+        Assert.Equal(expectedValues, value.AsT0.Argument.AsT2.Value);
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("date")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongScalarTypeOnMax(string type)
+    {
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_time",
+              "arg": {
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
+              }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteScalarArgumentOnMax()
+    {
+        IEnumerable<TimeOnly> expectedValues =
+        [
+            new TimeOnly(14, 30, 15),
+            new TimeOnly(15, 30, 15),
+            new TimeOnly(14, 40, 16),
+        ];
+
+        IEnumerable<string> formattedTimes = expectedValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_time",
+              "arg": {
+                "type": {
+                  "name": "timeArray"
+                },
+                "value": [
+                  "{{formattedTimes.First()}}",
+                  "{{formattedTimes.Skip(1).First()}}",
+                  "{{formattedTimes.Skip(2).First()}}"
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
             new TimeAggregate(
-                new AverageTime(new TimeReturning(new TimeParameter(expectedParamName)))
+                new MaxTime(new TimeArrayReturning(new TimeArrayScalar(expectedValues)))
             ),
             _options
         );
@@ -549,116 +1145,25 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgumentOnAverageTime()
+    public void ReadParameterArgumentOnMax()
     {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
+        const string expectedParamName = "ashjlbd";
 
         const string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "average_time",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "time"
-                  }
-                }
-            }
-            """;
-
-        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(
-            new TimeField(expectedEntityName, expectedFieldName),
-            value.AsT2.Argument.AsT0
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("date")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnAverageTime(string type)
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_time",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentOnAverageTime()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_time",
-              "arg": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
-                "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new TimeAggregate(
-                new AverageTime(
-                    new TimeReturning(
-                        new TimeField(expectedEntityName, expectedFieldName)
-                    )
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadScalarArgumentOnMaxDate()
-    {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
-        string input = /*lang=json,strict*/
-            $$"""
-            {
               "operator": "max_time",
               "arg": {
+                  "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "time"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
+                    "name": "timeArray"
+                  }
                 }
             }
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeScalar(now), value.AsT0.Argument.AsT2);
+        Assert.Equal(new TimeArrayParameter(expectedParamName), value.AsT0.Argument.AsT0);
     }
 
     [Theory]
@@ -669,84 +1174,15 @@ public sealed record TimeAggregateConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
-    public void ThrowsExceptionOnWrongScalarTypeOnMaxDate(string type)
-    {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_time",
-              "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{JsonSerializer.Serialize(now, _options)}}
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteScalarArgumentOnMaxDate()
-    {
-        TimeOnly now = TimeOnly.FromDateTime(DateTime.Now);
-        string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_time",
-              "arg": {
-                "type": {
-                  "name": "time"
-                },
-                "value": {{JsonSerializer.Serialize(now, _options)}}
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new TimeAggregate(new MaxTime(new TimeReturning(new TimeScalar(now)))),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadParameterArgumentOnMaxDate()
-    {
-        const string expectedParamName = "ashjlbd";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_time",
-              "arg": {
-                  "name": "{{expectedParamName}}",
-                  "type": {
-                    "name": "time"
-                  }
-                }
-            }
-            """;
-
-        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeParameter(expectedParamName), value.AsT0.Argument.AsT1);
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("date")]
-    [InlineData("uuid")]
-    [InlineData("ehufry")]
-    public void ThrowsExceptionOnWrongParameterTypeOnMaxDate(string type)
+    public void ThrowsExceptionOnWrongParameterTypeOnMax(string type)
     {
         const string expectedParamName = "ashjlbd";
 
@@ -769,7 +1205,7 @@ public sealed record TimeAggregateConverterTests
     }
 
     [Fact]
-    public void WriteParameterArgumentOnMaxDate()
+    public void WriteParameterArgumentOnMax()
     {
         const string expectedParamName = "ashjlbd";
 
@@ -779,95 +1215,7 @@ public sealed record TimeAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "time"
-                }
-              }
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new TimeAggregate(
-                new MaxTime(new TimeReturning(new TimeParameter(expectedParamName)))
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
-    public void ReadFieldArgumentOnMaxDate()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_time",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "time"
-                  }
-                }
-            }
-            """;
-
-        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(
-            new TimeField(expectedEntityName, expectedFieldName),
-            value.AsT0.Argument.AsT0
-        );
-    }
-
-    [Theory]
-    [InlineData("boolean")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("date")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnMaxDate(string type)
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_time",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentOnMaxDate()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_time",
-              "arg": {
-                "entity": "{{expectedEntityName}}",
-                "field": "{{expectedFieldName}}",
-                "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 }
               }
             }
@@ -876,7 +1224,105 @@ public sealed record TimeAggregateConverterTests
         string value = JsonSerializer.Serialize(
             new TimeAggregate(
                 new MaxTime(
-                    new TimeReturning(
+                    new TimeArrayReturning(new TimeArrayParameter(expectedParamName))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadFieldArgumentOnMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_time",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "timeArray"
+                  }
+                }
+            }
+            """;
+
+        TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
+        Assert.Equal(
+            new TimeField(expectedEntityName, expectedFieldName),
+            value.AsT0.Argument.AsT1
+        );
+    }
+
+    [Theory]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("date")]
+    [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("dateArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
+    public void ThrowsExceptionOnWrongFieldTypeOnMax(string type)
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_time",
+              "arg": {
+                  "entity": "{{expectedEntityName}}",
+                  "field": "{{expectedFieldName}}",
+                  "type": {
+                    "name": "{{type}}"
+                  }
+                }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeAggregate>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteFieldArgumentOnMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_time",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new TimeAggregate(
+                new MaxTime(
+                    new TimeArrayReturning(
                         new TimeField(expectedEntityName, expectedFieldName)
                     )
                 )

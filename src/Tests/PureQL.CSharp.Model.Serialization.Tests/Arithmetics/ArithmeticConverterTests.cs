@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Arithmetics;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -180,8 +179,8 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT0.Arguments.First().AsT2, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT0.Arguments.Last().AsT2, new NumberScalar(expectedValue2));
+        Assert.Equal(value.AsT0.Arguments.First().AsT1, new NumberScalar(expectedValue1));
+        Assert.Equal(value.AsT0.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
     }
 
     [Theory]
@@ -192,6 +191,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongScalarTypeOnAdd(string type)
     {
         double expectedValue1 = Random.Shared.NextDouble();
@@ -293,11 +299,11 @@ public sealed record ArithmeticConverterTests
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT0.Arguments.First().AsT1,
+            value.AsT0.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.AsT0.Arguments.Last().AsT1,
+            value.AsT0.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -310,6 +316,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongParameterTypeOnAdd(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -383,155 +396,10 @@ public sealed record ArithmeticConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgumentsOnAdd()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "add",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(
-            value.AsT0.Arguments.First().AsT0,
-            new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.AsT0.Arguments.Last().AsT0,
-            new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("boolean")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnAdd(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "add",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<Arithmetic>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentsOnAdd()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "add",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(
-                            new NumberField(
-                                expectedFirstEntityName,
-                                expectedFirstFieldName
-                            )
-                        ),
-                        new NumberReturning(
-                            new NumberField(
-                                expectedSecondEntityName,
-                                expectedSecondFieldName
-                            )
-                        ),
-                    ]
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgumentsOnAdd()
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -544,13 +412,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -563,13 +424,9 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT0.Arguments.First().AsT2);
+        Assert.Equal(new NumberScalar(expectedValue), value.AsT0.Arguments.First().AsT1);
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
-            value.AsT0.Arguments.Skip(1).First().AsT0
-        );
-        Assert.Equal(
-            value.AsT0.Arguments.Skip(2).First().AsT1,
+            value.AsT0.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -579,8 +436,6 @@ public sealed record ArithmeticConverterTests
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string expected = /*lang=json,strict*/
@@ -593,13 +448,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -616,9 +464,6 @@ public sealed record ArithmeticConverterTests
                 new Add(
                     [
                         new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(
-                            new NumberField(expectedEntityName, expectedFieldName)
-                        ),
                         new NumberReturning(new NumberParameter(expectedParamName)),
                     ]
                 )
@@ -748,8 +593,8 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT1.Arguments.First().AsT2, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT1.Arguments.Last().AsT2, new NumberScalar(expectedValue2));
+        Assert.Equal(value.AsT1.Arguments.First().AsT1, new NumberScalar(expectedValue1));
+        Assert.Equal(value.AsT1.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
     }
 
     [Theory]
@@ -861,11 +706,11 @@ public sealed record ArithmeticConverterTests
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT1.Arguments.First().AsT1,
+            value.AsT1.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.AsT1.Arguments.Last().AsT1,
+            value.AsT1.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -878,6 +723,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongParameterTypeOnDivide(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -951,155 +803,10 @@ public sealed record ArithmeticConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgumentsOnDivide()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "divide",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(
-            value.AsT1.Arguments.First().AsT0,
-            new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.AsT1.Arguments.Last().AsT0,
-            new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("boolean")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnDivide(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "divide",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<Arithmetic>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentsOnDivide()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "divide",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(
-                            new NumberField(
-                                expectedFirstEntityName,
-                                expectedFirstFieldName
-                            )
-                        ),
-                        new NumberReturning(
-                            new NumberField(
-                                expectedSecondEntityName,
-                                expectedSecondFieldName
-                            )
-                        ),
-                    ]
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgumentsOnDivide()
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -1112,13 +819,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -1131,13 +831,9 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT1.Arguments.First().AsT2);
+        Assert.Equal(new NumberScalar(expectedValue), value.AsT1.Arguments.First().AsT1);
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
-            value.AsT1.Arguments.Skip(1).First().AsT0
-        );
-        Assert.Equal(
-            value.AsT1.Arguments.Skip(2).First().AsT1,
+            value.AsT1.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -1147,8 +843,6 @@ public sealed record ArithmeticConverterTests
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string expected = /*lang=json,strict*/
@@ -1161,13 +855,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -1184,9 +871,6 @@ public sealed record ArithmeticConverterTests
                 new Divide(
                     [
                         new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(
-                            new NumberField(expectedEntityName, expectedFieldName)
-                        ),
                         new NumberReturning(new NumberParameter(expectedParamName)),
                     ]
                 )
@@ -1304,8 +988,8 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT2.Arguments.First().AsT2, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT2.Arguments.Last().AsT2, new NumberScalar(expectedValue2));
+        Assert.Equal(value.AsT2.Arguments.First().AsT1, new NumberScalar(expectedValue1));
+        Assert.Equal(value.AsT2.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
     }
 
     [Theory]
@@ -1316,6 +1000,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongScalarTypeOnMultiply(string type)
     {
         double expectedValue1 = Random.Shared.NextDouble();
@@ -1417,11 +1108,11 @@ public sealed record ArithmeticConverterTests
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT2.Arguments.First().AsT1,
+            value.AsT2.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.AsT2.Arguments.Last().AsT1,
+            value.AsT2.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -1434,6 +1125,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongParameterTypeOnMultiply(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -1507,155 +1205,9 @@ public sealed record ArithmeticConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgumentsOnMultiply()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "multiply",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(
-            value.AsT2.Arguments.First().AsT0,
-            new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.AsT2.Arguments.Last().AsT0,
-            new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("boolean")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnMultiply(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "multiply",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<Arithmetic>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentsOnMultiply()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "multiply",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(
-                            new NumberField(
-                                expectedFirstEntityName,
-                                expectedFirstFieldName
-                            )
-                        ),
-                        new NumberReturning(
-                            new NumberField(
-                                expectedSecondEntityName,
-                                expectedSecondFieldName
-                            )
-                        ),
-                    ]
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgumentsOnMultiply()
     {
         double expectedValue = Random.Shared.NextDouble();
-
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -1668,13 +1220,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -1687,13 +1232,9 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT2.Arguments.First().AsT2);
+        Assert.Equal(new NumberScalar(expectedValue), value.AsT2.Arguments.First().AsT1);
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
-            value.AsT2.Arguments.Skip(1).First().AsT0
-        );
-        Assert.Equal(
-            value.AsT2.Arguments.Skip(2).First().AsT1,
+            value.AsT2.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -1703,8 +1244,6 @@ public sealed record ArithmeticConverterTests
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string expected = /*lang=json,strict*/
@@ -1717,13 +1256,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -1740,9 +1272,6 @@ public sealed record ArithmeticConverterTests
                 new Multiply(
                     [
                         new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(
-                            new NumberField(expectedEntityName, expectedFieldName)
-                        ),
                         new NumberReturning(new NumberParameter(expectedParamName)),
                     ]
                 )
@@ -1860,8 +1389,8 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT3.Arguments.First().AsT2, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT3.Arguments.Last().AsT2, new NumberScalar(expectedValue2));
+        Assert.Equal(value.AsT3.Arguments.First().AsT1, new NumberScalar(expectedValue1));
+        Assert.Equal(value.AsT3.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
     }
 
     [Theory]
@@ -1872,6 +1401,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongScalarTypeOnSubtract(string type)
     {
         double expectedValue1 = Random.Shared.NextDouble();
@@ -1973,11 +1509,11 @@ public sealed record ArithmeticConverterTests
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT3.Arguments.First().AsT1,
+            value.AsT3.Arguments.First().AsT0,
             new NumberParameter(expectedFirstParamName)
         );
         Assert.Equal(
-            value.AsT3.Arguments.Last().AsT1,
+            value.AsT3.Arguments.Last().AsT0,
             new NumberParameter(expectedSecondParamName)
         );
     }
@@ -1990,6 +1526,13 @@ public sealed record ArithmeticConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("booleanArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     public void ThrowsExceptionOnWrongParameterTypeOnSubtract(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -2063,155 +1606,10 @@ public sealed record ArithmeticConverterTests
     }
 
     [Fact]
-    public void ReadFieldArgumentsOnSubtract()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "subtract",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(
-            value.AsT3.Arguments.First().AsT0,
-            new NumberField(expectedFirstEntityName, expectedFirstFieldName)
-        );
-        Assert.Equal(
-            value.AsT3.Arguments.Last().AsT0,
-            new NumberField(expectedSecondEntityName, expectedSecondFieldName)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("datetime")]
-    [InlineData("null")]
-    [InlineData("boolean")]
-    [InlineData("string")]
-    [InlineData("time")]
-    [InlineData("uuid")]
-    public void ThrowsExceptionOnWrongFieldTypeOnSubtract(string type)
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "subtract",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}"
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}"
-                  "name": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "{{type}}"
-                  }
-                }
-              ]
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<Arithmetic>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void WriteFieldArgumentsOnSubtract()
-    {
-        const string expectedFirstEntityName = "aruhybfe";
-        const string expectedFirstFieldName = "erafuhyobdng";
-
-        const string expectedSecondEntityName = "rendgijhsftu";
-        const string expectedSecondFieldName = "erafuhyobdng";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "subtract",
-              "arguments": [
-                {
-                  "entity": "{{expectedFirstEntityName}}",
-                  "field": "{{expectedFirstFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                },
-                {
-                  "entity": "{{expectedSecondEntityName}}",
-                  "field": "{{expectedSecondFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
-                }
-              ]
-            }
-            """;
-
-        string value = JsonSerializer.Serialize(
-            new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(
-                            new NumberField(
-                                expectedFirstEntityName,
-                                expectedFirstFieldName
-                            )
-                        ),
-                        new NumberReturning(
-                            new NumberField(
-                                expectedSecondEntityName,
-                                expectedSecondFieldName
-                            )
-                        ),
-                    ]
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, value);
-    }
-
-    [Fact]
     public void ReadMixedArgumentsOnSubtract()
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string input = /*lang=json,strict*/
@@ -2224,13 +1622,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -2243,13 +1634,9 @@ public sealed record ArithmeticConverterTests
             """;
 
         Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT3.Arguments.First().AsT2);
+        Assert.Equal(new NumberScalar(expectedValue), value.AsT3.Arguments.First().AsT1);
         Assert.Equal(
-            new NumberField(expectedEntityName, expectedFieldName),
-            value.AsT3.Arguments.Skip(1).First().AsT0
-        );
-        Assert.Equal(
-            value.AsT3.Arguments.Skip(2).First().AsT1,
+            value.AsT3.Arguments.Skip(1).First().AsT0,
             new NumberParameter(expectedParamName)
         );
     }
@@ -2259,8 +1646,6 @@ public sealed record ArithmeticConverterTests
     {
         double expectedValue = Random.Shared.NextDouble();
 
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
         const string expectedParamName = "ashjlbd";
 
         string expected = /*lang=json,strict*/
@@ -2273,13 +1658,6 @@ public sealed record ArithmeticConverterTests
                     "name": "number"
                   },
                   "value": {{expectedValue.ToString(CultureInfo.InvariantCulture)}}
-                },
-                {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "number"
-                  }
                 },
                 {
                   "name": "{{expectedParamName}}",
@@ -2296,9 +1674,6 @@ public sealed record ArithmeticConverterTests
                 new Subtract(
                     [
                         new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(
-                            new NumberField(expectedEntityName, expectedFieldName)
-                        ),
                         new NumberReturning(new NumberParameter(expectedParamName)),
                     ]
                 )

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.Date;
-using PureQL.CSharp.Model.Returnings;
+using PureQL.CSharp.Model.ArrayReturnings;
 
 namespace PureQL.CSharp.Model.Serialization.Aggregates.Date;
 
@@ -27,7 +27,7 @@ internal sealed record DateAggregateJsonModel
     [JsonConstructor]
     public DateAggregateJsonModel(
         DateAggregateOperatorJsonModel @operator,
-        DateReturning arg
+        DateArrayReturning arg
     )
     {
         Operator = @operator;
@@ -36,5 +36,5 @@ internal sealed record DateAggregateJsonModel
 
     public DateAggregateOperatorJsonModel Operator { get; }
 
-    public DateReturning Arg { get; }
+    public DateArrayReturning Arg { get; }
 }

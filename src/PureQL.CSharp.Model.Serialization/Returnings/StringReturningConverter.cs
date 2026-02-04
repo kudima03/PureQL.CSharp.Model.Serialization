@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -18,13 +17,15 @@ internal sealed class StringReturningConverter : JsonConverter<StringReturning>
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return JsonExtensions.TryDeserialize(root, options, out StringField? field)
-                ? new StringReturning(field!)
-            : JsonExtensions.TryDeserialize(root, options, out StringParameter? parameter)
+        return JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out StringParameter? parameter
+            )
                 ? new StringReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out IStringScalar? scalar)
                 ? new StringReturning(new StringScalar(scalar!.Value))
-            : throw new JsonException("Unable to determine BooleanReturning type.");
+            : throw new JsonException("Unable to determine StringReturning type.");
     }
 
     public override void Write(
@@ -33,21 +34,17 @@ internal sealed class StringReturningConverter : JsonConverter<StringReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.IsT0)
+        if (value.TryPickT0(out StringParameter? parameter, out _))
         {
-            JsonSerializer.Serialize(writer, value.AsT0, options);
+            JsonSerializer.Serialize(writer, parameter, options);
         }
-        else if (value.IsT1)
+        else if (value.TryPickT1(out StringScalar? scalar, out _))
         {
-            JsonSerializer.Serialize(writer, value.AsT1, options);
-        }
-        else if (value.IsT2)
-        {
-            JsonSerializer.Serialize<IStringScalar>(writer, value.AsT2, options);
+            JsonSerializer.Serialize<IStringScalar>(writer, scalar, options);
         }
         else
         {
-            throw new JsonException();
+            throw new JsonException("Unable to determine StringReturning type.");
         }
     }
 }

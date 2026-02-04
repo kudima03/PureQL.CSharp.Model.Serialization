@@ -1,17 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
 internal sealed record BooleanFieldJsonModel
 {
     public BooleanFieldJsonModel(BooleanField field)
-        : this(field.Entity, field.Field, (BooleanType)field.Type) { }
+        : this(field.Entity, field.Field, (BooleanArrayType)field.Type) { }
 
     [JsonConstructor]
-    public BooleanFieldJsonModel(string entity, string field, BooleanType type)
+    public BooleanFieldJsonModel(string entity, string field, BooleanArrayType type)
     {
         Entity = entity ?? throw new JsonException();
         Field = field ?? throw new JsonException();
@@ -22,7 +22,7 @@ internal sealed record BooleanFieldJsonModel
 
     public string Field { get; }
 
-    public BooleanType Type { get; }
+    public BooleanArrayType Type { get; }
 }
 
 internal sealed class BooleanFieldConverter : JsonConverter<BooleanField>

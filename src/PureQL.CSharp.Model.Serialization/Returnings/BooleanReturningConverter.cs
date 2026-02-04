@@ -1,8 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
-using PureQL.CSharp.Model.Equalities;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -20,9 +18,7 @@ internal sealed class BooleanReturningConverter : JsonConverter<BooleanReturning
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        return JsonExtensions.TryDeserialize(root, options, out BooleanField? boolean)
-                ? new BooleanReturning(boolean!)
-            : JsonExtensions.TryDeserialize(
+        return JsonExtensions.TryDeserialize(
                 root,
                 options,
                 out BooleanParameter? parameter
@@ -59,11 +55,11 @@ internal sealed class BooleanReturningConverter : JsonConverter<BooleanReturning
         }
         else if (value.IsT1)
         {
-            JsonSerializer.Serialize(writer, value.AsT1, options);
+            JsonSerializer.Serialize<IBooleanScalar>(writer, value.AsT1, options);
         }
         else if (value.IsT2)
         {
-            JsonSerializer.Serialize<IBooleanScalar>(writer, value.AsT2, options);
+            JsonSerializer.Serialize(writer, value.AsT2, options);
         }
         else if (value.IsT3)
         {
@@ -72,10 +68,6 @@ internal sealed class BooleanReturningConverter : JsonConverter<BooleanReturning
         else if (value.IsT4)
         {
             JsonSerializer.Serialize(writer, value.AsT4, options);
-        }
-        else if (value.IsT5)
-        {
-            JsonSerializer.Serialize(writer, value.AsT5, options);
         }
         else
         {

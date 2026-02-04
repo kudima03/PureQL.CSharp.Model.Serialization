@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Aggregates.String;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.ArrayScalars;
 using PureQL.CSharp.Model.Fields;
-using PureQL.CSharp.Model.Parameters;
-using PureQL.CSharp.Model.Returnings;
-using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Aggregates.String;
 
@@ -40,7 +40,7 @@ public sealed record MaxStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record MaxStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record MaxStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -151,22 +151,24 @@ public sealed record MaxStringConverterTests
     [Fact]
     public void ReadScalarArgument()
     {
-        const string str = "aeiwnfhsubdrj";
         const string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "max_string",
               "arg": {
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   },
-                  "value": "{{str}}"
+                  "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
                 }
             }
             """;
 
         MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
-        Assert.Equal(new StringScalar(str), value.Argument.AsT2);
+        Assert.Equal(
+            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
+            value.Argument.AsT2.Value
+        );
     }
 
     [Theory]
@@ -177,6 +179,13 @@ public sealed record MaxStringConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
     [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
@@ -202,22 +211,31 @@ public sealed record MaxStringConverterTests
     [Fact]
     public void WriteScalarArgument()
     {
-        const string str = "aeiwnfhsubdrj";
         const string expected = /*lang=json,strict*/
             $$"""
             {
               "operator": "max_string",
               "arg": {
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 },
-                "value": "{{str}}"
+                "value": [
+                  "afirndhujvr",
+                  "sahbjndfashbndfj",
+                  "dnfjkanjkf"
+                ]
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new MaxString(new StringReturning(new StringScalar(str))),
+            new MaxString(
+                new StringArrayReturning(
+                    new StringArrayScalar(
+                        ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
+                    )
+                )
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -235,14 +253,14 @@ public sealed record MaxStringConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
             """;
 
         MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
-        Assert.Equal(new StringParameter(expectedParamName), value.Argument.AsT1);
+        Assert.Equal(new StringArrayParameter(expectedParamName), value.Argument.AsT0);
     }
 
     [Theory]
@@ -253,7 +271,14 @@ public sealed record MaxStringConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
-    [InlineData("ehufry")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedParamName = "ashjlbd";
@@ -287,14 +312,16 @@ public sealed record MaxStringConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 }
               }
             }
             """;
 
         string value = JsonSerializer.Serialize(
-            new MaxString(new StringReturning(new StringParameter(expectedParamName))),
+            new MaxString(
+                new StringArrayReturning(new StringArrayParameter(expectedParamName))
+            ),
             _options
         );
         Assert.Equal(expected, value);
@@ -314,7 +341,7 @@ public sealed record MaxStringConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "string"
+                    "name": "stringArray"
                   }
                 }
             }
@@ -323,7 +350,7 @@ public sealed record MaxStringConverterTests
         MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
         Assert.Equal(
             new StringField(expectedEntityName, expectedFieldName),
-            value.Argument.AsT0
+            value.Argument.AsT1
         );
     }
 
@@ -335,6 +362,14 @@ public sealed record MaxStringConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
+    [InlineData("dateArray")]
+    [InlineData("nullArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("numberArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongFieldType(string type)
     {
         const string expectedEntityName = "aruhybfe";
@@ -373,7 +408,7 @@ public sealed record MaxStringConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "string"
+                  "name": "stringArray"
                 }
               }
             }
@@ -381,7 +416,7 @@ public sealed record MaxStringConverterTests
 
         string value = JsonSerializer.Serialize(
             new MaxString(
-                new StringReturning(
+                new StringArrayReturning(
                     new StringField(expectedEntityName, expectedFieldName)
                 )
             ),

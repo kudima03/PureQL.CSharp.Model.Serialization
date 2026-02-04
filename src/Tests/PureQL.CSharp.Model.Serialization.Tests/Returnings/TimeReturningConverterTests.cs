@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -28,56 +27,6 @@ public sealed record TimeReturningConverterTests
     }
 
     [Fact]
-    public void ReadTimeField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "type": {
-                "name": "time"
-              },
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}"
-            }
-            """;
-
-        TimeField field = JsonSerializer
-            .Deserialize<TimeReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new TimeType(), field.Type);
-    }
-
-    [Fact]
-    public void WriteTimeField()
-    {
-        const string expectedEntity = "uheayfodrbniJ";
-        const string expectedField = "ubhjedwasuyhgbefrda";
-
-        string output = JsonSerializer.Serialize(
-            new TimeReturning(new TimeField(expectedEntity, expectedField)),
-            _options
-        );
-
-        const string expectedOutput = /*lang=json,strict*/
-            $$"""
-            {
-              "entity": "{{expectedEntity}}",
-              "field": "{{expectedField}}",
-              "type": {
-                "name": "time"
-              }
-            }
-            """;
-
-        Assert.Equal(expectedOutput, output);
-    }
-
-    [Fact]
     public void ReadTimeParameter()
     {
         const string paramName = "auryehgfbduygbhaerf";
@@ -94,7 +43,7 @@ public sealed record TimeReturningConverterTests
 
         TimeParameter parameter = JsonSerializer
             .Deserialize<TimeReturning>(input, _options)!
-            .AsT1;
+            .AsT0;
 
         Assert.Equal(paramName, parameter.Name);
         Assert.Equal(new TimeType(), parameter.Type);
@@ -138,7 +87,7 @@ public sealed record TimeReturningConverterTests
             """;
         TimeScalar scalar = JsonSerializer
             .Deserialize<TimeReturning>(input, _options)!
-            .AsT2;
+            .AsT1;
 
         Assert.Equal(expectedValue, scalar.Value);
     }
@@ -172,32 +121,6 @@ public sealed record TimeReturningConverterTests
     [InlineData(" ")]
     public void ThrowsExceptionOnBadFormat(string input)
     {
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<TimeReturning>(input, _options)
-        );
-    }
-
-    [Theory]
-    [InlineData("date")]
-    [InlineData("boolean")]
-    [InlineData("null")]
-    [InlineData("datetime")]
-    [InlineData("number")]
-    [InlineData("string")]
-    [InlineData("uuid")]
-    [InlineData("ihufd")]
-    public void ThrowsExceptionOnWrongFieldType(string typeName)
-    {
-        string input = $$"""
-            {
-              "type": {
-                "name": "{{typeName}}"
-              },
-              "entity": "ufbrdeyhov",
-              "field": "heuiyrndfosgv"
-            }
-            """;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<TimeReturning>(input, _options)
         );
