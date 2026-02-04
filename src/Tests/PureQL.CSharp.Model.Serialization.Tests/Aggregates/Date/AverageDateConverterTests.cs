@@ -165,17 +165,22 @@ public sealed record AverageDateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "average_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         AverageDate value = JsonSerializer.Deserialize<AverageDate>(input, _options)!;
-        Assert.Equal(new DateArrayScalar(expectedDates), value.Argument.AsT2);
+        Assert.Equal(expectedDates, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -210,12 +215,17 @@ public sealed record AverageDateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "{{type}}"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "average_date",
+              "arg": {
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -241,12 +251,17 @@ public sealed record AverageDateConverterTests
         string expected = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "average_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
