@@ -588,12 +588,7 @@ public sealed record AndOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadBooleanOperatorConditions()
     {
         const string input = /*lang=json,strict*/
@@ -641,26 +636,18 @@ public sealed record AndOperatorConverterTests
 
         AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.AsT0.First().AsT3,
-            new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
-            )
+            value.Conditions.AsT0.First().AsT3.AsT0.Conditions.AsT0,
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ]
         );
         Assert.Equal(
-            value.Conditions.AsT0.Last().AsT3,
-            new BooleanOperator(
-                new AndOperator(
-                    [
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true)),
-                    ]
-                )
-            )
+            value.Conditions.AsT0.Last().AsT3.AsT0.Conditions.AsT0,
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ]
         );
     }
 
