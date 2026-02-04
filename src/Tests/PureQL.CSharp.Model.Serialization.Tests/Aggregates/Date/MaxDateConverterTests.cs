@@ -163,7 +163,7 @@ public sealed record MaxDateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "max_date",
               "arg": {
@@ -213,7 +213,7 @@ public sealed record MaxDateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "max_date",
               "arg": {
@@ -248,7 +248,7 @@ public sealed record MaxDateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "max_date",
               "arg": {

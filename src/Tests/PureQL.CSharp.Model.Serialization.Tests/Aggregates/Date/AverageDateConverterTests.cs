@@ -163,7 +163,7 @@ public sealed record AverageDateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "average_date",
               "arg": {
@@ -213,7 +213,7 @@ public sealed record AverageDateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "average_date",
               "arg": {
@@ -249,7 +249,7 @@ public sealed record AverageDateConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "average_date",
               "arg": {

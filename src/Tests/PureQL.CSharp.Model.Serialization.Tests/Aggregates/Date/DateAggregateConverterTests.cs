@@ -114,7 +114,7 @@ public sealed record DateAggregateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "average_date",
               "arg": {
@@ -163,7 +163,7 @@ public sealed record DateAggregateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "average_date",
               "arg": {
@@ -199,7 +199,7 @@ public sealed record DateAggregateConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "average_date",
               "arg": {
@@ -476,7 +476,7 @@ public sealed record DateAggregateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "max_date",
               "arg": {
@@ -525,7 +525,7 @@ public sealed record DateAggregateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "max_date",
               "arg": {
@@ -561,7 +561,7 @@ public sealed record DateAggregateConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "max_date",
               "arg": {
@@ -836,7 +836,7 @@ public sealed record DateAggregateConverterTests
         );
 
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "min_date",
               "arg": {
@@ -885,7 +885,7 @@ public sealed record DateAggregateConverterTests
             x.ToString("yyyy-MM-dd")
         );
         string input = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "min_date",
               "arg": {
@@ -921,7 +921,7 @@ public sealed record DateAggregateConverterTests
         );
 
         string expected = /*lang=json,strict*/
-        $$"""
+            $$"""
             {
               "operator": "min_date",
               "arg": {
