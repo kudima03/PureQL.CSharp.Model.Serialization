@@ -295,12 +295,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -308,6 +303,15 @@ public sealed record AndOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("drftgihnuj")]
     public void ThrowsExceptionOnWrongParameterType(string type)
     {
         const string expectedFirstParamName = "ashjlbd";
@@ -822,20 +826,18 @@ public sealed record AndOperatorConverterTests
                 },
                 {
                   "operator": "equal",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": false
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "boolean"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
@@ -851,16 +853,16 @@ public sealed record AndOperatorConverterTests
         );
         Assert.Equal(value.Conditions.AsT0.Skip(1).First().AsT1, new BooleanScalar(true));
         Assert.Equal(
-            value.Conditions.AsT0.Skip(3).First().AsT0,
+            value.Conditions.AsT0.Skip(2).First().AsT0,
             new BooleanParameter(expectedParamName)
         );
         Assert.Equal(
-            value.Conditions.AsT0.Skip(4).First().AsT2.AsT0.AsT0.Left,
-            new BooleanReturning(new BooleanScalar(true))
+            value.Conditions.AsT0.Skip(3).First().AsT2.AsT0.AsT0.Left,
+            new BooleanReturning(new BooleanScalar(false))
         );
         Assert.Equal(
-            value.Conditions.AsT0.Skip(4).First().AsT2.AsT0.AsT0.Left,
-            new BooleanReturning(new BooleanScalar(false))
+            value.Conditions.AsT0.Skip(3).First().AsT2.AsT0.AsT0.Right,
+            new BooleanReturning(new BooleanScalar(true))
         );
     }
 
