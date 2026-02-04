@@ -40,7 +40,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -180,7 +180,7 @@ public sealed record TimeAggregateConverterTests
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeArrayScalar(expectedValues), value.AsT0.Argument.AsT2);
+        Assert.Equal(expectedValues, value.AsT2.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -288,14 +288,14 @@ public sealed record TimeAggregateConverterTests
               "arg": {
                   "name": "{{expectedParamName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeArrayParameter(expectedParamName), value.AsT0.Argument.AsT0);
+        Assert.Equal(new TimeArrayParameter(expectedParamName), value.AsT2.Argument.AsT0);
     }
 
     [Theory]
@@ -346,7 +346,7 @@ public sealed record TimeAggregateConverterTests
               "arg": {
                 "name": "{{expectedParamName}}",
                 "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 }
               }
             }
@@ -377,7 +377,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "time"
+                    "name": "timeArray"
                   }
                 }
             }
@@ -386,7 +386,7 @@ public sealed record TimeAggregateConverterTests
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
         Assert.Equal(
             new TimeField(expectedEntityName, expectedFieldName),
-            value.AsT0.Argument.AsT1
+            value.AsT2.Argument.AsT1
         );
     }
 
@@ -443,7 +443,7 @@ public sealed record TimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "time"
+                  "name": "timeArray"
                 }
               }
             }
@@ -615,7 +615,7 @@ public sealed record TimeAggregateConverterTests
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeArrayScalar(expectedValues), value.AsT1.Argument.AsT2);
+        Assert.Equal(expectedValues, value.AsT1.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -1050,7 +1050,7 @@ public sealed record TimeAggregateConverterTests
             """;
 
         TimeAggregate value = JsonSerializer.Deserialize<TimeAggregate>(input, _options)!;
-        Assert.Equal(new TimeArrayScalar(expectedValues), value.AsT0.Argument.AsT2);
+        Assert.Equal(expectedValues, value.AsT0.Argument.AsT2.Value);
     }
 
     [Theory]
