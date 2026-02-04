@@ -378,12 +378,7 @@ public sealed record OrOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void ReadEqualityConditions()
     {
         const string input = /*lang=json,strict*/
@@ -427,26 +422,20 @@ public sealed record OrOperatorConverterTests
 
         OrOperator value = JsonSerializer.Deserialize<OrOperator>(input, _options)!;
         Assert.Equal(
-            value.Conditions.AsT0.First().AsT2,
-            new Equality(
-                new SingleValueEquality(
-                    new BooleanEquality(
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true))
-                    )
-                )
-            )
+            value.Conditions.AsT0.First().AsT2.AsT0.AsT0.Left,
+            new BooleanReturning(new BooleanScalar(false))
         );
         Assert.Equal(
-            value.Conditions.AsT0.Last().AsT2,
-            new Equality(
-                new SingleValueEquality(
-                    new BooleanEquality(
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true))
-                    )
-                )
-            )
+            value.Conditions.AsT0.First().AsT2.AsT0.AsT0.Right,
+            new BooleanReturning(new BooleanScalar(true))
+        );
+        Assert.Equal(
+            value.Conditions.AsT0.Last().AsT2.AsT0.AsT0.Left,
+            new BooleanReturning(new BooleanScalar(false))
+        );
+        Assert.Equal(
+            value.Conditions.AsT0.Last().AsT2.AsT0.AsT0.Right,
+            new BooleanReturning(new BooleanScalar(true))
         );
     }
 
