@@ -180,7 +180,7 @@ public sealed record MaxTimeConverterTests
             """;
 
         MaxTime value = JsonSerializer.Deserialize<MaxTime>(input, _options)!;
-        Assert.Equal(new TimeArrayScalar(expectedValues), value.Argument.AsT2);
+        Assert.Equal(expectedValues, value.Argument.AsT2.Value);
     }
 
     [Theory]
