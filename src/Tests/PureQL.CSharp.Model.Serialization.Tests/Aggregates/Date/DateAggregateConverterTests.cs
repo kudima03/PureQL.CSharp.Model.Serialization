@@ -116,17 +116,22 @@ public sealed record DateAggregateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "average_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateArrayScalar(expectedDates), value.AsT2.Argument.AsT2);
+        Assert.Equal(expectedDates, value.AsT2.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -162,13 +167,15 @@ public sealed record DateAggregateConverterTests
             {
               "operator": "average_date",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -194,12 +201,17 @@ public sealed record DateAggregateConverterTests
         string expected = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "average_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -466,17 +478,22 @@ public sealed record DateAggregateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "max_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateArrayScalar(expectedDates), value.AsT0.Argument.AsT2);
+        Assert.Equal(expectedDates, value.AsT0.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -512,13 +529,15 @@ public sealed record DateAggregateConverterTests
             {
               "operator": "max_date",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -544,12 +563,17 @@ public sealed record DateAggregateConverterTests
         string expected = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "max_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -814,17 +838,22 @@ public sealed record DateAggregateConverterTests
         string input = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "min_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
         DateAggregate value = JsonSerializer.Deserialize<DateAggregate>(input, _options)!;
-        Assert.Equal(new DateArrayScalar(expectedDates), value.AsT1.Argument.AsT2);
+        Assert.Equal(expectedDates, value.AsT1.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -860,13 +889,15 @@ public sealed record DateAggregateConverterTests
             {
               "operator": "min_date",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
@@ -892,12 +923,17 @@ public sealed record DateAggregateConverterTests
         string expected = /*lang=json,strict*/
         $$"""
             {
-              "type": {
-                "name": "dateArray"
-              },
-              "value": ["{{formattedDates.First()}}", "{{formattedDates.Skip(
-                1
-            ).First()}}", "{{formattedDates.Skip(2).First()}}"]
+              "operator": "min_date",
+              "arg": {
+                "type": {
+                  "name": "dateArray"
+                },
+                "value": [
+                  "{{formattedDates.First()}}",
+                  "{{formattedDates.Skip(1).First()}}",
+                  "{{formattedDates.Skip(2).First()}}"
+                ]
+              }
             }
             """;
 
