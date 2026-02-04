@@ -28,7 +28,7 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnAverage()
+    public void ThrowsExceptionOnOperatorNameAbsence()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -52,7 +52,7 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnAverage()
+    public void ThrowsExceptionOnOtherOperatorName()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -77,7 +77,7 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnAverage()
+    public void ThrowsExceptionOnInvalidOperatorName()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -102,7 +102,7 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnAverage()
+    public void ThrowsExceptionOnUndefinedArgument()
     {
         const string input = /*lang=json,strict*/
             """
@@ -117,7 +117,7 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnNullArgumentOnAverage()
+    public void ThrowsExceptionOnNullArgument()
     {
         const string input = /*lang=json,strict*/
             """
@@ -133,7 +133,7 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnAverage()
+    public void ThrowsExceptionOnArgumentWrongType()
     {
         const string input = /*lang=json,strict*/
             """
@@ -158,7 +158,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -169,9 +171,9 @@ public sealed record DateTimeAggregateConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -181,7 +183,7 @@ public sealed record DateTimeAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new DateTimeArrayScalar(expected), value.AsT0.Argument.AsT2);
+        Assert.Equal(expected, value.AsT2.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -210,7 +212,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -244,7 +248,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string expectedJson = /*lang=json,strict*/
             $$"""
@@ -255,9 +261,9 @@ public sealed record DateTimeAggregateConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -298,7 +304,7 @@ public sealed record DateTimeAggregateConverterTests
         )!;
         Assert.Equal(
             new DateTimeArrayParameter(expectedParamName),
-            value.AsT0.Argument.AsT0
+            value.AsT2.Argument.AsT0
         );
     }
 
@@ -397,7 +403,7 @@ public sealed record DateTimeAggregateConverterTests
         )!;
         Assert.Equal(
             new DateTimeField(expectedEntityName, expectedFieldName),
-            value.AsT0.Argument.AsT1
+            value.AsT2.Argument.AsT1
         );
     }
 
@@ -476,127 +482,6 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnMax()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "datetimeArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnMax()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "min_datetime",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "datetimeArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnMax()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "euhwyrfdbuyeghrfdb",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "datetimeArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnMax()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "max_datetime"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullArgumentOnMax()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "max_datetime",
-              "arg": null
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnMax()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "max_datetime",
-              "arg": []
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
     public void ReadScalarArgumentOnMax()
     {
         IEnumerable<DateTime> expected =
@@ -606,7 +491,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -617,9 +504,9 @@ public sealed record DateTimeAggregateConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -629,7 +516,7 @@ public sealed record DateTimeAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new DateTimeArrayScalar(expected), value.AsT1.Argument.AsT2);
+        Assert.Equal(expected, value.AsT0.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -658,7 +545,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -692,7 +581,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string expectedJson = /*lang=json,strict*/
             $$"""
@@ -703,9 +594,9 @@ public sealed record DateTimeAggregateConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -746,7 +637,7 @@ public sealed record DateTimeAggregateConverterTests
         )!;
         Assert.Equal(
             new DateTimeArrayParameter(expectedParamName),
-            value.AsT1.Argument.AsT0
+            value.AsT0.Argument.AsT0
         );
     }
 
@@ -845,7 +736,7 @@ public sealed record DateTimeAggregateConverterTests
         )!;
         Assert.Equal(
             new DateTimeField(expectedEntityName, expectedFieldName),
-            value.AsT1.Argument.AsT1
+            value.AsT0.Argument.AsT1
         );
     }
 
@@ -924,127 +815,6 @@ public sealed record DateTimeAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "datetimeArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_datetime",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "datetimeArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "euhwyrfdbuyeghrfdb",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "datetimeArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_datetime"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullArgumentOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_datetime",
-              "arg": null
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_datetime",
-              "arg": []
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<DateTimeAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
     public void ReadScalarArgumentOnMin()
     {
         IEnumerable<DateTime> expected =
@@ -1054,7 +824,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -1065,9 +837,9 @@ public sealed record DateTimeAggregateConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -1077,7 +849,7 @@ public sealed record DateTimeAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new DateTimeArrayScalar(expected), value.AsT2.Argument.AsT2);
+        Assert.Equal(expected, value.AsT1.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -1106,7 +878,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -1140,7 +914,9 @@ public sealed record DateTimeAggregateConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string expectedJson = /*lang=json,strict*/
             $$"""
@@ -1151,9 +927,9 @@ public sealed record DateTimeAggregateConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -1194,7 +970,7 @@ public sealed record DateTimeAggregateConverterTests
         )!;
         Assert.Equal(
             new DateTimeArrayParameter(expectedParamName),
-            value.AsT2.Argument.AsT0
+            value.AsT1.Argument.AsT0
         );
     }
 
@@ -1293,7 +1069,7 @@ public sealed record DateTimeAggregateConverterTests
         )!;
         Assert.Equal(
             new DateTimeField(expectedEntityName, expectedFieldName),
-            value.AsT2.Argument.AsT1
+            value.AsT1.Argument.AsT1
         );
     }
 
