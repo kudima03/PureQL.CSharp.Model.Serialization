@@ -159,25 +159,29 @@ public sealed record MinNumberConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "max_number",
+              "operator": "min_number",
               "arg": {
                 "type": {
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
             """;
 
         MinNumber value = JsonSerializer.Deserialize<MinNumber>(input, _options)!;
-        Assert.Equal(new NumberArrayScalar(values), value.Argument.AsT2);
+        Assert.Equal(values, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -198,17 +202,31 @@ public sealed record MinNumberConverterTests
     [InlineData("refhyuabogs")]
     public void ThrowsExceptionOnWrongScalarType(string type)
     {
-        DateOnly number = DateOnly.FromDateTime(DateTime.Now);
+        IEnumerable<double> values =
+        [
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+            Random.Shared.NextDouble(),
+        ];
+
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
               "operator": "min_number",
               "arg": {
-                  "type": {
-                    "name": "{{type}}"
-                  },
-                  "value": {{number.ToString(CultureInfo.InvariantCulture)}}
-                }
+                "type": {
+                  "name": "{{type}}"
+                },
+                "value": [
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
+                ]
+              }
             }
             """;
 
@@ -227,18 +245,22 @@ public sealed record MinNumberConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "max_number",
+              "operator": "min_number",
               "arg": {
                 "type": {
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
