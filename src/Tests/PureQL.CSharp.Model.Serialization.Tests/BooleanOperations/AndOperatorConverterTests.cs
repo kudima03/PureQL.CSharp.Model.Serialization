@@ -442,12 +442,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -455,6 +450,15 @@ public sealed record AndOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("rfsedjinup")]
     public void ThrowsExceptionOnWrongEqualityType(string type)
     {
         string input = /*lang=json,strict*/
