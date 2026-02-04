@@ -158,7 +158,9 @@ public sealed record AverageDateTimeConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -169,9 +171,9 @@ public sealed record AverageDateTimeConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
@@ -181,7 +183,7 @@ public sealed record AverageDateTimeConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new DateTimeArrayScalar(expected), value.Argument.AsT2);
+        Assert.Equal(expected, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -210,7 +212,9 @@ public sealed record AverageDateTimeConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -244,7 +248,9 @@ public sealed record AverageDateTimeConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string expectedJson = /*lang=json,strict*/
             $$"""
@@ -255,9 +261,9 @@ public sealed record AverageDateTimeConverterTests
                   "name": "datetimeArray"
                 },
                 "value": [
-                  "{{formattedDates.First()}}",
-                  "{{formattedDates.Skip(1).First()}}",
-                  "{{formattedDates.Skip(2).First()}}"
+                  {{formattedDates.First()}},
+                  {{formattedDates.Skip(1).First()}},
+                  {{formattedDates.Skip(2).First()}}
                 ]
               }
             }
