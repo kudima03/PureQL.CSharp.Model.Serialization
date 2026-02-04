@@ -405,13 +405,8 @@ public sealed record NotOperatorConverterTests
         Assert.Equal(expected, value);
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
-    public void ReadBooleanOperatorcondition()
+    [Fact]
+    public void ReadBooleanOperatorCondition()
     {
         const string input = /*lang=json,strict*/
             """
@@ -419,7 +414,7 @@ public sealed record NotOperatorConverterTests
               "operator": "not",
               "condition": {
                   "operator": "or",
-                  "condition": [
+                  "conditions": [
                     {
                       "type": {
                         "name": "boolean"
@@ -439,15 +434,11 @@ public sealed record NotOperatorConverterTests
 
         NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
         Assert.Equal(
-            value.Condition.AsT3,
-            new BooleanOperator(
-                new OrOperator(
+            value.Condition.AsT3.AsT1.Conditions.AsT0,
                     [
                         new BooleanReturning(new BooleanScalar(false)),
                         new BooleanReturning(new BooleanScalar(true)),
                     ]
-                )
-            )
         );
     }
 
