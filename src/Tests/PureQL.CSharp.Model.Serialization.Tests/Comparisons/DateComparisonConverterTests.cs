@@ -630,7 +630,7 @@ public sealed record DateComparisonConverterTests
             _options
         )!;
         Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Right.AsT1, new DateScalar(expectedDate));
+        Assert.Equal(value.Left.AsT1, new DateScalar(expectedDate));
         Assert.Equal(value.Right.AsT0, new DateParameter(expectedParamName));
     }
 
