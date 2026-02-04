@@ -507,12 +507,7 @@ public sealed record AndOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteEqualityConditions()
     {
         const string expected = /*lang=json,strict*/
