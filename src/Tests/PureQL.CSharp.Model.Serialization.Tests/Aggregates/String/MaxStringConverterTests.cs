@@ -166,8 +166,8 @@ public sealed record MaxStringConverterTests
 
         MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
         Assert.Equal(
-            new StringArrayScalar(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]),
-            value.Argument.AsT2
+            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
+            value.Argument.AsT2.Value
         );
     }
 
