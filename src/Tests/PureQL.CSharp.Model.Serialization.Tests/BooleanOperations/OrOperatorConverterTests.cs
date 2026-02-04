@@ -718,12 +718,7 @@ public sealed record OrOperatorConverterTests
         );
     }
 
-    [Fact(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Fact]
     public void WriteBooleanOperatorConditions()
     {
         const string expected = /*lang=json,strict*/
@@ -773,22 +768,22 @@ public sealed record OrOperatorConverterTests
             new OrOperator(
                 [
                     new BooleanReturning(
-                        new Equality(
-                            new SingleValueEquality(
-                                new BooleanEquality(
+                        new BooleanOperator(
+                            new OrOperator(
+                                [
                                     new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true))
-                                )
+                                    new BooleanReturning(new BooleanScalar(true)),
+                                ]
                             )
                         )
                     ),
                     new BooleanReturning(
-                        new Equality(
-                            new SingleValueEquality(
-                                new BooleanEquality(
+                        new BooleanOperator(
+                            new OrOperator(
+                                [
                                     new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true))
-                                )
+                                    new BooleanReturning(new BooleanScalar(true)),
+                                ]
                             )
                         )
                     ),
