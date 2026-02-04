@@ -87,7 +87,9 @@ public sealed record DateTimeArrayReturningConverterTests
             DateTime.Now.AddYears(1),
         ];
 
-        IEnumerable<string> formattedDates = expected.Select(x => x.ToString("O"));
+        IEnumerable<string> formattedDates = expected.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -96,9 +98,9 @@ public sealed record DateTimeArrayReturningConverterTests
                 "name": "datetimeArray"
               },
               "value": [
-                "{{formattedDates.First()}}",
-                "{{formattedDates.Skip(1).First()}}",
-                "{{formattedDates.Skip(2).First()}}"
+                {{formattedDates.First()}},
+                {{formattedDates.Skip(1).First()}},
+                {{formattedDates.Skip(2).First()}}
               ]
             }
             """;
