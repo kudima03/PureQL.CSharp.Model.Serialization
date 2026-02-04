@@ -219,7 +219,11 @@ public sealed record MaxStringConverterTests
                 "type": {
                   "name": "stringArray"
                 },
-                "value": ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
+                "value": [
+                  "afirndhujvr",
+                  "sahbjndfashbndfj",
+                  "dnfjkanjkf"
+                ]
               }
             }
             """;
