@@ -1453,7 +1453,7 @@ public sealed record ComparisonConverterTests
                 "type": {
                   "name": "datetime"
                 },
-                "value": "{{expectedValue:O}}"
+                "value": {{JsonSerializer.Serialize(expectedValue, _options)}}
               },
               "right": {
                 "name": "{{expectedParamName}}",
