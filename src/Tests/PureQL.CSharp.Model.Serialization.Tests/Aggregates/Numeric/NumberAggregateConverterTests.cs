@@ -29,7 +29,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnAverage()
+    public void ThrowsExceptionOnOperatorNameAbsence()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -44,103 +44,6 @@ public sealed record NumberAggregateConverterTests
                     "name": "numberArray"
                   }
                 }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnAverage()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnAverage()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "euhwyrfdbuyeghrfdb",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnAverage()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "average_number"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullArgumentOnAverage()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "average_number",
-              "arg": null
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnAverage()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "average_number",
-              "arg": []
             }
             """;
 
@@ -159,6 +62,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
@@ -168,9 +75,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -180,7 +87,7 @@ public sealed record NumberAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new NumberArrayScalar(values), value.AsT0.Argument.AsT2);
+        Assert.Equal(values, value.AsT0.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -240,6 +147,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
@@ -249,9 +160,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -464,56 +375,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnMax()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnMax()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "max_number",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnMax()
+    public void ThrowsExceptionOnInvalidOperatorName()
     {
         const string expectedEntityName = "aruhybfe";
         const string expectedFieldName = "erafuhyobdng";
@@ -538,7 +400,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnMax()
+    public void ThrowsExceptionOnUndefinedArgument()
     {
         const string input = /*lang=json,strict*/
             """
@@ -553,7 +415,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnNullArgumentOnMax()
+    public void ThrowsExceptionOnNullArgument()
     {
         const string input = /*lang=json,strict*/
             """
@@ -569,7 +431,7 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnMax()
+    public void ThrowsExceptionOnArgumentWrongType()
     {
         const string input = /*lang=json,strict*/
             """
@@ -594,6 +456,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
@@ -603,9 +469,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -615,7 +481,7 @@ public sealed record NumberAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new NumberArrayScalar(values), value.AsT1.Argument.AsT2);
+        Assert.Equal(values, value.AsT1.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -675,6 +541,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
@@ -684,9 +554,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -899,127 +769,6 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_number",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnMin()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "euhwyrfdbuyeghrfdb",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_number"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullArgumentOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_number",
-              "arg": null
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnMin()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "min_number",
-              "arg": []
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<NumberAggregate>(input, _options)
-        );
-    }
-
-    [Fact]
     public void ReadScalarArgumentOnMin()
     {
         IEnumerable<double> values =
@@ -1028,6 +777,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
             Random.Shared.NextDouble(),
         ];
+
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -1038,9 +791,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -1050,7 +803,7 @@ public sealed record NumberAggregateConverterTests
             input,
             _options
         )!;
-        Assert.Equal(new NumberArrayScalar(values), value.AsT2.Argument.AsT2);
+        Assert.Equal(values, value.AsT2.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -1100,18 +853,22 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "max_number",
+              "operator": "min_number",
               "arg": {
                 "type": {
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -1324,127 +1081,6 @@ public sealed record NumberAggregateConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnOperatorNameAbsenceOnSum()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<SumNumber>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnOtherOperatorNameOnSum()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "average_number",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<SumNumber>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnInvalidOperatorNameOnSum()
-    {
-        const string expectedEntityName = "aruhybfe";
-        const string expectedFieldName = "erafuhyobdng";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "euhwyrfdbuyeghrfdb",
-              "arg": {
-                  "entity": "{{expectedEntityName}}",
-                  "field": "{{expectedFieldName}}",
-                  "type": {
-                    "name": "numberArray"
-                  }
-                }
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<SumNumber>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnUndefinedArgumentOnSum()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "sum"
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<SumNumber>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnNullArgumentOnSum()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "sum",
-              "arg": null
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<SumNumber>(input, _options)
-        );
-    }
-
-    [Fact]
-    public void ThrowsExceptionOnArgumentWrongTypeOnSum()
-    {
-        const string input = /*lang=json,strict*/
-            """
-            {
-              "operator": "sum",
-              "arg": []
-            }
-            """;
-
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<SumNumber>(input, _options)
-        );
-    }
-
-    [Fact]
     public void ReadScalarArgument()
     {
         IEnumerable<double> values =
@@ -1453,6 +1089,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
             Random.Shared.NextDouble(),
         ];
+
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -1463,16 +1103,16 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
             """;
 
         SumNumber value = JsonSerializer.Deserialize<SumNumber>(input, _options)!;
-        Assert.Equal(new NumberArrayScalar(values), value.Argument.AsT2);
+        Assert.Equal(values, value.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -1500,6 +1140,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string input = /*lang=json,strict*/
             $$"""
             {
@@ -1509,9 +1153,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "{{type}}"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
@@ -1532,6 +1176,10 @@ public sealed record NumberAggregateConverterTests
             Random.Shared.NextDouble(),
         ];
 
+        IEnumerable<string> formattedValues = values.Select(x =>
+            x.ToString(CultureInfo.InvariantCulture)
+        );
+
         string expected = /*lang=json,strict*/
             $$"""
             {
@@ -1541,9 +1189,9 @@ public sealed record NumberAggregateConverterTests
                   "name": "numberArray"
                 },
                 "value": [
-                  {{values.First()}},
-                  {{values.Skip(1).First()}},
-                  {{values.Skip(2).First()}}
+                  {{formattedValues.First()}},
+                  {{formattedValues.Skip(1).First()}},
+                  {{formattedValues.Skip(2).First()}}
                 ]
               }
             }
