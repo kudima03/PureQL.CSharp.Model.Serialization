@@ -442,12 +442,7 @@ public sealed record NotOperatorConverterTests
         );
     }
 
-    [Theory(Skip = "NotImplemented")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Usage",
-        "xUnit1004:Test methods should not be skipped",
-        Justification = "<Pending>"
-    )]
+    [Theory]
     [InlineData("date")]
     [InlineData("datetime")]
     [InlineData("null")]
@@ -455,6 +450,15 @@ public sealed record NotOperatorConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
+    [InlineData("datetimeArray")]
+    [InlineData("nullArray")]
+    [InlineData("numberArray")]
+    [InlineData("stringArray")]
+    [InlineData("timeArray")]
+    [InlineData("uuidArray")]
+    [InlineData("")]
+    [InlineData("dfrikhnujl")]
     public void ThrowsExceptionOnWrongBooleanOperatorType(string type)
     {
         string input = /*lang=json,strict*/
@@ -463,7 +467,7 @@ public sealed record NotOperatorConverterTests
               "operator": "not",
               "condition": {
                   "operator": "or",
-                  "condition": [
+                  "conditions": [
                     {
                       "type": {
                         "name": "{{type}}"
@@ -480,8 +484,6 @@ public sealed record NotOperatorConverterTests
                 }
             }
             """;
-
-        NotOperator value = JsonSerializer.Deserialize<NotOperator>(input, _options)!;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<NotOperator>(input, _options)
