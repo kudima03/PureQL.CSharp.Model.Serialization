@@ -504,8 +504,6 @@ public sealed record AndOperatorConverterTests
             }
             """;
 
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
-
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<AndOperator>(input, _options)
         );
@@ -921,26 +919,22 @@ public sealed record AndOperatorConverterTests
                 },
                 {
                   "operator": "equal",
-                  "conditions": [
-                    {
-                      "type": {
-                        "name": "{{type}}"
-                      },
-                      "value": false
+                  "left": {
+                    "type": {
+                      "name": "boolean"
                     },
-                    {
-                      "type": {
-                        "name": "{{type}}"
-                      },
-                      "value": true
-                    }
-                  ]
+                    "value": false
+                  },
+                  "right": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
                 }
               ]
             }
             """;
-
-        AndOperator value = JsonSerializer.Deserialize<AndOperator>(input, _options)!;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<AndOperator>(input, _options)
