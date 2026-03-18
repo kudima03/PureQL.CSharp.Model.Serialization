@@ -746,7 +746,7 @@ public sealed record ArrayReturningConverterTests
     [Fact]
     public void ReadStringArrayScalar()
     {
-        string input = /*lang=json,strict*/
+        const string input = /*lang=json,strict*/
             """
             {
               "type": {
@@ -769,7 +769,7 @@ public sealed record ArrayReturningConverterTests
     [Fact]
     public void WriteStringArrayScalar()
     {
-        string expected = /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "type": {
