@@ -41,16 +41,16 @@ public sealed record TimeTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new TimeType(), _options);
-
-        Assert.Equal( /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "time"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new TimeType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
