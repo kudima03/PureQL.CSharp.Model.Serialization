@@ -250,12 +250,10 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator(
-                [
-                    new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(new BooleanScalar(false)),
-                ]
-            ),
+            new OrOperator([
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanScalar(false)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -375,12 +373,10 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator(
-                [
-                    new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
-                    new BooleanReturning(new BooleanParameter(expectedSecondParamName)),
-                ]
-            ),
+            new OrOperator([
+                new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
+                new BooleanReturning(new BooleanParameter(expectedSecondParamName)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -553,30 +549,28 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator(
-                [
-                    new BooleanReturning(
-                        new Equality(
-                            new SingleValueEquality(
-                                new BooleanEquality(
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true))
-                                )
+            new OrOperator([
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
                             )
                         )
-                    ),
-                    new BooleanReturning(
-                        new Equality(
-                            new SingleValueEquality(
-                                new BooleanEquality(
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true))
-                                )
+                    )
+                ),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
                             )
                         )
-                    ),
-                ]
-            ),
+                    )
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -759,30 +753,24 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator(
-                [
-                    new BooleanReturning(
-                        new BooleanOperator(
-                            new OrOperator(
-                                [
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true)),
-                                ]
-                            )
-                        )
-                    ),
-                    new BooleanReturning(
-                        new BooleanOperator(
-                            new OrOperator(
-                                [
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true)),
-                                ]
-                            )
-                        )
-                    ),
-                ]
-            ),
+            new OrOperator([
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new OrOperator([
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true)),
+                        ])
+                    )
+                ),
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new OrOperator([
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true)),
+                        ])
+                    )
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -1007,32 +995,28 @@ public sealed record OrOperatorConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new OrOperator(
-                [
-                    new BooleanReturning(
-                        new BooleanOperator(
-                            new OrOperator(
-                                [
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true)),
-                                ]
+            new OrOperator([
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new OrOperator([
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true)),
+                        ])
+                    )
+                ),
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanParameter(expectedParamName)),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
                             )
                         )
-                    ),
-                    new BooleanReturning(new BooleanScalar(true)),
-                    new BooleanReturning(new BooleanParameter(expectedParamName)),
-                    new BooleanReturning(
-                        new Equality(
-                            new SingleValueEquality(
-                                new BooleanEquality(
-                                    new BooleanReturning(new BooleanScalar(false)),
-                                    new BooleanReturning(new BooleanScalar(true))
-                                )
-                            )
-                        )
-                    ),
-                ]
-            ),
+                    )
+                ),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
