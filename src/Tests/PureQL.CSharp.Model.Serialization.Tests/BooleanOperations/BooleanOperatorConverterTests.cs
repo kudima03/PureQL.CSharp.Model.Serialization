@@ -1,6 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayParameters;
+using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.BooleanOperations;
+using PureQL.CSharp.Model.Comparisons;
+using PureQL.CSharp.Model.Equalities;
+using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
 
@@ -26,7 +31,7 @@ public sealed record BooleanOperatorConverterTests
     }
 
     [Fact]
-    public void ReadAndOperator()
+    public void ReadAndOperatorWithBooleanReturningList()
     {
         const string input = /*lang=json,strict*/
             """
@@ -63,7 +68,7 @@ public sealed record BooleanOperatorConverterTests
     }
 
     [Fact]
-    public void WriteAndOperator()
+    public void WriteAndOperatorWithBooleanReturningList()
     {
         const string expected = /*lang=json,strict*/
             """
@@ -100,7 +105,62 @@ public sealed record BooleanOperatorConverterTests
     }
 
     [Fact]
-    public void ReadOrOperator()
+    public void ReadAndOperatorWithBooleanArrayReturning()
+    {
+        const string paramName = "ashjlbd";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "and",
+              "conditions": {
+                "type": {
+                  "name": "booleanArray"
+                },
+                "name": "{{paramName}}"
+              }
+            }
+            """;
+
+        AndOperator andOperator = JsonSerializer
+            .Deserialize<BooleanOperator>(input, _options)!
+            .AsT0;
+
+        Assert.Equal(new BooleanArrayParameter(paramName), andOperator.Conditions.AsT1.AsT2);
+    }
+
+    [Fact]
+    public void WriteAndOperatorWithBooleanArrayReturning()
+    {
+        const string paramName = "ashjlbd";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "and",
+              "conditions": {
+                "name": "{{paramName}}",
+                "type": {
+                  "name": "booleanArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanOperator(
+                new AndOperator(
+                    new BooleanArrayReturning(new BooleanArrayParameter(paramName))
+                )
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadOrOperatorWithBooleanReturningList()
     {
         const string input = /*lang=json,strict*/
             """
@@ -137,7 +197,7 @@ public sealed record BooleanOperatorConverterTests
     }
 
     [Fact]
-    public void WriteOrOperator()
+    public void WriteOrOperatorWithBooleanReturningList()
     {
         const string expected = /*lang=json,strict*/
             """
@@ -174,7 +234,62 @@ public sealed record BooleanOperatorConverterTests
     }
 
     [Fact]
-    public void ReadNotOperator()
+    public void ReadOrOperatorWithBooleanArrayReturning()
+    {
+        const string paramName = "ashjlbd";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "or",
+              "conditions": {
+                "type": {
+                  "name": "booleanArray"
+                },
+                "name": "{{paramName}}"
+              }
+            }
+            """;
+
+        OrOperator orOperator = JsonSerializer
+            .Deserialize<BooleanOperator>(input, _options)!
+            .AsT1;
+
+        Assert.Equal(new BooleanArrayParameter(paramName), orOperator.Conditions.AsT1.AsT2);
+    }
+
+    [Fact]
+    public void WriteOrOperatorWithBooleanArrayReturning()
+    {
+        const string paramName = "ashjlbd";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "or",
+              "conditions": {
+                "name": "{{paramName}}",
+                "type": {
+                  "name": "booleanArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanOperator(
+                new OrOperator(
+                    new BooleanArrayReturning(new BooleanArrayParameter(paramName))
+                )
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadNotOperatorWithScalar()
     {
         const string input = /*lang=json,strict*/
             """
@@ -197,7 +312,7 @@ public sealed record BooleanOperatorConverterTests
     }
 
     [Fact]
-    public void WriteNotOperator()
+    public void WriteNotOperatorWithScalar()
     {
         const string expected = /*lang=json,strict*/
             """
@@ -215,6 +330,278 @@ public sealed record BooleanOperatorConverterTests
         string output = JsonSerializer.Serialize(
             new BooleanOperator(
                 new NotOperator(new BooleanReturning(new BooleanScalar(true)))
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadNotOperatorWithParameter()
+    {
+        const string paramName = "ashjlbd";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "not",
+              "condition": {
+                "type": {
+                  "name": "boolean"
+                },
+                "name": "{{paramName}}"
+              }
+            }
+            """;
+
+        NotOperator notOperator = JsonSerializer
+            .Deserialize<BooleanOperator>(input, _options)!
+            .AsT2;
+
+        Assert.Equal(new BooleanParameter(paramName), notOperator.Condition.AsT0);
+    }
+
+    [Fact]
+    public void WriteNotOperatorWithParameter()
+    {
+        const string paramName = "ashjlbd";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "not",
+              "condition": {
+                "name": "{{paramName}}",
+                "type": {
+                  "name": "boolean"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanOperator(
+                new NotOperator(new BooleanReturning(new BooleanParameter(paramName)))
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadNotOperatorWithEquality()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "equal",
+                "left": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
+                },
+                "right": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": false
+                }
+              }
+            }
+            """;
+
+        NotOperator notOperator = JsonSerializer
+            .Deserialize<BooleanOperator>(input, _options)!
+            .AsT2;
+
+        Assert.Equal(new BooleanScalar(true), notOperator.Condition.AsT2.AsT0.AsT0.Left.AsT1);
+        Assert.Equal(new BooleanScalar(false), notOperator.Condition.AsT2.AsT0.AsT0.Right.AsT1);
+    }
+
+    [Fact]
+    public void WriteNotOperatorWithEquality()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "equal",
+                "left": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
+                },
+                "right": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": false
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanOperator(
+                new NotOperator(
+                    new BooleanReturning(
+                        new Equality(
+                            new SingleValueEquality(
+                                new BooleanEquality(
+                                    new BooleanReturning(new BooleanScalar(true)),
+                                    new BooleanReturning(new BooleanScalar(false))
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadNotOperatorWithBooleanOperator()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "not",
+                "condition": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
+                }
+              }
+            }
+            """;
+
+        NotOperator notOperator = JsonSerializer
+            .Deserialize<BooleanOperator>(input, _options)!
+            .AsT2;
+
+        Assert.Equal(new BooleanScalar(true), notOperator.Condition.AsT3.AsT2.Condition.AsT1);
+    }
+
+    [Fact]
+    public void WriteNotOperatorWithBooleanOperator()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "not",
+                "condition": {
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "value": true
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanOperator(
+                new NotOperator(
+                    new BooleanReturning(
+                        new BooleanOperator(
+                            new NotOperator(new BooleanReturning(new BooleanScalar(true)))
+                        )
+                    )
+                )
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadNotOperatorWithComparison()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "greaterThan",
+                "left": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 42
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 24
+                }
+              }
+            }
+            """;
+
+        NotOperator notOperator = JsonSerializer
+            .Deserialize<BooleanOperator>(input, _options)!
+            .AsT2;
+
+        Assert.Equal(ComparisonOperator.GreaterThan, notOperator.Condition.AsT4.AsT2.Operator);
+        Assert.Equal(new NumberScalar(42), notOperator.Condition.AsT4.AsT2.Left.AsT1);
+        Assert.Equal(new NumberScalar(24), notOperator.Condition.AsT4.AsT2.Right.AsT1);
+    }
+
+    [Fact]
+    public void WriteNotOperatorWithComparison()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "greaterThan",
+                "left": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 42
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 24
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new BooleanOperator(
+                new NotOperator(
+                    new BooleanReturning(
+                        new Comparison(
+                            new NumberComparison(
+                                ComparisonOperator.GreaterThan,
+                                new NumberReturning(new NumberScalar(42)),
+                                new NumberReturning(new NumberScalar(24))
+                            )
+                        )
+                    )
+                )
             ),
             _options
         );
