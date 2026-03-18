@@ -44,16 +44,16 @@ public sealed record NumberArrayTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new NumberArrayType(), _options);
-
-        Assert.Equal( /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "numberArray"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new NumberArrayType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
