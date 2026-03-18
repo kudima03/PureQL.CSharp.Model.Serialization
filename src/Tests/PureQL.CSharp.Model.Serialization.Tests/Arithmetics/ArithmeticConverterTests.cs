@@ -258,12 +258,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Add([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -383,12 +381,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Add([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -461,12 +457,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Add([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
@@ -665,12 +659,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Divide([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -790,12 +782,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Divide([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -868,12 +858,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Divide([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
@@ -1067,12 +1055,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Multiply([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -1192,12 +1178,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Multiply([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -1269,12 +1253,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Multiply([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
@@ -1468,12 +1450,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Subtract([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -1593,12 +1573,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Subtract([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -1671,12 +1649,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Subtract([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
