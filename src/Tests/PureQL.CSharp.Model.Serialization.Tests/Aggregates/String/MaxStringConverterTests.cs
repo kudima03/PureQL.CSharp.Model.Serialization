@@ -231,9 +231,11 @@ public sealed record MaxStringConverterTests
         string value = JsonSerializer.Serialize(
             new MaxString(
                 new StringArrayReturning(
-                    new StringArrayScalar(
-                        ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
-                    )
+                    new StringArrayScalar([
+                        "afirndhujvr",
+                        "sahbjndfashbndfj",
+                        "dnfjkanjkf",
+                    ])
                 )
             ),
             _options
