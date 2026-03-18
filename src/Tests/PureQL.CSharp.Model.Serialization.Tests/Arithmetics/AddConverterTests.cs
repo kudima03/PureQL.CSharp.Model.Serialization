@@ -257,12 +257,10 @@ public sealed record AddConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Add(
-                [
-                    new NumberReturning(new NumberScalar(expectedValue1)),
-                    new NumberReturning(new NumberScalar(expectedValue2)),
-                ]
-            ),
+            new Add([
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -380,12 +378,10 @@ public sealed record AddConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Add(
-                [
-                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                ]
-            ),
+            new Add([
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -456,12 +452,10 @@ public sealed record AddConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Add(
-                [
-                    new NumberReturning(new NumberScalar(expectedValue)),
-                    new NumberReturning(new NumberParameter(expectedParamName)),
-                ]
-            ),
+            new Add([
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
