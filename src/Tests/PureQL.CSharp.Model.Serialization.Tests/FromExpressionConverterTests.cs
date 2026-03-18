@@ -78,7 +78,7 @@ public sealed record FromExpressionConverterTests
         string output = JsonSerializer.Serialize(
             new FromExpression(expectedEntity, expectedAlias),
             _options
-        )!;
+        );
         Assert.Equal(expected, output);
     }
 
@@ -97,7 +97,7 @@ public sealed record FromExpressionConverterTests
         string output = JsonSerializer.Serialize(
             new FromExpression(string.Empty, string.Empty),
             _options
-        )!;
+        );
         Assert.Equal(expected, output);
     }
 
