@@ -41,16 +41,16 @@ public sealed record StringTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new StringType(), _options);
-
-        Assert.Equal( /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "string"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new StringType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
