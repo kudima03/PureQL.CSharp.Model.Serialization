@@ -41,16 +41,16 @@ public sealed record DateArrayTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new DateArrayType(), _options);
-
-        Assert.Equal( /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "dateArray"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new DateArrayType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
