@@ -414,8 +414,12 @@ public sealed record ArrayEqualityConverterTests
         IEnumerable<DateOnly> leftDates = [new(2024, 1, 15), new(2024, 6, 20)];
         IEnumerable<DateOnly> rightDates = [new(2024, 3, 10), new(2024, 9, 25)];
 
-        IEnumerable<string> leftFormatted = leftDates.Select(x => x.ToString("yyyy-MM-dd"));
-        IEnumerable<string> rightFormatted = rightDates.Select(x => x.ToString("yyyy-MM-dd"));
+        IEnumerable<string> leftFormatted = leftDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+        IEnumerable<string> rightFormatted = rightDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -456,8 +460,12 @@ public sealed record ArrayEqualityConverterTests
         IEnumerable<DateOnly> leftDates = [new(2024, 1, 15), new(2024, 6, 20)];
         IEnumerable<DateOnly> rightDates = [new(2024, 3, 10), new(2024, 9, 25)];
 
-        IEnumerable<string> leftFormatted = leftDates.Select(x => x.ToString("yyyy-MM-dd"));
-        IEnumerable<string> rightFormatted = rightDates.Select(x => x.ToString("yyyy-MM-dd"));
+        IEnumerable<string> leftFormatted = leftDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
+        IEnumerable<string> rightFormatted = rightDates.Select(x =>
+            x.ToString("yyyy-MM-dd")
+        );
 
         string expected = /*lang=json,strict*/
             $$"""
@@ -652,11 +660,23 @@ public sealed record ArrayEqualityConverterTests
     [Fact]
     public void ReadDateTimeArrayEqualityWithScalar()
     {
-        IEnumerable<DateTime> leftValues = [new(2024, 1, 15, 10, 30, 0), new(2024, 6, 20, 15, 45, 0)];
-        IEnumerable<DateTime> rightValues = [new(2024, 3, 10, 8, 0, 0), new(2024, 9, 25, 12, 0, 0)];
+        IEnumerable<DateTime> leftValues =
+        [
+            new(2024, 1, 15, 10, 30, 0),
+            new(2024, 6, 20, 15, 45, 0),
+        ];
+        IEnumerable<DateTime> rightValues =
+        [
+            new(2024, 3, 10, 8, 0, 0),
+            new(2024, 9, 25, 12, 0, 0),
+        ];
 
-        IEnumerable<string> leftFormatted = leftValues.Select(x => JsonSerializer.Serialize(x, _options));
-        IEnumerable<string> rightFormatted = rightValues.Select(x => JsonSerializer.Serialize(x, _options));
+        IEnumerable<string> leftFormatted = leftValues.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
+        IEnumerable<string> rightFormatted = rightValues.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -694,11 +714,23 @@ public sealed record ArrayEqualityConverterTests
     [Fact]
     public void WriteDateTimeArrayEqualityWithScalar()
     {
-        IEnumerable<DateTime> leftValues = [new(2024, 1, 15, 10, 30, 0), new(2024, 6, 20, 15, 45, 0)];
-        IEnumerable<DateTime> rightValues = [new(2024, 3, 10, 8, 0, 0), new(2024, 9, 25, 12, 0, 0)];
+        IEnumerable<DateTime> leftValues =
+        [
+            new(2024, 1, 15, 10, 30, 0),
+            new(2024, 6, 20, 15, 45, 0),
+        ];
+        IEnumerable<DateTime> rightValues =
+        [
+            new(2024, 3, 10, 8, 0, 0),
+            new(2024, 9, 25, 12, 0, 0),
+        ];
 
-        IEnumerable<string> leftFormatted = leftValues.Select(x => JsonSerializer.Serialize(x, _options));
-        IEnumerable<string> rightFormatted = rightValues.Select(x => JsonSerializer.Serialize(x, _options));
+        IEnumerable<string> leftFormatted = leftValues.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
+        IEnumerable<string> rightFormatted = rightValues.Select(x =>
+            JsonSerializer.Serialize(x, _options)
+        );
 
         string expected = /*lang=json,strict*/
             $$"""
@@ -1186,8 +1218,12 @@ public sealed record ArrayEqualityConverterTests
         string output = JsonSerializer.Serialize(
             new ArrayEquality(
                 new StringArrayEquality(
-                    new StringArrayReturning(new StringArrayScalar(["leftValue1", "leftValue2"])),
-                    new StringArrayReturning(new StringArrayScalar(["rightValue1", "rightValue2"]))
+                    new StringArrayReturning(
+                        new StringArrayScalar(["leftValue1", "leftValue2"])
+                    ),
+                    new StringArrayReturning(
+                        new StringArrayScalar(["rightValue1", "rightValue2"])
+                    )
                 )
             ),
             _options
@@ -1354,8 +1390,12 @@ public sealed record ArrayEqualityConverterTests
         IEnumerable<TimeOnly> leftValues = [new(10, 30, 0), new(14, 45, 0)];
         IEnumerable<TimeOnly> rightValues = [new(8, 0, 0), new(16, 30, 0)];
 
-        IEnumerable<string> leftFormatted = leftValues.Select(x => x.ToString("HH:mm:ss"));
-        IEnumerable<string> rightFormatted = rightValues.Select(x => x.ToString("HH:mm:ss"));
+        IEnumerable<string> leftFormatted = leftValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+        IEnumerable<string> rightFormatted = rightValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
 
         string input = /*lang=json,strict*/
             $$"""
@@ -1396,8 +1436,12 @@ public sealed record ArrayEqualityConverterTests
         IEnumerable<TimeOnly> leftValues = [new(10, 30, 0), new(14, 45, 0)];
         IEnumerable<TimeOnly> rightValues = [new(8, 0, 0), new(16, 30, 0)];
 
-        IEnumerable<string> leftFormatted = leftValues.Select(x => x.ToString("HH:mm:ss"));
-        IEnumerable<string> rightFormatted = rightValues.Select(x => x.ToString("HH:mm:ss"));
+        IEnumerable<string> leftFormatted = leftValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
+        IEnumerable<string> rightFormatted = rightValues.Select(x =>
+            x.ToString("HH:mm:ss")
+        );
 
         string expected = /*lang=json,strict*/
             $$"""

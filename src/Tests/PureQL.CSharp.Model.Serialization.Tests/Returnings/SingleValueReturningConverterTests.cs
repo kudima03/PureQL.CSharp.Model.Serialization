@@ -111,9 +111,7 @@ public sealed record SingleValueReturningConverterTests
             """;
 
         string output = JsonSerializer.Serialize(
-            new SingleValueReturning(
-                new BooleanReturning(new BooleanScalar(true))
-            ),
+            new SingleValueReturning(new BooleanReturning(new BooleanScalar(true))),
             _options
         );
 

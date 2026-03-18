@@ -126,7 +126,10 @@ public sealed record BooleanOperatorConverterTests
             .Deserialize<BooleanOperator>(input, _options)!
             .AsT0;
 
-        Assert.Equal(new BooleanArrayParameter(paramName), andOperator.Conditions.AsT1.AsT2);
+        Assert.Equal(
+            new BooleanArrayParameter(paramName),
+            andOperator.Conditions.AsT1.AsT2
+        );
     }
 
     [Fact]
@@ -255,7 +258,10 @@ public sealed record BooleanOperatorConverterTests
             .Deserialize<BooleanOperator>(input, _options)!
             .AsT1;
 
-        Assert.Equal(new BooleanArrayParameter(paramName), orOperator.Conditions.AsT1.AsT2);
+        Assert.Equal(
+            new BooleanArrayParameter(paramName),
+            orOperator.Conditions.AsT1.AsT2
+        );
     }
 
     [Fact]
@@ -419,8 +425,14 @@ public sealed record BooleanOperatorConverterTests
             .Deserialize<BooleanOperator>(input, _options)!
             .AsT2;
 
-        Assert.Equal(new BooleanScalar(true), notOperator.Condition.AsT2.AsT0.AsT0.Left.AsT1);
-        Assert.Equal(new BooleanScalar(false), notOperator.Condition.AsT2.AsT0.AsT0.Right.AsT1);
+        Assert.Equal(
+            new BooleanScalar(true),
+            notOperator.Condition.AsT2.AsT0.AsT0.Left.AsT1
+        );
+        Assert.Equal(
+            new BooleanScalar(false),
+            notOperator.Condition.AsT2.AsT0.AsT0.Right.AsT1
+        );
     }
 
     [Fact]
@@ -492,7 +504,10 @@ public sealed record BooleanOperatorConverterTests
             .Deserialize<BooleanOperator>(input, _options)!
             .AsT2;
 
-        Assert.Equal(new BooleanScalar(true), notOperator.Condition.AsT3.AsT2.Condition.AsT1);
+        Assert.Equal(
+            new BooleanScalar(true),
+            notOperator.Condition.AsT3.AsT2.Condition.AsT1
+        );
     }
 
     [Fact]
@@ -559,7 +574,10 @@ public sealed record BooleanOperatorConverterTests
             .Deserialize<BooleanOperator>(input, _options)!
             .AsT2;
 
-        Assert.Equal(ComparisonOperator.GreaterThan, notOperator.Condition.AsT4.AsT2.Operator);
+        Assert.Equal(
+            ComparisonOperator.GreaterThan,
+            notOperator.Condition.AsT4.AsT2.Operator
+        );
         Assert.Equal(new NumberScalar(42), notOperator.Condition.AsT4.AsT2.Left.AsT1);
         Assert.Equal(new NumberScalar(24), notOperator.Condition.AsT4.AsT2.Right.AsT1);
     }

@@ -260,8 +260,12 @@ public sealed record SingleValueEqualityConverterTests
         string output = JsonSerializer.Serialize(
             new SingleValueEquality(
                 new BooleanEquality(
-                    new BooleanReturning(new Equality(new SingleValueEquality(innerEquality))),
-                    new BooleanReturning(new Equality(new SingleValueEquality(innerEquality)))
+                    new BooleanReturning(
+                        new Equality(new SingleValueEquality(innerEquality))
+                    ),
+                    new BooleanReturning(
+                        new Equality(new SingleValueEquality(innerEquality))
+                    )
                 )
             ),
             _options
