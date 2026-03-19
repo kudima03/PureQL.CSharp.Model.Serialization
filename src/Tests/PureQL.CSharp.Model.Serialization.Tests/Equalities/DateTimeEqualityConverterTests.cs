@@ -314,12 +314,13 @@ public sealed record DateTimeEqualityConverterTests
             }
             """;
 
-        DateTimeEquality value = JsonSerializer.Deserialize<DateTimeEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new DateTimeScalar(now));
-        Assert.Equal(value.Right.AsT1, new DateTimeScalar(now));
+        Assert.Equal(
+            new DateTimeEquality(
+                new DateTimeReturning(new DateTimeScalar(now)),
+                new DateTimeReturning(new DateTimeScalar(now))
+            ),
+            JsonSerializer.Deserialize<DateTimeEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -415,12 +416,13 @@ public sealed record DateTimeEqualityConverterTests
             }
             """;
 
-        DateTimeEquality value = JsonSerializer.Deserialize<DateTimeEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT0, new DateTimeParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new DateTimeParameter(expectedSecondParamName));
+        Assert.Equal(
+            new DateTimeEquality(
+                new DateTimeReturning(new DateTimeParameter(expectedFirstParamName)),
+                new DateTimeReturning(new DateTimeParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<DateTimeEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -519,12 +521,13 @@ public sealed record DateTimeEqualityConverterTests
             }
             """;
 
-        DateTimeEquality value = JsonSerializer.Deserialize<DateTimeEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new DateTimeScalar(expected));
-        Assert.Equal(value.Right.AsT0, new DateTimeParameter(expectedParamName));
+        Assert.Equal(
+            new DateTimeEquality(
+                new DateTimeReturning(new DateTimeScalar(expected)),
+                new DateTimeReturning(new DateTimeParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<DateTimeEquality>(input, _options)
+        );
     }
 
     [Theory]
