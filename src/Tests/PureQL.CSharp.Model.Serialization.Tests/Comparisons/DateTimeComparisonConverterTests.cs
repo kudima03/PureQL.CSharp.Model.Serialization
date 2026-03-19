@@ -351,13 +351,14 @@ public sealed record DateTimeComparisonConverterTests
             }
             """;
 
-        DateTimeComparison value = JsonSerializer.Deserialize<DateTimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new DateTimeScalar(now));
-        Assert.Equal(value.Right.AsT1, new DateTimeScalar(now));
+        Assert.Equal(
+            new DateTimeComparison(
+                @operator,
+                new DateTimeReturning(new DateTimeScalar(now)),
+                new DateTimeReturning(new DateTimeScalar(now))
+            ),
+            JsonSerializer.Deserialize<DateTimeComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -486,13 +487,14 @@ public sealed record DateTimeComparisonConverterTests
             }
             """;
 
-        DateTimeComparison value = JsonSerializer.Deserialize<DateTimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT0, new DateTimeParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new DateTimeParameter(expectedSecondParamName));
+        Assert.Equal(
+            new DateTimeComparison(
+                @operator,
+                new DateTimeReturning(new DateTimeParameter(expectedFirstParamName)),
+                new DateTimeReturning(new DateTimeParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<DateTimeComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -624,13 +626,14 @@ public sealed record DateTimeComparisonConverterTests
             }
             """;
 
-        DateTimeComparison value = JsonSerializer.Deserialize<DateTimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new DateTimeScalar(expected));
-        Assert.Equal(value.Right.AsT0, new DateTimeParameter(expectedParamName));
+        Assert.Equal(
+            new DateTimeComparison(
+                @operator,
+                new DateTimeReturning(new DateTimeScalar(expected)),
+                new DateTimeReturning(new DateTimeParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<DateTimeComparison>(input, _options)
+        );
     }
 
     [Theory]
