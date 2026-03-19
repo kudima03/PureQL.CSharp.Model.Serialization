@@ -314,9 +314,13 @@ public sealed record DateEqualityConverterTests
             }
             """;
 
-        DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new DateScalar(now));
-        Assert.Equal(value.Right.AsT1, new DateScalar(now));
+        Assert.Equal(
+            new DateEquality(
+                new DateReturning(new DateScalar(now)),
+                new DateReturning(new DateScalar(now))
+            ),
+            JsonSerializer.Deserialize<DateEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -412,9 +416,13 @@ public sealed record DateEqualityConverterTests
             }
             """;
 
-        DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT0, new DateParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new DateParameter(expectedSecondParamName));
+        Assert.Equal(
+            new DateEquality(
+                new DateReturning(new DateParameter(expectedFirstParamName)),
+                new DateReturning(new DateParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<DateEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -513,9 +521,13 @@ public sealed record DateEqualityConverterTests
             }
             """;
 
-        DateEquality value = JsonSerializer.Deserialize<DateEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new DateScalar(expectedDate));
-        Assert.Equal(value.Right.AsT0, new DateParameter(expectedParamName));
+        Assert.Equal(
+            new DateEquality(
+                new DateReturning(new DateScalar(expectedDate)),
+                new DateReturning(new DateParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<DateEquality>(input, _options)
+        );
     }
 
     [Theory]
