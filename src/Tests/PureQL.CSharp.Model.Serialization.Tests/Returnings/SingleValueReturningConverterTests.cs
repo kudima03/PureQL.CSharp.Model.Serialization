@@ -6,7 +6,6 @@ using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Returnings;
 
@@ -44,12 +43,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        BooleanParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT0.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new BooleanType(), parameter.Type);
+        Assert.Equal(
+            new BooleanParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT0.AsT0
+        );
     }
 
     [Fact]
@@ -140,12 +137,21 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        Equality equality = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT0.AsT2;
-
-        Assert.Equal(new BooleanScalar(true), equality.AsT0.AsT0.Left.AsT1);
-        Assert.Equal(new BooleanScalar(false), equality.AsT0.AsT0.Right.AsT1);
+        Assert.Equal(
+            new SingleValueReturning(
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(true)),
+                                new BooleanReturning(new BooleanScalar(false))
+                            )
+                        )
+                    )
+                )
+            ),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)
+        );
     }
 
     [Fact]
@@ -264,13 +270,20 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        Comparison comparison = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT0.AsT4;
-
-        Assert.Equal(ComparisonOperator.GreaterThan, comparison.AsT2.Operator);
-        Assert.Equal(new NumberScalar(42), comparison.AsT2.Left.AsT1);
-        Assert.Equal(new NumberScalar(24), comparison.AsT2.Right.AsT1);
+        Assert.Equal(
+            new SingleValueReturning(
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
+                        )
+                    )
+                )
+            ),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)
+        );
     }
 
     [Fact]
@@ -328,12 +341,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        DateParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT1.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new DateType(), parameter.Type);
+        Assert.Equal(
+            new DateParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT1.AsT0
+        );
     }
 
     [Fact]
@@ -421,12 +432,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        DateTimeParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT2.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new DateTimeType(), parameter.Type);
+        Assert.Equal(
+            new DateTimeParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT2.AsT0
+        );
     }
 
     [Fact]
@@ -516,12 +525,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        NumberParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT3.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new NumberType(), parameter.Type);
+        Assert.Equal(
+            new NumberParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT3.AsT0
+        );
     }
 
     [Fact]
@@ -605,12 +612,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        StringParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT4.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new StringType(), parameter.Type);
+        Assert.Equal(
+            new StringParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT4.AsT0
+        );
     }
 
     [Fact]
@@ -698,12 +703,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        TimeParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT5.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new TimeType(), parameter.Type);
+        Assert.Equal(
+            new TimeParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT5.AsT0
+        );
     }
 
     [Fact]
@@ -791,12 +794,10 @@ public sealed record SingleValueReturningConverterTests
             }
             """;
 
-        UuidParameter parameter = JsonSerializer
-            .Deserialize<SingleValueReturning>(input, _options)!
-            .AsT6.AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new UuidType(), parameter.Type);
+        Assert.Equal(
+            new UuidParameter(paramName),
+            JsonSerializer.Deserialize<SingleValueReturning>(input, _options)!.AsT6.AsT0
+        );
     }
 
     [Fact]
