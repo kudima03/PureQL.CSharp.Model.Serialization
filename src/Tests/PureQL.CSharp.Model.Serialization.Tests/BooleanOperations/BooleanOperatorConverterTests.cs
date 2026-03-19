@@ -310,11 +310,10 @@ public sealed record BooleanOperatorConverterTests
             }
             """;
 
-        NotOperator notOperator = JsonSerializer
-            .Deserialize<BooleanOperator>(input, _options)!
-            .AsT2;
-
-        Assert.Equal(new BooleanScalar(true), notOperator.Condition.AsT1);
+        Assert.Equal(
+            new NotOperator(new BooleanReturning(new BooleanScalar(true))),
+            JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
+        );
     }
 
     [Fact]
@@ -361,11 +360,10 @@ public sealed record BooleanOperatorConverterTests
             }
             """;
 
-        NotOperator notOperator = JsonSerializer
-            .Deserialize<BooleanOperator>(input, _options)!
-            .AsT2;
-
-        Assert.Equal(new BooleanParameter(paramName), notOperator.Condition.AsT0);
+        Assert.Equal(
+            new NotOperator(new BooleanReturning(new BooleanParameter(paramName))),
+            JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
+        );
     }
 
     [Fact]
@@ -421,17 +419,12 @@ public sealed record BooleanOperatorConverterTests
             }
             """;
 
-        NotOperator notOperator = JsonSerializer
-            .Deserialize<BooleanOperator>(input, _options)!
-            .AsT2;
-
         Assert.Equal(
-            new BooleanScalar(true),
-            notOperator.Condition.AsT2.AsT0.AsT0.Left.AsT1
-        );
-        Assert.Equal(
-            new BooleanScalar(false),
-            notOperator.Condition.AsT2.AsT0.AsT0.Right.AsT1
+            new NotOperator(new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanScalar(false))
+            ))))),
+            JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
         );
     }
 
@@ -500,13 +493,11 @@ public sealed record BooleanOperatorConverterTests
             }
             """;
 
-        NotOperator notOperator = JsonSerializer
-            .Deserialize<BooleanOperator>(input, _options)!
-            .AsT2;
-
         Assert.Equal(
-            new BooleanScalar(true),
-            notOperator.Condition.AsT3.AsT2.Condition.AsT1
+            new NotOperator(new BooleanReturning(new BooleanOperator(
+                new NotOperator(new BooleanReturning(new BooleanScalar(true)))
+            ))),
+            JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
         );
     }
 
@@ -570,16 +561,14 @@ public sealed record BooleanOperatorConverterTests
             }
             """;
 
-        NotOperator notOperator = JsonSerializer
-            .Deserialize<BooleanOperator>(input, _options)!
-            .AsT2;
-
         Assert.Equal(
-            ComparisonOperator.GreaterThan,
-            notOperator.Condition.AsT4.AsT2.Operator
+            new NotOperator(new BooleanReturning(new Comparison(new NumberComparison(
+                ComparisonOperator.GreaterThan,
+                new NumberReturning(new NumberScalar(42)),
+                new NumberReturning(new NumberScalar(24))
+            )))),
+            JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
         );
-        Assert.Equal(new NumberScalar(42), notOperator.Condition.AsT4.AsT2.Left.AsT1);
-        Assert.Equal(new NumberScalar(24), notOperator.Condition.AsT4.AsT2.Right.AsT1);
     }
 
     [Fact]
