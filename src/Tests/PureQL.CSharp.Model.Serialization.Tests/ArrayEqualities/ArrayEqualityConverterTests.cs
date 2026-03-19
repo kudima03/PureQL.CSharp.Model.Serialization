@@ -59,8 +59,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT0;
 
-        Assert.Equal([true, false], equality.Left.AsT0.Value);
-        Assert.Equal([false, true], equality.Right.AsT0.Value);
+        Assert.Equal(
+            new bool[] { true, false }.Concat([false, true]),
+            equality.Left.AsT0.Value.Concat(equality.Right.AsT0.Value)
+        );
     }
 
     [Fact]
@@ -133,14 +135,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        BooleanArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new BooleanArrayEquality(
+                new BooleanArrayReturning(new BooleanField(leftEntity, leftField)),
+                new BooleanArrayReturning(new BooleanField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -210,12 +211,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        BooleanArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(new BooleanArrayParameter(leftParamName), equality.Left.AsT2);
-        Assert.Equal(new BooleanArrayParameter(rightParamName), equality.Right.AsT2);
+        Assert.Equal(
+            new ArrayEquality(
+                new BooleanArrayEquality(
+                    new BooleanArrayReturning(new BooleanArrayParameter(leftParamName)),
+                    new BooleanArrayReturning(new BooleanArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -281,12 +285,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        DateArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT1;
-
-        Assert.Equal(new DateArrayParameter(leftParamName), equality.Left.AsT0);
-        Assert.Equal(new DateArrayParameter(rightParamName), equality.Right.AsT0);
+        Assert.Equal(
+            new ArrayEquality(
+                new DateArrayEquality(
+                    new DateArrayReturning(new DateArrayParameter(leftParamName)),
+                    new DateArrayReturning(new DateArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -356,14 +363,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        DateArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT1;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new DateArrayEquality(
+                new DateArrayReturning(new DateField(leftEntity, leftField)),
+                new DateArrayReturning(new DateField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -450,8 +456,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT1;
 
-        Assert.Equal(leftDates, equality.Left.AsT2.Value);
-        Assert.Equal(rightDates, equality.Right.AsT2.Value);
+        Assert.Equal(
+            leftDates.Concat(rightDates),
+            equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
+        );
     }
 
     [Fact]
@@ -530,12 +538,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        DateTimeArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT2;
-
-        Assert.Equal(new DateTimeArrayParameter(leftParamName), equality.Left.AsT0);
-        Assert.Equal(new DateTimeArrayParameter(rightParamName), equality.Right.AsT0);
+        Assert.Equal(
+            new ArrayEquality(
+                new DateTimeArrayEquality(
+                    new DateTimeArrayReturning(new DateTimeArrayParameter(leftParamName)),
+                    new DateTimeArrayReturning(new DateTimeArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -605,14 +616,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        DateTimeArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT2;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new DateTimeArrayEquality(
+                new DateTimeArrayReturning(new DateTimeField(leftEntity, leftField)),
+                new DateTimeArrayReturning(new DateTimeField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -707,8 +717,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT2;
 
-        Assert.Equal(leftValues, equality.Left.AsT2.Value);
-        Assert.Equal(rightValues, equality.Right.AsT2.Value);
+        Assert.Equal(
+            leftValues.Concat(rightValues),
+            equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
+        );
     }
 
     [Fact]
@@ -795,12 +807,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        NumberArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT3;
-
-        Assert.Equal(new NumberArrayParameter(leftParamName), equality.Left.AsT0);
-        Assert.Equal(new NumberArrayParameter(rightParamName), equality.Right.AsT0);
+        Assert.Equal(
+            new ArrayEquality(
+                new NumberArrayEquality(
+                    new NumberArrayReturning(new NumberArrayParameter(leftParamName)),
+                    new NumberArrayReturning(new NumberArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -870,14 +885,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        NumberArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT3;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new NumberArrayEquality(
+                new NumberArrayReturning(new NumberField(leftEntity, leftField)),
+                new NumberArrayReturning(new NumberField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -954,8 +968,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT3;
 
-        Assert.Equal([42, 24], equality.Left.AsT2.Value);
-        Assert.Equal([10, 20], equality.Right.AsT2.Value);
+        Assert.Equal(
+            new double[] { 42, 24 }.Concat([10, 20]),
+            equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
+        );
     }
 
     [Fact]
@@ -1024,12 +1040,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        StringArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT4;
-
-        Assert.Equal(new StringArrayParameter(leftParamName), equality.Left.AsT0);
-        Assert.Equal(new StringArrayParameter(rightParamName), equality.Right.AsT0);
+        Assert.Equal(
+            new ArrayEquality(
+                new StringArrayEquality(
+                    new StringArrayReturning(new StringArrayParameter(leftParamName)),
+                    new StringArrayReturning(new StringArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -1099,14 +1118,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        StringArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT4;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new StringArrayEquality(
+                new StringArrayReturning(new StringField(leftEntity, leftField)),
+                new StringArrayReturning(new StringField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -1183,8 +1201,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT4;
 
-        Assert.Equal(["leftValue1", "leftValue2"], equality.Left.AsT2.Value);
-        Assert.Equal(["rightValue1", "rightValue2"], equality.Right.AsT2.Value);
+        Assert.Equal(
+            new string[] { "leftValue1", "leftValue2" }.Concat(["rightValue1", "rightValue2"]),
+            equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
+        );
     }
 
     [Fact]
@@ -1257,12 +1277,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        TimeArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT5;
-
-        Assert.Equal(new TimeArrayParameter(leftParamName), equality.Left.AsT0);
-        Assert.Equal(new TimeArrayParameter(rightParamName), equality.Right.AsT0);
+        Assert.Equal(
+            new ArrayEquality(
+                new TimeArrayEquality(
+                    new TimeArrayReturning(new TimeArrayParameter(leftParamName)),
+                    new TimeArrayReturning(new TimeArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -1332,14 +1355,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        TimeArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT5;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new TimeArrayEquality(
+                new TimeArrayReturning(new TimeField(leftEntity, leftField)),
+                new TimeArrayReturning(new TimeField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -1426,8 +1448,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT5;
 
-        Assert.Equal(leftValues, equality.Left.AsT2.Value);
-        Assert.Equal(rightValues, equality.Right.AsT2.Value);
+        Assert.Equal(
+            leftValues.Concat(rightValues),
+            equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
+        );
     }
 
     [Fact]
@@ -1506,12 +1530,15 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        UuidArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT6;
-
-        Assert.Equal(new UuidArrayParameter(leftParamName), equality.Left.AsT0);
-        Assert.Equal(new UuidArrayParameter(rightParamName), equality.Right.AsT0);
+        Assert.Equal(
+            new ArrayEquality(
+                new UuidArrayEquality(
+                    new UuidArrayReturning(new UuidArrayParameter(leftParamName)),
+                    new UuidArrayReturning(new UuidArrayParameter(rightParamName))
+                )
+            ),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -1581,14 +1608,13 @@ public sealed record ArrayEqualityConverterTests
             }
             """;
 
-        UuidArrayEquality equality = JsonSerializer
-            .Deserialize<ArrayEquality>(input, _options)!
-            .AsT6;
-
-        Assert.Equal(leftEntity, equality.Left.AsT1.Entity);
-        Assert.Equal(leftField, equality.Left.AsT1.Field);
-        Assert.Equal(rightEntity, equality.Right.AsT1.Entity);
-        Assert.Equal(rightField, equality.Right.AsT1.Field);
+        Assert.Equal(
+            new ArrayEquality(new UuidArrayEquality(
+                new UuidArrayReturning(new UuidField(leftEntity, leftField)),
+                new UuidArrayReturning(new UuidField(rightEntity, rightField))
+            )),
+            JsonSerializer.Deserialize<ArrayEquality>(input, _options)
+        );
     }
 
     [Fact]
@@ -1676,8 +1702,10 @@ public sealed record ArrayEqualityConverterTests
             .Deserialize<ArrayEquality>(input, _options)!
             .AsT6;
 
-        Assert.Equal(leftValues, equality.Left.AsT2.Value);
-        Assert.Equal(rightValues, equality.Right.AsT2.Value);
+        Assert.Equal(
+            leftValues.Concat(rightValues),
+            equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
+        );
     }
 
     [Fact]
