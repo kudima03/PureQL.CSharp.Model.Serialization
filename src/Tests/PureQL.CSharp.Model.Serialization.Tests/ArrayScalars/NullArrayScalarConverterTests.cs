@@ -91,7 +91,7 @@ public sealed record NullArrayScalarConverterTests
             """;
 
         _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<INullArrayScalar>(input, _options)!
+            JsonSerializer.Deserialize<INullArrayScalar>(input, _options)
         );
     }
 

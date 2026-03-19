@@ -23,7 +23,7 @@ internal sealed class NullScalarConverter : JsonConverter<INullScalar>
         JsonSerializerOptions options
     )
     {
-        _ = JsonSerializer.Deserialize<NullScalarJsonModel>(ref reader, options)!;
+        _ = JsonSerializer.Deserialize<NullScalarJsonModel>(ref reader, options);
 
         return new NullScalar();
     }
