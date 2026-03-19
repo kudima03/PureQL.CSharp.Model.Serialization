@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Returnings;
 
@@ -41,12 +40,7 @@ public sealed record TimeReturningConverterTests
             }
             """;
 
-        TimeParameter parameter = JsonSerializer
-            .Deserialize<TimeReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new TimeType(), parameter.Type);
+        Assert.Equal(new TimeParameter(paramName), JsonSerializer.Deserialize<TimeReturning>(input, _options)!.AsT0);
     }
 
     [Fact]
