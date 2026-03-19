@@ -164,11 +164,7 @@ public sealed record MaxStringConverterTests
             }
             """;
 
-        MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
-        Assert.Equal(
-            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
-            value.Argument.AsT2.Value
-        );
+        Assert.Equal(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"], JsonSerializer.Deserialize<MaxString>(input, _options)!.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -261,8 +257,7 @@ public sealed record MaxStringConverterTests
             }
             """;
 
-        MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
-        Assert.Equal(new StringArrayParameter(expectedParamName), value.Argument.AsT0);
+        Assert.Equal(new StringArrayParameter(expectedParamName), JsonSerializer.Deserialize<MaxString>(input, _options)!.Argument.AsT0);
     }
 
     [Theory]
@@ -349,11 +344,7 @@ public sealed record MaxStringConverterTests
             }
             """;
 
-        MaxString value = JsonSerializer.Deserialize<MaxString>(input, _options)!;
-        Assert.Equal(
-            new StringField(expectedEntityName, expectedFieldName),
-            value.Argument.AsT1
-        );
+        Assert.Equal(new StringField(expectedEntityName, expectedFieldName), JsonSerializer.Deserialize<MaxString>(input, _options)!.Argument.AsT1);
     }
 
     [Theory]
