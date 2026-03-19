@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
-using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
@@ -43,13 +42,7 @@ public sealed record TimeArrayReturningConverterTests
             }
             """;
 
-        TimeField field = JsonSerializer
-            .Deserialize<TimeArrayReturning>(input, _options)!
-            .AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new TimeArrayType(), field.Type);
+        Assert.Equal(new TimeField(expectedEntity, expectedField), JsonSerializer.Deserialize<TimeArrayReturning>(input, _options)!.AsT1);
     }
 
     [Fact]
