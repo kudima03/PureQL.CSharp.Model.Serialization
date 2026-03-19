@@ -1,12 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Comparisons;
 using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.Returnings;
 
@@ -44,12 +42,7 @@ public sealed record BooleanReturningConverterTests
             }
             """;
 
-        BooleanParameter parameter = JsonSerializer
-            .Deserialize<BooleanReturning>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(paramName, parameter.Name);
-        Assert.Equal(new BooleanType(), parameter.Type);
+        Assert.Equal(new BooleanParameter(paramName), JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT0);
     }
 
     [Fact]
@@ -140,12 +133,7 @@ public sealed record BooleanReturningConverterTests
             }
             """;
 
-        BooleanEquality equality = JsonSerializer
-            .Deserialize<BooleanReturning>(input, _options)!
-            .AsT2.AsT0.AsT0;
-
-        Assert.Equal(new BooleanParameter(expectedParamName), equality.Left.AsT0);
-        Assert.Equal(new BooleanScalar(true), equality.Right.AsT1);
+        Assert.Equal(new BooleanEquality(new BooleanReturning(new BooleanParameter(expectedParamName)), new BooleanReturning(new BooleanScalar(true))), JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT2.AsT0.AsT0);
     }
 
     [Fact]
@@ -174,18 +162,7 @@ public sealed record BooleanReturningConverterTests
             }
             """;
 
-        BooleanReturning booleanReturning = JsonSerializer.Deserialize<BooleanReturning>(
-            input,
-            _options
-        )!;
-
-        AndOperator andOperator = booleanReturning.AsT3.AsT0;
-
-        Assert.Equal(
-            new BooleanParameter(expectedParamName),
-            andOperator.Conditions.AsT0.First().AsT0
-        );
-        Assert.Equal(new BooleanScalar(true), andOperator.Conditions.AsT0.Last().AsT1);
+        Assert.Equal([new BooleanReturning(new BooleanParameter(expectedParamName)), new BooleanReturning(new BooleanScalar(true))], JsonSerializer.Deserialize<BooleanReturning>(input, _options)!.AsT3.AsT0.Conditions.AsT0);
     }
 
     [Fact]
