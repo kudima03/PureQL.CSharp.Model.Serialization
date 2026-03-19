@@ -11,7 +11,6 @@ namespace PureQL.CSharp.Model.Serialization.Tests.ArrayEqualities;
 public sealed record ArrayEqualityConverterTests
 {
     private readonly JsonSerializerOptions _options;
-    private static readonly bool[] first = new bool[] { true, false };
 
     public ArrayEqualityConverterTests()
     {
@@ -61,7 +60,7 @@ public sealed record ArrayEqualityConverterTests
             .AsT0;
 
         Assert.Equal(
-first.Concat([false, true]),
+            [true, false, false, true],
             equality.Left.AsT0.Value.Concat(equality.Right.AsT0.Value)
         );
     }
@@ -1213,10 +1212,7 @@ first.Concat([false, true]),
             .AsT4;
 
         Assert.Equal(
-            new string[] { "leftValue1", "leftValue2" }.Concat([
-                "rightValue1",
-                "rightValue2",
-            ]),
+            ["leftValue2", "leftValue1", "rightValue1", "rightValue2"],
             equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
         );
     }
