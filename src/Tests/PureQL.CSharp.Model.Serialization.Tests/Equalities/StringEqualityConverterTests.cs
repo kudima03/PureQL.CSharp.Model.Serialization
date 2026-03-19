@@ -302,12 +302,13 @@ public sealed record StringEqualityConverterTests
             }
             """;
 
-        StringEquality value = JsonSerializer.Deserialize<StringEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new StringScalar(str));
-        Assert.Equal(value.Right.AsT1, new StringScalar(str));
+        Assert.Equal(
+            new StringEquality(
+                new StringReturning(new StringScalar(str)),
+                new StringReturning(new StringScalar(str))
+            ),
+            JsonSerializer.Deserialize<StringEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -402,12 +403,13 @@ public sealed record StringEqualityConverterTests
             }
             """;
 
-        StringEquality value = JsonSerializer.Deserialize<StringEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT0, new StringParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new StringParameter(expectedSecondParamName));
+        Assert.Equal(
+            new StringEquality(
+                new StringReturning(new StringParameter(expectedFirstParamName)),
+                new StringReturning(new StringParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<StringEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -505,12 +507,13 @@ public sealed record StringEqualityConverterTests
             }
             """;
 
-        StringEquality value = JsonSerializer.Deserialize<StringEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new StringScalar("ianhuedrfiuhaerfd"));
-        Assert.Equal(value.Right.AsT0, new StringParameter(expectedParamName));
+        Assert.Equal(
+            new StringEquality(
+                new StringReturning(new StringScalar("ianhuedrfiuhaerfd")),
+                new StringReturning(new StringParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<StringEquality>(input, _options)
+        );
     }
 
     [Theory]
