@@ -314,9 +314,13 @@ public sealed record TimeEqualityConverterTests
             }
             """;
 
-        TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new TimeScalar(now));
-        Assert.Equal(value.Right.AsT1, new TimeScalar(now));
+        Assert.Equal(
+            new TimeEquality(
+                new TimeReturning(new TimeScalar(now)),
+                new TimeReturning(new TimeScalar(now))
+            ),
+            JsonSerializer.Deserialize<TimeEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -412,9 +416,13 @@ public sealed record TimeEqualityConverterTests
             }
             """;
 
-        TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT0, new TimeParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedSecondParamName));
+        Assert.Equal(
+            new TimeEquality(
+                new TimeReturning(new TimeParameter(expectedFirstParamName)),
+                new TimeReturning(new TimeParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<TimeEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -513,9 +521,13 @@ public sealed record TimeEqualityConverterTests
             }
             """;
 
-        TimeEquality value = JsonSerializer.Deserialize<TimeEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new TimeScalar(expected));
-        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedParamName));
+        Assert.Equal(
+            new TimeEquality(
+                new TimeReturning(new TimeScalar(expected)),
+                new TimeReturning(new TimeParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<TimeEquality>(input, _options)
+        );
     }
 
     [Theory]
