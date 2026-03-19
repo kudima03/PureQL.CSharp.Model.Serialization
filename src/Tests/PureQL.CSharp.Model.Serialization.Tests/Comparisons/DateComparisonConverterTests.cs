@@ -351,13 +351,14 @@ public sealed record DateComparisonConverterTests
             }
             """;
 
-        DateComparison value = JsonSerializer.Deserialize<DateComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new DateScalar(now));
-        Assert.Equal(value.Right.AsT1, new DateScalar(now));
+        Assert.Equal(
+            new DateComparison(
+                @operator,
+                new DateReturning(new DateScalar(now)),
+                new DateReturning(new DateScalar(now))
+            ),
+            JsonSerializer.Deserialize<DateComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -486,13 +487,14 @@ public sealed record DateComparisonConverterTests
             }
             """;
 
-        DateComparison value = JsonSerializer.Deserialize<DateComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT0, new DateParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new DateParameter(expectedSecondParamName));
+        Assert.Equal(
+            new DateComparison(
+                @operator,
+                new DateReturning(new DateParameter(expectedFirstParamName)),
+                new DateReturning(new DateParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<DateComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -625,13 +627,14 @@ public sealed record DateComparisonConverterTests
             }
             """;
 
-        DateComparison value = JsonSerializer.Deserialize<DateComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new DateScalar(expectedDate));
-        Assert.Equal(value.Right.AsT0, new DateParameter(expectedParamName));
+        Assert.Equal(
+            new DateComparison(
+                @operator,
+                new DateReturning(new DateScalar(expectedDate)),
+                new DateReturning(new DateParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<DateComparison>(input, _options)
+        );
     }
 
     [Theory]
