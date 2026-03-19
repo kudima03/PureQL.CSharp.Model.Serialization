@@ -1212,7 +1212,7 @@ public sealed record ArrayEqualityConverterTests
             .AsT4;
 
         Assert.Equal(
-            ["leftValue2", "leftValue1", "rightValue1", "rightValue2"],
+            ["leftValue1", "leftValue2", "rightValue1", "rightValue2"],
             equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
         );
     }
