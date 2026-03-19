@@ -40,7 +40,10 @@ public sealed record StringReturningConverterTests
             }
             """;
 
-        Assert.Equal(new StringParameter(paramName), JsonSerializer.Deserialize<StringReturning>(input, _options)!.AsT0);
+        Assert.Equal(
+            new StringParameter(paramName),
+            JsonSerializer.Deserialize<StringReturning>(input, _options)!.AsT0
+        );
     }
 
     [Fact]

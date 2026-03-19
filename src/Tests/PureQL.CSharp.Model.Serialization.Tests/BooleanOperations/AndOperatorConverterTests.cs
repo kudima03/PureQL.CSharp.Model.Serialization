@@ -428,14 +428,26 @@ public sealed record AndOperatorConverterTests
 
         Assert.Equal(
             [
-                new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )))),
-                new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )))),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
             ],
             JsonSerializer.Deserialize<AndOperator>(input, _options)!.Conditions.AsT0
         );
@@ -627,8 +639,9 @@ public sealed record AndOperatorConverterTests
                 new BooleanReturning(new BooleanScalar(false)),
                 new BooleanReturning(new BooleanScalar(true)),
             ],
-            JsonSerializer.Deserialize<AndOperator>(input, _options)!.Conditions.AsT0
-                .SelectMany(c => c.AsT3.AsT0.Conditions.AsT0)
+            JsonSerializer
+                .Deserialize<AndOperator>(input, _options)!
+                .Conditions.AsT0.SelectMany(c => c.AsT3.AsT0.Conditions.AsT0)
         );
     }
 
@@ -818,20 +831,30 @@ public sealed record AndOperatorConverterTests
             }
             """;
 
-        IEnumerable<BooleanReturning> conditions =
-            JsonSerializer.Deserialize<AndOperator>(input, _options)!.Conditions.AsT0;
+        IEnumerable<BooleanReturning> conditions = JsonSerializer
+            .Deserialize<AndOperator>(input, _options)!
+            .Conditions.AsT0;
         Assert.Equal(
-            [new BooleanReturning(new BooleanScalar(false)), new BooleanReturning(new BooleanScalar(true))],
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ],
             conditions.First().AsT3.AsT0.Conditions.AsT0
         );
         Assert.Equal(
             [
                 new BooleanReturning(new BooleanScalar(true)),
                 new BooleanReturning(new BooleanParameter(expectedParamName)),
-                new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )))),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
             ],
             conditions.Skip(1)
         );

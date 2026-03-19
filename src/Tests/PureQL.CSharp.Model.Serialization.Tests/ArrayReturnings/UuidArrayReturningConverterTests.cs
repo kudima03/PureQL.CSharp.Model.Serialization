@@ -42,7 +42,10 @@ public sealed record UuidArrayReturningConverterTests
             }
             """;
 
-        Assert.Equal(new UuidField(expectedEntity, expectedField), JsonSerializer.Deserialize<UuidArrayReturning>(input, _options)!.AsT1);
+        Assert.Equal(
+            new UuidField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<UuidArrayReturning>(input, _options)!.AsT1
+        );
     }
 
     [Fact]

@@ -43,7 +43,10 @@ public sealed record NumberArrayReturningConverterTests
             }
             """;
 
-        Assert.Equal(new NumberField(expectedEntity, expectedField), JsonSerializer.Deserialize<NumberArrayReturning>(input, _options)!.AsT1);
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<NumberArrayReturning>(input, _options)!.AsT1
+        );
     }
 
     [Fact]

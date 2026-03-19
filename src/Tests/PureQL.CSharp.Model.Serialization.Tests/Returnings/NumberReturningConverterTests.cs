@@ -41,7 +41,10 @@ public sealed record NumberReturningConverterTests
             }
             """;
 
-        Assert.Equal(new NumberParameter(paramName), JsonSerializer.Deserialize<NumberReturning>(input, _options)!.AsT0);
+        Assert.Equal(
+            new NumberParameter(paramName),
+            JsonSerializer.Deserialize<NumberReturning>(input, _options)!.AsT0
+        );
     }
 
     [Fact]

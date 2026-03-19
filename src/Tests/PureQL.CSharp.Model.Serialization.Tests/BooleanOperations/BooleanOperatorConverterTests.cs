@@ -420,10 +420,18 @@ public sealed record BooleanOperatorConverterTests
             """;
 
         Assert.Equal(
-            new NotOperator(new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                new BooleanReturning(new BooleanScalar(true)),
-                new BooleanReturning(new BooleanScalar(false))
-            ))))),
+            new NotOperator(
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(true)),
+                                new BooleanReturning(new BooleanScalar(false))
+                            )
+                        )
+                    )
+                )
+            ),
             JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
         );
     }
@@ -494,9 +502,13 @@ public sealed record BooleanOperatorConverterTests
             """;
 
         Assert.Equal(
-            new NotOperator(new BooleanReturning(new BooleanOperator(
-                new NotOperator(new BooleanReturning(new BooleanScalar(true)))
-            ))),
+            new NotOperator(
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new NotOperator(new BooleanReturning(new BooleanScalar(true)))
+                    )
+                )
+            ),
             JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
         );
     }
@@ -562,11 +574,17 @@ public sealed record BooleanOperatorConverterTests
             """;
 
         Assert.Equal(
-            new NotOperator(new BooleanReturning(new Comparison(new NumberComparison(
-                ComparisonOperator.GreaterThan,
-                new NumberReturning(new NumberScalar(42)),
-                new NumberReturning(new NumberScalar(24))
-            )))),
+            new NotOperator(
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
+                        )
+                    )
+                )
+            ),
             JsonSerializer.Deserialize<BooleanOperator>(input, _options)!.AsT2
         );
     }

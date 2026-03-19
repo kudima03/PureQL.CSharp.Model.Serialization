@@ -11,6 +11,7 @@ namespace PureQL.CSharp.Model.Serialization.Tests.ArrayEqualities;
 public sealed record ArrayEqualityConverterTests
 {
     private readonly JsonSerializerOptions _options;
+    private static readonly bool[] first = new bool[] { true, false };
 
     public ArrayEqualityConverterTests()
     {
@@ -60,7 +61,7 @@ public sealed record ArrayEqualityConverterTests
             .AsT0;
 
         Assert.Equal(
-            new bool[] { true, false }.Concat([false, true]),
+first.Concat([false, true]),
             equality.Left.AsT0.Value.Concat(equality.Right.AsT0.Value)
         );
     }
@@ -136,10 +137,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new BooleanArrayEquality(
-                new BooleanArrayReturning(new BooleanField(leftEntity, leftField)),
-                new BooleanArrayReturning(new BooleanField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new BooleanArrayEquality(
+                    new BooleanArrayReturning(new BooleanField(leftEntity, leftField)),
+                    new BooleanArrayReturning(new BooleanField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }
@@ -364,10 +367,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new DateArrayEquality(
-                new DateArrayReturning(new DateField(leftEntity, leftField)),
-                new DateArrayReturning(new DateField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new DateArrayEquality(
+                    new DateArrayReturning(new DateField(leftEntity, leftField)),
+                    new DateArrayReturning(new DateField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }
@@ -617,10 +622,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new DateTimeArrayEquality(
-                new DateTimeArrayReturning(new DateTimeField(leftEntity, leftField)),
-                new DateTimeArrayReturning(new DateTimeField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new DateTimeArrayEquality(
+                    new DateTimeArrayReturning(new DateTimeField(leftEntity, leftField)),
+                    new DateTimeArrayReturning(new DateTimeField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }
@@ -886,10 +893,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new NumberArrayEquality(
-                new NumberArrayReturning(new NumberField(leftEntity, leftField)),
-                new NumberArrayReturning(new NumberField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new NumberArrayEquality(
+                    new NumberArrayReturning(new NumberField(leftEntity, leftField)),
+                    new NumberArrayReturning(new NumberField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }
@@ -1119,10 +1128,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new StringArrayEquality(
-                new StringArrayReturning(new StringField(leftEntity, leftField)),
-                new StringArrayReturning(new StringField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new StringArrayEquality(
+                    new StringArrayReturning(new StringField(leftEntity, leftField)),
+                    new StringArrayReturning(new StringField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }
@@ -1202,7 +1213,10 @@ public sealed record ArrayEqualityConverterTests
             .AsT4;
 
         Assert.Equal(
-            new string[] { "leftValue1", "leftValue2" }.Concat(["rightValue1", "rightValue2"]),
+            new string[] { "leftValue1", "leftValue2" }.Concat([
+                "rightValue1",
+                "rightValue2",
+            ]),
             equality.Left.AsT2.Value.Concat(equality.Right.AsT2.Value)
         );
     }
@@ -1356,10 +1370,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new TimeArrayEquality(
-                new TimeArrayReturning(new TimeField(leftEntity, leftField)),
-                new TimeArrayReturning(new TimeField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new TimeArrayEquality(
+                    new TimeArrayReturning(new TimeField(leftEntity, leftField)),
+                    new TimeArrayReturning(new TimeField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }
@@ -1609,10 +1625,12 @@ public sealed record ArrayEqualityConverterTests
             """;
 
         Assert.Equal(
-            new ArrayEquality(new UuidArrayEquality(
-                new UuidArrayReturning(new UuidField(leftEntity, leftField)),
-                new UuidArrayReturning(new UuidField(rightEntity, rightField))
-            )),
+            new ArrayEquality(
+                new UuidArrayEquality(
+                    new UuidArrayReturning(new UuidField(leftEntity, leftField)),
+                    new UuidArrayReturning(new UuidField(rightEntity, rightField))
+                )
+            ),
             JsonSerializer.Deserialize<ArrayEquality>(input, _options)
         );
     }

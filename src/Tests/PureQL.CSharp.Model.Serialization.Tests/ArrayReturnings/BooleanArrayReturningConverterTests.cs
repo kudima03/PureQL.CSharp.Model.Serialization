@@ -42,7 +42,10 @@ public sealed record BooleanArrayReturningConverterTests
             }
             """;
 
-        Assert.Equal(new BooleanField(expectedEntity, expectedField), JsonSerializer.Deserialize<BooleanArrayReturning>(input, _options)!.AsT1);
+        Assert.Equal(
+            new BooleanField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<BooleanArrayReturning>(input, _options)!.AsT1
+        );
     }
 
     [Fact]

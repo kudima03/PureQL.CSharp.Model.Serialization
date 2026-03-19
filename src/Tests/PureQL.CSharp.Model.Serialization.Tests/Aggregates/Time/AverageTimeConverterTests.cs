@@ -179,7 +179,10 @@ public sealed record AverageTimeConverterTests
             }
             """;
 
-        Assert.Equal(expectedValues, JsonSerializer.Deserialize<AverageTime>(input, _options)!.Argument.AsT2.Value);
+        Assert.Equal(
+            expectedValues,
+            JsonSerializer.Deserialize<AverageTime>(input, _options)!.Argument.AsT2.Value
+        );
     }
 
     [Theory]
@@ -289,7 +292,10 @@ public sealed record AverageTimeConverterTests
             }
             """;
 
-        Assert.Equal(new TimeArrayParameter(expectedParamName), JsonSerializer.Deserialize<AverageTime>(input, _options)!.Argument.AsT0);
+        Assert.Equal(
+            new TimeArrayParameter(expectedParamName),
+            JsonSerializer.Deserialize<AverageTime>(input, _options)!.Argument.AsT0
+        );
     }
 
     [Theory]
@@ -375,7 +381,10 @@ public sealed record AverageTimeConverterTests
             }
             """;
 
-        Assert.Equal(new TimeField(expectedEntityName, expectedFieldName), JsonSerializer.Deserialize<AverageTime>(input, _options)!.Argument.AsT1);
+        Assert.Equal(
+            new TimeField(expectedEntityName, expectedFieldName),
+            JsonSerializer.Deserialize<AverageTime>(input, _options)!.Argument.AsT1
+        );
     }
 
     [Theory]

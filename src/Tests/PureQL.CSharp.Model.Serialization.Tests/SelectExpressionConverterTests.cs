@@ -2,12 +2,10 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayReturnings;
-using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests;
 

@@ -164,7 +164,10 @@ public sealed record MinStringConverterTests
             }
             """;
 
-        Assert.Equal(["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"], JsonSerializer.Deserialize<MinString>(input, _options)!.Argument.AsT2.Value);
+        Assert.Equal(
+            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"],
+            JsonSerializer.Deserialize<MinString>(input, _options)!.Argument.AsT2.Value
+        );
     }
 
     [Theory]
@@ -257,7 +260,10 @@ public sealed record MinStringConverterTests
             }
             """;
 
-        Assert.Equal(new StringArrayParameter(expectedParamName), JsonSerializer.Deserialize<MinString>(input, _options)!.Argument.AsT0);
+        Assert.Equal(
+            new StringArrayParameter(expectedParamName),
+            JsonSerializer.Deserialize<MinString>(input, _options)!.Argument.AsT0
+        );
     }
 
     [Theory]
@@ -344,7 +350,10 @@ public sealed record MinStringConverterTests
             }
             """;
 
-        Assert.Equal(new StringField(expectedEntityName, expectedFieldName), JsonSerializer.Deserialize<MinString>(input, _options)!.Argument.AsT1);
+        Assert.Equal(
+            new StringField(expectedEntityName, expectedFieldName),
+            JsonSerializer.Deserialize<MinString>(input, _options)!.Argument.AsT1
+        );
     }
 
     [Theory]

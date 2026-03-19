@@ -40,7 +40,10 @@ public sealed record TimeReturningConverterTests
             }
             """;
 
-        Assert.Equal(new TimeParameter(paramName), JsonSerializer.Deserialize<TimeReturning>(input, _options)!.AsT0);
+        Assert.Equal(
+            new TimeParameter(paramName),
+            JsonSerializer.Deserialize<TimeReturning>(input, _options)!.AsT0
+        );
     }
 
     [Fact]

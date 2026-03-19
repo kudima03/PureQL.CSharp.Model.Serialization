@@ -42,7 +42,10 @@ public sealed record TimeArrayReturningConverterTests
             }
             """;
 
-        Assert.Equal(new TimeField(expectedEntity, expectedField), JsonSerializer.Deserialize<TimeArrayReturning>(input, _options)!.AsT1);
+        Assert.Equal(
+            new TimeField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<TimeArrayReturning>(input, _options)!.AsT1
+        );
     }
 
     [Fact]

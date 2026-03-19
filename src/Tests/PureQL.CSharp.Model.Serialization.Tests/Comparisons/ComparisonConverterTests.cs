@@ -354,7 +354,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new DateComparison(@operator, new DateReturning(new DateScalar(now)), new DateReturning(new DateScalar(now))),
+            new DateComparison(
+                @operator,
+                new DateReturning(new DateScalar(now)),
+                new DateReturning(new DateScalar(now))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT0
         );
     }
@@ -500,7 +504,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new DateComparison(@operator, new DateReturning(new DateParameter(expectedFirstParamName)), new DateReturning(new DateParameter(expectedSecondParamName))),
+            new DateComparison(
+                @operator,
+                new DateReturning(new DateParameter(expectedFirstParamName)),
+                new DateReturning(new DateParameter(expectedSecondParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT0
         );
     }
@@ -650,7 +658,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new DateComparison(@operator, new DateReturning(new DateScalar(expectedDate)), new DateReturning(new DateParameter(expectedParamName))),
+            new DateComparison(
+                @operator,
+                new DateReturning(new DateScalar(expectedDate)),
+                new DateReturning(new DateParameter(expectedParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT0
         );
     }
@@ -1075,7 +1087,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new DateTimeComparison(@operator, new DateTimeReturning(new DateTimeScalar(now)), new DateTimeReturning(new DateTimeScalar(now))),
+            new DateTimeComparison(
+                @operator,
+                new DateTimeReturning(new DateTimeScalar(now)),
+                new DateTimeReturning(new DateTimeScalar(now))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT1
         );
     }
@@ -1221,7 +1237,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new DateTimeComparison(@operator, new DateTimeReturning(new DateTimeParameter(expectedFirstParamName)), new DateTimeReturning(new DateTimeParameter(expectedSecondParamName))),
+            new DateTimeComparison(
+                @operator,
+                new DateTimeReturning(new DateTimeParameter(expectedFirstParamName)),
+                new DateTimeReturning(new DateTimeParameter(expectedSecondParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT1
         );
     }
@@ -1370,7 +1390,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new DateTimeComparison(@operator, new DateTimeReturning(new DateTimeScalar(expected)), new DateTimeReturning(new DateTimeParameter(expectedParamName))),
+            new DateTimeComparison(
+                @operator,
+                new DateTimeReturning(new DateTimeScalar(expected)),
+                new DateTimeReturning(new DateTimeParameter(expectedParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT1
         );
     }
@@ -1799,7 +1823,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new NumberComparison(@operator, new NumberReturning(new NumberScalar(value)), new NumberReturning(new NumberScalar(value))),
+            new NumberComparison(
+                @operator,
+                new NumberReturning(new NumberScalar(value)),
+                new NumberReturning(new NumberScalar(value))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT2
         );
     }
@@ -1933,7 +1961,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new NumberComparison(@operator, new NumberReturning(new NumberParameter(expectedFirstParamName)), new NumberReturning(new NumberParameter(expectedSecondParamName))),
+            new NumberComparison(
+                @operator,
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT2
         );
     }
@@ -2081,7 +2113,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new NumberComparison(@operator, new NumberReturning(new NumberScalar(0.5800537796011547)), new NumberReturning(new NumberParameter(expectedParamName))),
+            new NumberComparison(
+                @operator,
+                new NumberReturning(new NumberScalar(0.5800537796011547)),
+                new NumberReturning(new NumberParameter(expectedParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT2
         );
     }
@@ -2512,7 +2548,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new StringComparison(@operator, new StringReturning(new StringScalar(value)), new StringReturning(new StringScalar(value))),
+            new StringComparison(
+                @operator,
+                new StringReturning(new StringScalar(value)),
+                new StringReturning(new StringScalar(value))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT3
         );
     }
@@ -2646,7 +2686,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new StringComparison(@operator, new StringReturning(new StringParameter(expectedFirstParamName)), new StringReturning(new StringParameter(expectedSecondParamName))),
+            new StringComparison(
+                @operator,
+                new StringReturning(new StringParameter(expectedFirstParamName)),
+                new StringReturning(new StringParameter(expectedSecondParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT3
         );
     }
@@ -2794,7 +2838,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new StringComparison(@operator, new StringReturning(new StringScalar("adsihuowbfohuasdfipsduF")), new StringReturning(new StringParameter(expectedParamName))),
+            new StringComparison(
+                @operator,
+                new StringReturning(new StringScalar("adsihuowbfohuasdfipsduF")),
+                new StringReturning(new StringParameter(expectedParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT3
         );
     }
@@ -3225,7 +3273,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new TimeComparison(@operator, new TimeReturning(new TimeScalar(now)), new TimeReturning(new TimeScalar(now))),
+            new TimeComparison(
+                @operator,
+                new TimeReturning(new TimeScalar(now)),
+                new TimeReturning(new TimeScalar(now))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT4
         );
     }
@@ -3371,7 +3423,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new TimeComparison(@operator, new TimeReturning(new TimeParameter(expectedFirstParamName)), new TimeReturning(new TimeParameter(expectedSecondParamName))),
+            new TimeComparison(
+                @operator,
+                new TimeReturning(new TimeParameter(expectedFirstParamName)),
+                new TimeReturning(new TimeParameter(expectedSecondParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT4
         );
     }
@@ -3520,7 +3576,11 @@ public sealed record ComparisonConverterTests
             """;
 
         Assert.Equal(
-            new TimeComparison(@operator, new TimeReturning(new TimeScalar(expected)), new TimeReturning(new TimeParameter(expectedParamName))),
+            new TimeComparison(
+                @operator,
+                new TimeReturning(new TimeScalar(expected)),
+                new TimeReturning(new TimeParameter(expectedParamName))
+            ),
             JsonSerializer.Deserialize<Comparison>(input, _options)!.AsT4
         );
     }

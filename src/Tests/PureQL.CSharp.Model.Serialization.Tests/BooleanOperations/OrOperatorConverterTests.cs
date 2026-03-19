@@ -428,14 +428,26 @@ public sealed record OrOperatorConverterTests
 
         Assert.Equal(
             [
-                new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )))),
-                new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )))),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
             ],
             JsonSerializer.Deserialize<OrOperator>(input, _options)!.Conditions.AsT0
         );
@@ -627,8 +639,9 @@ public sealed record OrOperatorConverterTests
                 new BooleanReturning(new BooleanScalar(false)),
                 new BooleanReturning(new BooleanScalar(true)),
             ],
-            JsonSerializer.Deserialize<OrOperator>(input, _options)!.Conditions.AsT0
-                .SelectMany(c => c.AsT3.AsT1.Conditions.AsT0)
+            JsonSerializer
+                .Deserialize<OrOperator>(input, _options)!
+                .Conditions.AsT0.SelectMany(c => c.AsT3.AsT1.Conditions.AsT0)
         );
     }
 
@@ -827,20 +840,30 @@ public sealed record OrOperatorConverterTests
             }
             """;
 
-        IEnumerable<BooleanReturning> conditions =
-            JsonSerializer.Deserialize<OrOperator>(input, _options)!.Conditions.AsT0;
+        IEnumerable<BooleanReturning> conditions = JsonSerializer
+            .Deserialize<OrOperator>(input, _options)!
+            .Conditions.AsT0;
         Assert.Equal(
-            [new BooleanReturning(new BooleanScalar(false)), new BooleanReturning(new BooleanScalar(true))],
+            [
+                new BooleanReturning(new BooleanScalar(false)),
+                new BooleanReturning(new BooleanScalar(true)),
+            ],
             conditions.First().AsT3.AsT1.Conditions.AsT0
         );
         Assert.Equal(
             [
                 new BooleanReturning(new BooleanScalar(true)),
                 new BooleanReturning(new BooleanParameter(expectedParamName)),
-                new BooleanReturning(new Equality(new SingleValueEquality(new BooleanEquality(
-                    new BooleanReturning(new BooleanScalar(false)),
-                    new BooleanReturning(new BooleanScalar(true))
-                )))),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
             ],
             conditions.Skip(1)
         );

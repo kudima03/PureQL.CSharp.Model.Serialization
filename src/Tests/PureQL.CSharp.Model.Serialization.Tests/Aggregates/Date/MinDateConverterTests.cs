@@ -178,7 +178,10 @@ public sealed record MinDateConverterTests
             }
             """;
 
-        Assert.Equal(expectedDates, JsonSerializer.Deserialize<MinDate>(input, _options)!.Argument.AsT2.Value);
+        Assert.Equal(
+            expectedDates,
+            JsonSerializer.Deserialize<MinDate>(input, _options)!.Argument.AsT2.Value
+        );
     }
 
     [Theory]
@@ -286,7 +289,10 @@ public sealed record MinDateConverterTests
             }
             """;
 
-        Assert.Equal(new DateArrayParameter(expectedParamName), JsonSerializer.Deserialize<MinDate>(input, _options)!.Argument.AsT0);
+        Assert.Equal(
+            new DateArrayParameter(expectedParamName),
+            JsonSerializer.Deserialize<MinDate>(input, _options)!.Argument.AsT0
+        );
     }
 
     [Theory]
@@ -373,7 +379,10 @@ public sealed record MinDateConverterTests
             }
             """;
 
-        Assert.Equal(new DateField(expectedEntityName, expectedFieldName), JsonSerializer.Deserialize<MinDate>(input, _options)!.Argument.AsT1);
+        Assert.Equal(
+            new DateField(expectedEntityName, expectedFieldName),
+            JsonSerializer.Deserialize<MinDate>(input, _options)!.Argument.AsT1
+        );
     }
 
     [Theory]

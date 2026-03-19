@@ -40,7 +40,10 @@ public sealed record DateTimeReturningConverterTests
             }
             """;
 
-        Assert.Equal(new DateTimeParameter(paramName), JsonSerializer.Deserialize<DateTimeReturning>(input, _options)!.AsT0);
+        Assert.Equal(
+            new DateTimeParameter(paramName),
+            JsonSerializer.Deserialize<DateTimeReturning>(input, _options)!.AsT0
+        );
     }
 
     [Fact]

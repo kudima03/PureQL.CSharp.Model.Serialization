@@ -42,7 +42,10 @@ public sealed record DateArrayReturningConverterTests
             }
             """;
 
-        Assert.Equal(new DateField(expectedEntity, expectedField), JsonSerializer.Deserialize<DateArrayReturning>(input, _options)!.AsT1);
+        Assert.Equal(
+            new DateField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<DateArrayReturning>(input, _options)!.AsT1
+        );
     }
 
     [Fact]
