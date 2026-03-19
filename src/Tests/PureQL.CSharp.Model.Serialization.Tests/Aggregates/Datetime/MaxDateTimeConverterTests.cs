@@ -179,8 +179,7 @@ public sealed record MaxDateTimeConverterTests
             }
             """;
 
-        MaxDateTime value = JsonSerializer.Deserialize<MaxDateTime>(input, _options)!;
-        Assert.Equal(expected, value.Argument.AsT2.Value);
+        Assert.Equal(expected, JsonSerializer.Deserialize<MaxDateTime>(input, _options)!.Argument.AsT2.Value);
     }
 
     [Theory]
@@ -293,8 +292,7 @@ public sealed record MaxDateTimeConverterTests
             }
             """;
 
-        MaxDateTime value = JsonSerializer.Deserialize<MaxDateTime>(input, _options)!;
-        Assert.Equal(new DateTimeArrayParameter(expectedParamName), value.Argument.AsT0);
+        Assert.Equal(new DateTimeArrayParameter(expectedParamName), JsonSerializer.Deserialize<MaxDateTime>(input, _options)!.Argument.AsT0);
     }
 
     [Theory]
@@ -382,11 +380,7 @@ public sealed record MaxDateTimeConverterTests
             }
             """;
 
-        MaxDateTime value = JsonSerializer.Deserialize<MaxDateTime>(input, _options)!;
-        Assert.Equal(
-            new DateTimeField(expectedEntityName, expectedFieldName),
-            value.Argument.AsT1
-        );
+        Assert.Equal(new DateTimeField(expectedEntityName, expectedFieldName), JsonSerializer.Deserialize<MaxDateTime>(input, _options)!.Argument.AsT1);
     }
 
     [Theory]
