@@ -50,12 +50,13 @@ public sealed record EqualityConverterTests
             }
             """;
 
-        SingleValueEquality equality = JsonSerializer
-            .Deserialize<Equality>(input, _options)!
-            .AsT0;
-
-        Assert.Equal(new BooleanScalar(true), equality.AsT0.Left.AsT1);
-        Assert.Equal(new BooleanScalar(false), equality.AsT0.Right.AsT1);
+        Assert.Equal(
+            new Equality(new SingleValueEquality(new BooleanEquality(
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanScalar(false))
+            ))),
+            JsonSerializer.Deserialize<Equality>(input, _options)
+        );
     }
 
     [Fact]
@@ -120,12 +121,13 @@ public sealed record EqualityConverterTests
             }
             """;
 
-        ArrayEquality equality = JsonSerializer
-            .Deserialize<Equality>(input, _options)!
-            .AsT1;
-
-        Assert.Equal(new BooleanArrayParameter(leftParamName), equality.AsT0.Left.AsT2);
-        Assert.Equal(new BooleanArrayParameter(rightParamName), equality.AsT0.Right.AsT2);
+        Assert.Equal(
+            new Equality(new ArrayEquality(new BooleanArrayEquality(
+                new BooleanArrayReturning(new BooleanArrayParameter(leftParamName)),
+                new BooleanArrayReturning(new BooleanArrayParameter(rightParamName))
+            ))),
+            JsonSerializer.Deserialize<Equality>(input, _options)
+        );
     }
 
     [Fact]
