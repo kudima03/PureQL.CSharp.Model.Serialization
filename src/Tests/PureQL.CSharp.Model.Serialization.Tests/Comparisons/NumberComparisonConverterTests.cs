@@ -351,13 +351,14 @@ public sealed record NumberComparisonConverterTests
             }
             """;
 
-        NumberComparison comparison = JsonSerializer.Deserialize<NumberComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, comparison.Operator);
-        Assert.Equal(new NumberScalar(value), comparison.Left.AsT1);
-        Assert.Equal(new NumberScalar(value), comparison.Right.AsT1);
+        Assert.Equal(
+            new NumberComparison(
+                @operator,
+                new NumberReturning(new NumberScalar(value)),
+                new NumberReturning(new NumberScalar(value))
+            ),
+            JsonSerializer.Deserialize<NumberComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -486,13 +487,14 @@ public sealed record NumberComparisonConverterTests
             }
             """;
 
-        NumberComparison value = JsonSerializer.Deserialize<NumberComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT0, new NumberParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new NumberParameter(expectedSecondParamName));
+        Assert.Equal(
+            new NumberComparison(
+                @operator,
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<NumberComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -623,13 +625,14 @@ public sealed record NumberComparisonConverterTests
             }
             """;
 
-        NumberComparison value = JsonSerializer.Deserialize<NumberComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new NumberScalar(0.5800537796011547));
-        Assert.Equal(value.Right.AsT0, new NumberParameter(expectedParamName));
+        Assert.Equal(
+            new NumberComparison(
+                @operator,
+                new NumberReturning(new NumberScalar(0.5800537796011547)),
+                new NumberReturning(new NumberParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<NumberComparison>(input, _options)
+        );
     }
 
     [Theory]
