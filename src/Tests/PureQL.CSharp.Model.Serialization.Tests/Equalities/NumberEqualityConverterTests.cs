@@ -314,12 +314,13 @@ public sealed record NumberEqualityConverterTests
             }
             """;
 
-        NumberEquality value = JsonSerializer.Deserialize<NumberEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new NumberScalar(number));
-        Assert.Equal(value.Right.AsT1, new NumberScalar(number));
+        Assert.Equal(
+            new NumberEquality(
+                new NumberReturning(new NumberScalar(number)),
+                new NumberReturning(new NumberScalar(number))
+            ),
+            JsonSerializer.Deserialize<NumberEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -415,12 +416,13 @@ public sealed record NumberEqualityConverterTests
             }
             """;
 
-        NumberEquality value = JsonSerializer.Deserialize<NumberEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT0, new NumberParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new NumberParameter(expectedSecondParamName));
+        Assert.Equal(
+            new NumberEquality(
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<NumberEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -518,12 +520,13 @@ public sealed record NumberEqualityConverterTests
             }
             """;
 
-        NumberEquality value = JsonSerializer.Deserialize<NumberEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new NumberScalar(0.5800537796011547));
-        Assert.Equal(value.Right.AsT0, new NumberParameter(expectedParamName));
+        Assert.Equal(
+            new NumberEquality(
+                new NumberReturning(new NumberScalar(0.5800537796011547)),
+                new NumberReturning(new NumberParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<NumberEquality>(input, _options)
+        );
     }
 
     [Theory]
