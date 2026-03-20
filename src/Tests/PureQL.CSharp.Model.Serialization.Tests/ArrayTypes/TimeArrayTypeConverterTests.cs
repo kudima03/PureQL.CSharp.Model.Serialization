@@ -41,16 +41,16 @@ public sealed record TimeArrayTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new TimeArrayType(), _options);
-
-        Assert.Equal( /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "timeArray"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new TimeArrayType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]

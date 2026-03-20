@@ -41,17 +41,16 @@ public sealed record UuidArrayTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new UuidArrayType(), _options);
-
-        Assert.Equal(
-            /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "uuidArray"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new UuidArrayType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]

@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
-using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
@@ -44,13 +43,10 @@ public sealed record NumberArrayReturningConverterTests
             }
             """;
 
-        NumberField field = JsonSerializer
-            .Deserialize<NumberArrayReturning>(input, _options)!
-            .AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new NumberArrayType(), field.Type);
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<NumberArrayReturning>(input, _options)!.AsT1
+        );
     }
 
     [Fact]

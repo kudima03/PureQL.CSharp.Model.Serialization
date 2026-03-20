@@ -26,7 +26,7 @@ public sealed record NullScalarConverterTests
     [Fact]
     public void Read()
     {
-        string input = /*lang=json,strict*/
+        const string input = /*lang=json,strict*/
             """
             {
               "type": {
@@ -43,7 +43,7 @@ public sealed record NullScalarConverterTests
     [Fact]
     public void Write()
     {
-        string expected = /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "type": {

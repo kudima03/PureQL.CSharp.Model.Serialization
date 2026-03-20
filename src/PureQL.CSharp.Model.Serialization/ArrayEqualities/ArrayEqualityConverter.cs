@@ -48,7 +48,7 @@ internal sealed class ArrayEqualityConverter : JsonConverter<ArrayEquality>
             : JsonExtensions.TryDeserialize(
                 root,
                 options,
-                out BooleanArrayEquality? timeArray
+                out TimeArrayEquality? timeArray
             )
                 ? new ArrayEquality(timeArray!)
             : JsonExtensions.TryDeserialize(

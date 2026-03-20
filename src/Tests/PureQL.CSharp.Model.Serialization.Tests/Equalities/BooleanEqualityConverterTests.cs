@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.BooleanOperations;
+using PureQL.CSharp.Model.Comparisons;
 using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -302,12 +304,13 @@ public sealed record BooleanEqualityConverterTests
             }
             """;
 
-        BooleanEquality value = JsonSerializer.Deserialize<BooleanEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT1, new BooleanScalar(true));
-        Assert.Equal(value.Right.AsT1, new BooleanScalar(false));
+        Assert.Equal(
+            new BooleanEquality(
+                new BooleanReturning(new BooleanScalar(true)),
+                new BooleanReturning(new BooleanScalar(false))
+            ),
+            JsonSerializer.Deserialize<BooleanEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -401,12 +404,13 @@ public sealed record BooleanEqualityConverterTests
             }
             """;
 
-        BooleanEquality value = JsonSerializer.Deserialize<BooleanEquality>(
-            input,
-            _options
-        )!;
-        Assert.Equal(value.Left.AsT0, new BooleanParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new BooleanParameter(expectedSecondParamName));
+        Assert.Equal(
+            new BooleanEquality(
+                new BooleanReturning(new BooleanParameter(expectedFirstParamName)),
+                new BooleanReturning(new BooleanParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<BooleanEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -521,31 +525,30 @@ public sealed record BooleanEqualityConverterTests
             }
             """;
 
-        BooleanEquality value = JsonSerializer.Deserialize<BooleanEquality>(
-            input,
-            _options
-        )!;
         Assert.Equal(
-            value.Left.AsT2,
-            new Equality(
-                new SingleValueEquality(
-                    new BooleanEquality(
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true))
+            new BooleanEquality(
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
+                    )
+                ),
+                new BooleanReturning(
+                    new Equality(
+                        new SingleValueEquality(
+                            new BooleanEquality(
+                                new BooleanReturning(new BooleanScalar(false)),
+                                new BooleanReturning(new BooleanScalar(true))
+                            )
+                        )
                     )
                 )
-            )
-        );
-        Assert.Equal(
-            value.Right.AsT2,
-            new Equality(
-                new SingleValueEquality(
-                    new BooleanEquality(
-                        new BooleanReturning(new BooleanScalar(false)),
-                        new BooleanReturning(new BooleanScalar(true))
-                    )
-                )
-            )
+            ),
+            JsonSerializer.Deserialize<BooleanEquality>(input, _options)
         );
     }
 
@@ -721,16 +724,10 @@ public sealed record BooleanEqualityConverterTests
             [
                 new BooleanReturning(new BooleanScalar(false)),
                 new BooleanReturning(new BooleanScalar(true)),
-            ],
-            value.Left.AsT3.AsT0.Conditions.AsT0
-        );
-
-        Assert.Equal(
-            [
                 new BooleanReturning(new BooleanScalar(true)),
                 new BooleanReturning(new BooleanScalar(false)),
             ],
-            value.Right.AsT3.AsT0.Conditions.AsT0
+            new[] { value.Left, value.Right }.SelectMany(r => r.AsT3.AsT0.Conditions.AsT0)
         );
     }
 
@@ -800,33 +797,166 @@ public sealed record BooleanEqualityConverterTests
             {
               "operator": "equal",
               "left": {
-                "operator": "equal",
+                "operator": "and",
+                "conditions": [
+                  {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": false
+                  },
+                  {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
+                ]
+              },
+              "right": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  },
+                  {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": false
+                  }
+                ]
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new BooleanEquality(
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new AndOperator([
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true)),
+                        ])
+                    )
+                ),
+                new BooleanReturning(
+                    new BooleanOperator(
+                        new AndOperator([
+                            new BooleanReturning(new BooleanScalar(true)),
+                            new BooleanReturning(new BooleanScalar(false)),
+                        ])
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadComparisonArgs()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "equal",
+              "left": {
+                "operator": "greaterThan",
                 "left": {
                   "type": {
-                    "name": "boolean"
+                    "name": "number"
                   },
-                  "value": false
+                  "value": 42
                 },
                 "right": {
                   "type": {
-                    "name": "boolean"
+                    "name": "number"
                   },
-                  "value": true
+                  "value": 24
                 }
               },
               "right": {
-                "operator": "equal",
+                "operator": "lessThan",
                 "left": {
                   "type": {
-                    "name": "boolean"
+                    "name": "number"
                   },
-                  "value": false
+                  "value": 10
                 },
                 "right": {
                   "type": {
-                    "name": "boolean"
+                    "name": "number"
                   },
-                  "value": true
+                  "value": 5
+                }
+              }
+            }
+            """;
+
+        Assert.Equal(
+            new BooleanEquality(
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
+                        )
+                    )
+                ),
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.LessThan,
+                            new NumberReturning(new NumberScalar(10)),
+                            new NumberReturning(new NumberScalar(5))
+                        )
+                    )
+                )
+            ),
+            JsonSerializer.Deserialize<BooleanEquality>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void WriteComparisonArgs()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "equal",
+              "left": {
+                "operator": "greaterThan",
+                "left": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 42
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 24
+                }
+              },
+              "right": {
+                "operator": "lessThan",
+                "left": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 10
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 5
                 }
               }
             }
@@ -835,22 +965,20 @@ public sealed record BooleanEqualityConverterTests
         string value = JsonSerializer.Serialize(
             new BooleanEquality(
                 new BooleanReturning(
-                    new Equality(
-                        new SingleValueEquality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
                         )
                     )
                 ),
                 new BooleanReturning(
-                    new Equality(
-                        new SingleValueEquality(
-                            new BooleanEquality(
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true))
-                            )
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.LessThan,
+                            new NumberReturning(new NumberScalar(10)),
+                            new NumberReturning(new NumberScalar(5))
                         )
                     )
                 )

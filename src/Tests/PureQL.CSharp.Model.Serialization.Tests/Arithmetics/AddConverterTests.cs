@@ -178,9 +178,13 @@ public sealed record AddConverterTests
             }
             """;
 
-        Add value = JsonSerializer.Deserialize<Add>(input, _options)!;
-        Assert.Equal(value.Arguments.First().AsT1, new NumberScalar(expectedValue1));
-        Assert.Equal(value.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
+        Assert.Equal(
+            [
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ],
+            JsonSerializer.Deserialize<Add>(input, _options)!.Arguments
+        );
     }
 
     [Theory]
@@ -257,12 +261,10 @@ public sealed record AddConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Add(
-                [
-                    new NumberReturning(new NumberScalar(expectedValue1)),
-                    new NumberReturning(new NumberScalar(expectedValue2)),
-                ]
-            ),
+            new Add([
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -295,14 +297,12 @@ public sealed record AddConverterTests
             }
             """;
 
-        Add value = JsonSerializer.Deserialize<Add>(input, _options)!;
         Assert.Equal(
-            value.Arguments.First().AsT0,
-            new NumberParameter(expectedFirstParamName)
-        );
-        Assert.Equal(
-            value.Arguments.Last().AsT0,
-            new NumberParameter(expectedSecondParamName)
+            [
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ],
+            JsonSerializer.Deserialize<Add>(input, _options)!.Arguments
         );
     }
 
@@ -380,12 +380,10 @@ public sealed record AddConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Add(
-                [
-                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                ]
-            ),
+            new Add([
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);
@@ -419,11 +417,12 @@ public sealed record AddConverterTests
             }
             """;
 
-        Add value = JsonSerializer.Deserialize<Add>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.Arguments.First().AsT1);
         Assert.Equal(
-            value.Arguments.Skip(1).First().AsT0,
-            new NumberParameter(expectedParamName)
+            [
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ],
+            JsonSerializer.Deserialize<Add>(input, _options)!.Arguments
         );
     }
 
@@ -456,12 +455,10 @@ public sealed record AddConverterTests
             """;
 
         string value = JsonSerializer.Serialize(
-            new Add(
-                [
-                    new NumberReturning(new NumberScalar(expectedValue)),
-                    new NumberReturning(new NumberParameter(expectedParamName)),
-                ]
-            ),
+            new Add([
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ]),
             _options
         );
         Assert.Equal(expected, value);

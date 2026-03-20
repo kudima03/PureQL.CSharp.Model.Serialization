@@ -352,13 +352,14 @@ public sealed record StringComparisonConverterTests
             }
             """;
 
-        StringComparison comparison = JsonSerializer.Deserialize<StringComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, comparison.Operator);
-        Assert.Equal(new StringScalar(value), comparison.Left.AsT1);
-        Assert.Equal(new StringScalar(value), comparison.Right.AsT1);
+        Assert.Equal(
+            new StringComparison(
+                @operator,
+                new StringReturning(new StringScalar(value)),
+                new StringReturning(new StringScalar(value))
+            ),
+            JsonSerializer.Deserialize<StringComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -487,13 +488,14 @@ public sealed record StringComparisonConverterTests
             }
             """;
 
-        StringComparison value = JsonSerializer.Deserialize<StringComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT0, new StringParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new StringParameter(expectedSecondParamName));
+        Assert.Equal(
+            new StringComparison(
+                @operator,
+                new StringReturning(new StringParameter(expectedFirstParamName)),
+                new StringReturning(new StringParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<StringComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -624,13 +626,14 @@ public sealed record StringComparisonConverterTests
             }
             """;
 
-        StringComparison value = JsonSerializer.Deserialize<StringComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new StringScalar("adsihuowbfohuasdfipsduF"));
-        Assert.Equal(value.Right.AsT0, new StringParameter(expectedParamName));
+        Assert.Equal(
+            new StringComparison(
+                @operator,
+                new StringReturning(new StringScalar("adsihuowbfohuasdfipsduF")),
+                new StringReturning(new StringParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<StringComparison>(input, _options)
+        );
     }
 
     [Theory]

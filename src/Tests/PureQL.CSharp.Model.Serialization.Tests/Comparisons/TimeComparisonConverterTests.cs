@@ -352,13 +352,14 @@ public sealed record TimeComparisonConverterTests
             }
             """;
 
-        TimeComparison comparison = JsonSerializer.Deserialize<TimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, comparison.Operator);
-        Assert.Equal(new TimeScalar(now), comparison.Left.AsT1);
-        Assert.Equal(new TimeScalar(now), comparison.Right.AsT1);
+        Assert.Equal(
+            new TimeComparison(
+                @operator,
+                new TimeReturning(new TimeScalar(now)),
+                new TimeReturning(new TimeScalar(now))
+            ),
+            JsonSerializer.Deserialize<TimeComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -487,13 +488,14 @@ public sealed record TimeComparisonConverterTests
             }
             """;
 
-        TimeComparison value = JsonSerializer.Deserialize<TimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT0, new TimeParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedSecondParamName));
+        Assert.Equal(
+            new TimeComparison(
+                @operator,
+                new TimeReturning(new TimeParameter(expectedFirstParamName)),
+                new TimeReturning(new TimeParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<TimeComparison>(input, _options)
+        );
     }
 
     [Theory]
@@ -625,13 +627,14 @@ public sealed record TimeComparisonConverterTests
             }
             """;
 
-        TimeComparison value = JsonSerializer.Deserialize<TimeComparison>(
-            input,
-            _options
-        )!;
-        Assert.Equal(@operator, value.Operator);
-        Assert.Equal(value.Left.AsT1, new TimeScalar(expected));
-        Assert.Equal(value.Right.AsT0, new TimeParameter(expectedParamName));
+        Assert.Equal(
+            new TimeComparison(
+                @operator,
+                new TimeReturning(new TimeScalar(expected)),
+                new TimeReturning(new TimeParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<TimeComparison>(input, _options)
+        );
     }
 
     [Theory]

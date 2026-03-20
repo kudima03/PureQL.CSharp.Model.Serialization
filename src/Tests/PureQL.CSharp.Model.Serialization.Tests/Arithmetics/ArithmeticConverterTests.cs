@@ -178,9 +178,13 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT0.Arguments.First().AsT1, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT0.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
+        Assert.Equal(
+            [
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT0.Arguments
+        );
     }
 
     [Theory]
@@ -258,12 +262,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Add([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -297,14 +299,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT0.Arguments.First().AsT0,
-            new NumberParameter(expectedFirstParamName)
-        );
-        Assert.Equal(
-            value.AsT0.Arguments.Last().AsT0,
-            new NumberParameter(expectedSecondParamName)
+            [
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT0.Arguments
         );
     }
 
@@ -383,12 +383,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Add([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -423,11 +421,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT0.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT0.Arguments.Skip(1).First().AsT0,
-            new NumberParameter(expectedParamName)
+            [
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT0.Arguments
         );
     }
 
@@ -461,12 +460,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Add(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Add([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
@@ -592,9 +589,13 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT1.Arguments.First().AsT1, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT1.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
+        Assert.Equal(
+            [
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT1.Arguments
+        );
     }
 
     [Theory]
@@ -665,12 +666,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Divide([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -704,14 +703,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT1.Arguments.First().AsT0,
-            new NumberParameter(expectedFirstParamName)
-        );
-        Assert.Equal(
-            value.AsT1.Arguments.Last().AsT0,
-            new NumberParameter(expectedSecondParamName)
+            [
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT1.Arguments
         );
     }
 
@@ -790,12 +787,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Divide([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -830,11 +825,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT1.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT1.Arguments.Skip(1).First().AsT0,
-            new NumberParameter(expectedParamName)
+            [
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT1.Arguments
         );
     }
 
@@ -868,12 +864,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Divide(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Divide([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
@@ -987,9 +981,13 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT2.Arguments.First().AsT1, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT2.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
+        Assert.Equal(
+            [
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT2.Arguments
+        );
     }
 
     [Theory]
@@ -1067,12 +1065,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Multiply([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -1106,14 +1102,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT2.Arguments.First().AsT0,
-            new NumberParameter(expectedFirstParamName)
-        );
-        Assert.Equal(
-            value.AsT2.Arguments.Last().AsT0,
-            new NumberParameter(expectedSecondParamName)
+            [
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT2.Arguments
         );
     }
 
@@ -1192,12 +1186,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Multiply([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -1231,11 +1223,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT2.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT2.Arguments.Skip(1).First().AsT0,
-            new NumberParameter(expectedParamName)
+            [
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT2.Arguments
         );
     }
 
@@ -1269,12 +1262,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Multiply(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Multiply([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );
@@ -1388,9 +1379,13 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(value.AsT3.Arguments.First().AsT1, new NumberScalar(expectedValue1));
-        Assert.Equal(value.AsT3.Arguments.Last().AsT1, new NumberScalar(expectedValue2));
+        Assert.Equal(
+            [
+                new NumberReturning(new NumberScalar(expectedValue1)),
+                new NumberReturning(new NumberScalar(expectedValue2)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT3.Arguments
+        );
     }
 
     [Theory]
@@ -1468,12 +1463,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue1)),
-                        new NumberReturning(new NumberScalar(expectedValue2)),
-                    ]
-                )
+                new Subtract([
+                    new NumberReturning(new NumberScalar(expectedValue1)),
+                    new NumberReturning(new NumberScalar(expectedValue2)),
+                ])
             ),
             _options
         );
@@ -1507,14 +1500,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
         Assert.Equal(
-            value.AsT3.Arguments.First().AsT0,
-            new NumberParameter(expectedFirstParamName)
-        );
-        Assert.Equal(
-            value.AsT3.Arguments.Last().AsT0,
-            new NumberParameter(expectedSecondParamName)
+            [
+                new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                new NumberReturning(new NumberParameter(expectedSecondParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT3.Arguments
         );
     }
 
@@ -1593,12 +1584,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(new NumberParameter(expectedFirstParamName)),
-                        new NumberReturning(new NumberParameter(expectedSecondParamName)),
-                    ]
-                )
+                new Subtract([
+                    new NumberReturning(new NumberParameter(expectedFirstParamName)),
+                    new NumberReturning(new NumberParameter(expectedSecondParamName)),
+                ])
             ),
             _options
         );
@@ -1633,11 +1622,12 @@ public sealed record ArithmeticConverterTests
             }
             """;
 
-        Arithmetic value = JsonSerializer.Deserialize<Arithmetic>(input, _options)!;
-        Assert.Equal(new NumberScalar(expectedValue), value.AsT3.Arguments.First().AsT1);
         Assert.Equal(
-            value.AsT3.Arguments.Skip(1).First().AsT0,
-            new NumberParameter(expectedParamName)
+            [
+                new NumberReturning(new NumberScalar(expectedValue)),
+                new NumberReturning(new NumberParameter(expectedParamName)),
+            ],
+            JsonSerializer.Deserialize<Arithmetic>(input, _options)!.AsT3.Arguments
         );
     }
 
@@ -1671,12 +1661,10 @@ public sealed record ArithmeticConverterTests
 
         string value = JsonSerializer.Serialize(
             new Arithmetic(
-                new Subtract(
-                    [
-                        new NumberReturning(new NumberScalar(expectedValue)),
-                        new NumberReturning(new NumberParameter(expectedParamName)),
-                    ]
-                )
+                new Subtract([
+                    new NumberReturning(new NumberScalar(expectedValue)),
+                    new NumberReturning(new NumberParameter(expectedParamName)),
+                ])
             ),
             _options
         );

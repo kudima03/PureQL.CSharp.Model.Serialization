@@ -521,12 +521,10 @@ public sealed record NotOperatorConverterTests
             new NotOperator(
                 new BooleanReturning(
                     new BooleanOperator(
-                        new OrOperator(
-                            [
-                                new BooleanReturning(new BooleanScalar(false)),
-                                new BooleanReturning(new BooleanScalar(true)),
-                            ]
-                        )
+                        new OrOperator([
+                            new BooleanReturning(new BooleanScalar(false)),
+                            new BooleanReturning(new BooleanScalar(true)),
+                        ])
                     )
                 )
             ),

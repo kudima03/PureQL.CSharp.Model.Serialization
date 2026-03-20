@@ -210,9 +210,11 @@ public sealed record StringAggregateConverterTests
             new StringAggregate(
                 new MaxString(
                     new StringArrayReturning(
-                        new StringArrayScalar(
-                            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
-                        )
+                        new StringArrayScalar([
+                            "afirndhujvr",
+                            "sahbjndfashbndfj",
+                            "dnfjkanjkf",
+                        ])
                     )
                 )
             ),
@@ -529,9 +531,11 @@ public sealed record StringAggregateConverterTests
             new StringAggregate(
                 new MinString(
                     new StringArrayReturning(
-                        new StringArrayScalar(
-                            ["afirndhujvr", "sahbjndfashbndfj", "dnfjkanjkf"]
-                        )
+                        new StringArrayScalar([
+                            "afirndhujvr",
+                            "sahbjndfashbndfj",
+                            "dnfjkanjkf",
+                        ])
                     )
                 )
             ),

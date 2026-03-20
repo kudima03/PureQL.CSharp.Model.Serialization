@@ -26,7 +26,7 @@ public sealed record StringArrayScalarConverterTests
     [Fact]
     public void Read()
     {
-        string input = /*lang=json,strict*/
+        const string input = /*lang=json,strict*/
             """
             {
               "type": {
@@ -50,7 +50,7 @@ public sealed record StringArrayScalarConverterTests
     [Fact]
     public void Write()
     {
-        string expected = /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "type": {
@@ -82,6 +82,24 @@ public sealed record StringArrayScalarConverterTests
               }
             }
             """;
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IStringArrayScalar>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnEmptyValue()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "type": {
+                "name": "stringArray"
+              },
+              "value": ""
+            }
+            """;
+
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IStringArrayScalar>(input, _options)
         );

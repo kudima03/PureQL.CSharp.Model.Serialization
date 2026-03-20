@@ -314,9 +314,13 @@ public sealed record UuidEqualityConverterTests
             }
             """;
 
-        UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new UuidScalar(guid));
-        Assert.Equal(value.Right.AsT1, new UuidScalar(guid));
+        Assert.Equal(
+            new UuidEquality(
+                new UuidReturning(new UuidScalar(guid)),
+                new UuidReturning(new UuidScalar(guid))
+            ),
+            JsonSerializer.Deserialize<UuidEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -412,9 +416,13 @@ public sealed record UuidEqualityConverterTests
             }
             """;
 
-        UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT0, new UuidParameter(expectedFirstParamName));
-        Assert.Equal(value.Right.AsT0, new UuidParameter(expectedSecondParamName));
+        Assert.Equal(
+            new UuidEquality(
+                new UuidReturning(new UuidParameter(expectedFirstParamName)),
+                new UuidReturning(new UuidParameter(expectedSecondParamName))
+            ),
+            JsonSerializer.Deserialize<UuidEquality>(input, _options)
+        );
     }
 
     [Theory]
@@ -513,9 +521,13 @@ public sealed record UuidEqualityConverterTests
             }
             """;
 
-        UuidEquality value = JsonSerializer.Deserialize<UuidEquality>(input, _options)!;
-        Assert.Equal(value.Left.AsT1, new UuidScalar(expected));
-        Assert.Equal(value.Right.AsT0, new UuidParameter(expectedParamName));
+        Assert.Equal(
+            new UuidEquality(
+                new UuidReturning(new UuidScalar(expected)),
+                new UuidReturning(new UuidParameter(expectedParamName))
+            ),
+            JsonSerializer.Deserialize<UuidEquality>(input, _options)
+        );
     }
 
     [Theory]

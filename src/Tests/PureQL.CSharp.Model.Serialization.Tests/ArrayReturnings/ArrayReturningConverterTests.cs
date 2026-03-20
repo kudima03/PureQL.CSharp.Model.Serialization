@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
-using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
@@ -44,13 +43,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        BooleanField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT0.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new BooleanArrayType(), field.Type);
+        Assert.Equal(
+            new BooleanField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT0.AsT1
+        );
     }
 
     [Fact]
@@ -195,13 +191,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        DateField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT1.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateArrayType(), field.Type);
+        Assert.Equal(
+            new DateField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT1.AsT1
+        );
     }
 
     [Fact]
@@ -365,13 +358,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        DateTimeField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT2.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new DateTimeArrayType(), field.Type);
+        Assert.Equal(
+            new DateTimeField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT2.AsT1
+        );
     }
 
     [Fact]
@@ -539,13 +529,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        NumberField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT3.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new NumberArrayType(), field.Type);
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT3.AsT1
+        );
     }
 
     [Fact]
@@ -707,13 +694,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        StringField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT4.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new StringArrayType(), field.Type);
+        Assert.Equal(
+            new StringField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT4.AsT1
+        );
     }
 
     [Fact]
@@ -746,7 +730,7 @@ public sealed record ArrayReturningConverterTests
     [Fact]
     public void ReadStringArrayScalar()
     {
-        string input = /*lang=json,strict*/
+        const string input = /*lang=json,strict*/
             """
             {
               "type": {
@@ -769,7 +753,7 @@ public sealed record ArrayReturningConverterTests
     [Fact]
     public void WriteStringArrayScalar()
     {
-        string expected = /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "type": {
@@ -855,13 +839,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        TimeField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT5.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new TimeArrayType(), field.Type);
+        Assert.Equal(
+            new TimeField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT5.AsT1
+        );
     }
 
     [Fact]
@@ -1023,13 +1004,10 @@ public sealed record ArrayReturningConverterTests
             }
             """;
 
-        UuidField field = JsonSerializer
-            .Deserialize<ArrayReturning>(input, _options)!
-            .AsT6.AsT1;
-
-        Assert.Equal(expectedEntity, field.Entity);
-        Assert.Equal(expectedField, field.Field);
-        Assert.Equal(new UuidArrayType(), field.Type);
+        Assert.Equal(
+            new UuidField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<ArrayReturning>(input, _options)!.AsT6.AsT1
+        );
     }
 
     [Fact]

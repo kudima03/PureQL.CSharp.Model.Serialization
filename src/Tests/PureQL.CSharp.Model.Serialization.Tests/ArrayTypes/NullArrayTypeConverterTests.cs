@@ -41,16 +41,16 @@ public sealed record NullArrayTypeConverterTests
     [Fact]
     public void Write()
     {
-        string output = JsonSerializer.Serialize(new NullArrayType(), _options);
-
-        Assert.Equal( /*lang=json,strict*/
+        const string expected = /*lang=json,strict*/
             """
             {
               "name": "nullArray"
             }
-            """,
-            output
-        );
+            """;
+
+        string output = JsonSerializer.Serialize(new NullArrayType(), _options);
+
+        Assert.Equal(expected, output);
     }
 
     [Theory]
