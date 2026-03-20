@@ -373,6 +373,188 @@ public sealed record FieldConverterTests
         Assert.Equal(expectedOutput, output);
     }
 
+    [Fact]
+    public void WriteFieldWrappedBooleanField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "booleanArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new BooleanField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    [Fact]
+    public void WriteFieldWrappedDateField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "dateArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new DateField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    [Fact]
+    public void WriteFieldWrappedDateTimeField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "datetimeArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new DateTimeField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    [Fact]
+    public void WriteFieldWrappedNumberField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "numberArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new NumberField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    [Fact]
+    public void WriteFieldWrappedTimeField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "timeArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new TimeField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    [Fact]
+    public void WriteFieldWrappedUuidField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "uuidArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new UuidField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    [Fact]
+    public void WriteFieldWrappedStringField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "stringArray"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new StringField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
     [Theory]
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
