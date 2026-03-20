@@ -1387,4 +1387,37 @@ public sealed record NumberAggregateConverterTests
         );
         Assert.Equal(expected, value);
     }
+
+    [Fact]
+    public void WriteNumberAggregateWrappedSumNumber()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new SumNumber(
+                    new NumberArrayReturning(
+                        new NumberField(expectedEntityName, expectedFieldName)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
 }
