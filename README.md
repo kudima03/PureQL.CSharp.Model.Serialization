@@ -30,7 +30,7 @@ Covered model categories:
 
 ## Dependencies
 
-- [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model/tree/0.1.0-preview.10.0.0) — core query model types: `Query`, `FromExpression`, `Join`, `SelectExpression`, `Pagination`, typed scalars, fields, parameters, returnings, and the full PureQL type system
+- [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model/tree/0.1.0-preview.11.0.0) — core query model types: `Query`, `FromExpression`, `Join`, `SelectExpression`, `Pagination`, typed scalars, fields, parameters, returnings, and the full PureQL type system
 
 ## Target Frameworks
 
