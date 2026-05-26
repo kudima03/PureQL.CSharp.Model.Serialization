@@ -3,6 +3,10 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachArithmetics;
+using PureQL.CSharp.Model.EachDateArithmetics;
+using PureQL.CSharp.Model.EachDateTimeArithmetics;
+using PureQL.CSharp.Model.EachTimeArithmetics;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.ArrayReturnings;
@@ -28,7 +32,33 @@ internal sealed class NumberArrayReturningConverter : JsonConverter<NumberArrayR
                 out NumberArrayParameter? parameter
             )
                 ? new NumberArrayReturning(parameter!)
-            : throw new JsonException("Unable to determine NumberArrayReturning type.");
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachArithmetic? arithmetic
+            )
+                ? new NumberArrayReturning(arithmetic!)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachDateDiffDays? dateDiff
+            )
+                ? new NumberArrayReturning(dateDiff!)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachDateTimeDiffSeconds? dateTimeDiff
+            )
+                ? new NumberArrayReturning(dateTimeDiff!)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachTimeDiffSeconds? timeDiff
+            )
+                ? new NumberArrayReturning(timeDiff!)
+            : throw new JsonException(
+                "Unable to determine NumberArrayReturning type."
+            );
     }
 
     public override void Write(
@@ -49,9 +79,27 @@ internal sealed class NumberArrayReturningConverter : JsonConverter<NumberArrayR
         {
             JsonSerializer.Serialize<INumberArrayScalar>(writer, scalar, options);
         }
+        else if (value.TryPickT3(out EachArithmetic? arithmetic, out _))
+        {
+            JsonSerializer.Serialize(writer, arithmetic, options);
+        }
+        else if (value.TryPickT4(out EachDateDiffDays? dateDiff, out _))
+        {
+            JsonSerializer.Serialize(writer, dateDiff, options);
+        }
+        else if (value.TryPickT5(out EachDateTimeDiffSeconds? dateTimeDiff, out _))
+        {
+            JsonSerializer.Serialize(writer, dateTimeDiff, options);
+        }
+        else if (value.TryPickT6(out EachTimeDiffSeconds? timeDiff, out _))
+        {
+            JsonSerializer.Serialize(writer, timeDiff, options);
+        }
         else
         {
-            throw new JsonException("Unable to determine NumberArrayReturning type.");
+            throw new JsonException(
+                "Unable to determine NumberArrayReturning type."
+            );
         }
     }
 }

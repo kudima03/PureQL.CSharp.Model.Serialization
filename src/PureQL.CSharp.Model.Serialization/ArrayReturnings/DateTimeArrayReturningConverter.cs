@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachDateTimeArithmetics;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.ArrayReturnings;
@@ -33,7 +34,15 @@ internal sealed class DateTimeArrayReturningConverter
                 out DateTimeArrayParameter? parameter
             )
                 ? new DateTimeArrayReturning(parameter!)
-            : throw new JsonException("Unable to determine DateTimeArrayReturning type.");
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachDateTimeAddSeconds? addSeconds
+            )
+                ? new DateTimeArrayReturning(addSeconds!)
+            : throw new JsonException(
+                "Unable to determine DateTimeArrayReturning type."
+            );
     }
 
     public override void Write(
@@ -54,9 +63,15 @@ internal sealed class DateTimeArrayReturningConverter
         {
             JsonSerializer.Serialize<IDateTimeArrayScalar>(writer, scalar, options);
         }
+        else if (value.TryPickT3(out EachDateTimeAddSeconds? addSeconds, out _))
+        {
+            JsonSerializer.Serialize(writer, addSeconds, options);
+        }
         else
         {
-            throw new JsonException("Unable to determine DateTimeArrayReturning type.");
+            throw new JsonException(
+                "Unable to determine DateTimeArrayReturning type."
+            );
         }
     }
 }

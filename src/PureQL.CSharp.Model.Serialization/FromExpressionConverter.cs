@@ -9,15 +9,16 @@ internal sealed record FromExpressionJsonModel
         : this(expression.Entity, expression.Alias) { }
 
     [JsonConstructor]
-    public FromExpressionJsonModel(string entity, string alias)
+    public FromExpressionJsonModel(string entity, string? alias)
     {
         Entity = entity ?? throw new JsonException();
-        Alias = alias ?? throw new JsonException();
+        Alias = alias;
     }
 
     public string Entity { get; }
 
-    public string Alias { get; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Alias { get; }
 }
 
 internal sealed class FromExpressionConverter : JsonConverter<FromExpression>

@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.String;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -170,5 +173,65 @@ public sealed record StringReturningConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<StringReturning>(input, _options)
         );
+    }
+
+    [Fact]
+    public void ReadStringAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_string",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "stringArray"
+                }
+              }
+            }
+            """;
+
+        StringAggregate aggregate = JsonSerializer
+            .Deserialize<StringReturning>(input, _options)!
+            .AsT2;
+        Assert.Equal(
+            new StringField(entity, field),
+            aggregate.AsT1.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteStringAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_string",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "stringArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new StringReturning(
+                new StringAggregate(
+                    new MinString(new StringArrayReturning(new StringField(entity, field)))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
     }
 }

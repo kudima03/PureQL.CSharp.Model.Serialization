@@ -4,6 +4,10 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachArithmetics;
+using PureQL.CSharp.Model.EachDateArithmetics;
+using PureQL.CSharp.Model.EachDateTimeArithmetics;
+using PureQL.CSharp.Model.EachTimeArithmetics;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
@@ -187,6 +191,279 @@ public sealed record NumberArrayReturningConverterTests
             _options
         );
 
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachArithmetic()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "eachAdd",
+              "values": []
+            }
+            """;
+
+        EachArithmetic arithmetic = JsonSerializer
+            .Deserialize<NumberArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.True(arithmetic.IsT0);
+    }
+
+    [Fact]
+    public void WriteEachArithmetic()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "eachAdd",
+              "values": []
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new NumberArrayReturning(new EachArithmetic(new EachAdd([]))),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachDateDiffDays()
+    {
+        const string leftEntity = "leftEntity";
+        const string leftField = "leftField";
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateDiffDays",
+              "left": {
+                "entity": "{{leftEntity}}",
+                "field": "{{leftField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              }
+            }
+            """;
+
+        EachDateDiffDays diff = JsonSerializer
+            .Deserialize<NumberArrayReturning>(input, _options)!
+            .AsT4;
+        Assert.Equal(new DateField(leftEntity, leftField), diff.Left.AsT1.AsT1);
+    }
+
+    [Fact]
+    public void WriteEachDateDiffDays()
+    {
+        const string leftEntity = "leftEntity";
+        const string leftField = "leftField";
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateDiffDays",
+              "left": {
+                "entity": "{{leftEntity}}",
+                "field": "{{leftField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new NumberArrayReturning(
+                new EachDateDiffDays(
+                    new DateArrayReturning(new DateField(leftEntity, leftField)),
+                    new DateArrayReturning(new DateField(rightEntity, rightField))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachDateTimeDiffSeconds()
+    {
+        const string leftEntity = "leftEntity";
+        const string leftField = "leftField";
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeDiffSeconds",
+              "left": {
+                "entity": "{{leftEntity}}",
+                "field": "{{leftField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              }
+            }
+            """;
+
+        EachDateTimeDiffSeconds diff = JsonSerializer
+            .Deserialize<NumberArrayReturning>(input, _options)!
+            .AsT5;
+        Assert.Equal(
+            new DateTimeField(leftEntity, leftField),
+            diff.Left.AsT1.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteEachDateTimeDiffSeconds()
+    {
+        const string leftEntity = "leftEntity";
+        const string leftField = "leftField";
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeDiffSeconds",
+              "left": {
+                "entity": "{{leftEntity}}",
+                "field": "{{leftField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new NumberArrayReturning(
+                new EachDateTimeDiffSeconds(
+                    new DateTimeArrayReturning(
+                        new DateTimeField(leftEntity, leftField)
+                    ),
+                    new DateTimeArrayReturning(
+                        new DateTimeField(rightEntity, rightField)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachTimeDiffSeconds()
+    {
+        const string leftEntity = "leftEntity";
+        const string leftField = "leftField";
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeDiffSeconds",
+              "left": {
+                "entity": "{{leftEntity}}",
+                "field": "{{leftField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        EachTimeDiffSeconds diff = JsonSerializer
+            .Deserialize<NumberArrayReturning>(input, _options)!
+            .AsT6;
+        Assert.Equal(
+            new TimeField(leftEntity, leftField),
+            diff.Left.AsT1.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteEachTimeDiffSeconds()
+    {
+        const string leftEntity = "leftEntity";
+        const string leftField = "leftField";
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeDiffSeconds",
+              "left": {
+                "entity": "{{leftEntity}}",
+                "field": "{{leftField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new NumberArrayReturning(
+                new EachTimeDiffSeconds(
+                    new TimeArrayReturning(new TimeField(leftEntity, leftField)),
+                    new TimeArrayReturning(new TimeField(rightEntity, rightField))
+                )
+            ),
+            _options
+        );
         Assert.Equal(expected, output);
     }
 }

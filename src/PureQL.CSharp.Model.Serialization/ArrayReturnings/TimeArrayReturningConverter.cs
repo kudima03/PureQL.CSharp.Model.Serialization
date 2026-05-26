@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachTimeArithmetics;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.ArrayReturnings;
@@ -28,6 +29,12 @@ internal sealed class TimeArrayReturningConverter : JsonConverter<TimeArrayRetur
                 out TimeArrayParameter? parameter
             )
                 ? new TimeArrayReturning(parameter!)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachTimeAddSeconds? addSeconds
+            )
+                ? new TimeArrayReturning(addSeconds!)
             : throw new JsonException("Unable to determine TimeArrayReturning type.");
     }
 
@@ -48,6 +55,10 @@ internal sealed class TimeArrayReturningConverter : JsonConverter<TimeArrayRetur
         else if (value.TryPickT2(out TimeArrayScalar? scalar, out _))
         {
             JsonSerializer.Serialize<ITimeArrayScalar>(writer, scalar, options);
+        }
+        else if (value.TryPickT3(out EachTimeAddSeconds? addSeconds, out _))
+        {
+            JsonSerializer.Serialize(writer, addSeconds, options);
         }
         else
         {

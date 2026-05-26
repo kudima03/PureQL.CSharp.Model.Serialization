@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.Time;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -176,5 +179,65 @@ public sealed record TimeReturningConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<TimeReturning>(input, _options)
         );
+    }
+
+    [Fact]
+    public void ReadTimeAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_time",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        TimeAggregate aggregate = JsonSerializer
+            .Deserialize<TimeReturning>(input, _options)!
+            .AsT2;
+        Assert.Equal(
+            new TimeField(entity, field),
+            aggregate.AsT1.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteTimeAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_time",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new TimeReturning(
+                new TimeAggregate(
+                    new MinTime(new TimeArrayReturning(new TimeField(entity, field)))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
     }
 }

@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.DateTime;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -197,5 +200,67 @@ public sealed record DateTimeReturningConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateTimeReturning>(input, _options)
         );
+    }
+
+    [Fact]
+    public void ReadDateTimeAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_datetime",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              }
+            }
+            """;
+
+        DateTimeAggregate aggregate = JsonSerializer
+            .Deserialize<DateTimeReturning>(input, _options)!
+            .AsT2;
+        Assert.Equal(
+            new DateTimeField(entity, field),
+            aggregate.AsT1.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteDateTimeAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_datetime",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new DateTimeReturning(
+                new DateTimeAggregate(
+                    new MinDateTime(
+                        new DateTimeArrayReturning(new DateTimeField(entity, field))
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
     }
 }

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachDateArithmetics;
 using PureQL.CSharp.Model.Fields;
 
 namespace PureQL.CSharp.Model.Serialization.ArrayReturnings;
@@ -28,6 +29,12 @@ internal sealed class DateArrayReturningConverter : JsonConverter<DateArrayRetur
                 out DateArrayParameter? parameter
             )
                 ? new DateArrayReturning(parameter!)
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out EachDateAddDays? addDays
+            )
+                ? new DateArrayReturning(addDays!)
             : throw new JsonException("Unable to determine DateArrayReturning type.");
     }
 
@@ -48,6 +55,10 @@ internal sealed class DateArrayReturningConverter : JsonConverter<DateArrayRetur
         else if (value.TryPickT2(out DateArrayScalar? scalar, out _))
         {
             JsonSerializer.Serialize<IDateArrayScalar>(writer, scalar, options);
+        }
+        else if (value.TryPickT3(out EachDateAddDays? addDays, out _))
+        {
+            JsonSerializer.Serialize(writer, addDays, options);
         }
         else
         {

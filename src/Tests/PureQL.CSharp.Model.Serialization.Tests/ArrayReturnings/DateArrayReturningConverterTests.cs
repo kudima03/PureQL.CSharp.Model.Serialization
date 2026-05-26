@@ -3,7 +3,10 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachDateArithmetics;
 using PureQL.CSharp.Model.Fields;
+using PureQL.CSharp.Model.Returnings;
+using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
 
@@ -186,6 +189,152 @@ public sealed record DateArrayReturningConverterTests
             _options
         );
 
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachDateAddDays()
+    {
+        const string dateEntity = "dateEntity";
+        const string dateField = "dateField";
+        const string numEntity = "numEntity";
+        const string numField = "numField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateAddDays",
+              "left": {
+                "entity": "{{dateEntity}}",
+                "field": "{{dateField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              },
+              "right": {
+                "entity": "{{numEntity}}",
+                "field": "{{numField}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        EachDateAddDays addDays = JsonSerializer
+            .Deserialize<DateArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.Equal(new DateField(dateEntity, dateField), addDays.Left.AsT1.AsT1);
+    }
+
+    [Fact]
+    public void WriteEachDateAddDays()
+    {
+        const string dateEntity = "dateEntity";
+        const string dateField = "dateField";
+        const string numEntity = "numEntity";
+        const string numField = "numField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateAddDays",
+              "left": {
+                "entity": "{{dateEntity}}",
+                "field": "{{dateField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              },
+              "right": {
+                "entity": "{{numEntity}}",
+                "field": "{{numField}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new DateArrayReturning(
+                new EachDateAddDays(
+                    new DateArrayReturning(new DateField(dateEntity, dateField)),
+                    new NumberArrayReturning(new NumberField(numEntity, numField))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachDateAddDaysWithScalarRight()
+    {
+        const string dateEntity = "dateEntity";
+        const string dateField = "dateField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateAddDays",
+              "left": {
+                "entity": "{{dateEntity}}",
+                "field": "{{dateField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": 7
+              }
+            }
+            """;
+
+        EachDateAddDays addDays = JsonSerializer
+            .Deserialize<DateArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.Equal(7, addDays.Right.AsT0.AsT1.Value);
+    }
+
+    [Fact]
+    public void WriteEachDateAddDaysWithScalarRight()
+    {
+        const string dateEntity = "dateEntity";
+        const string dateField = "dateField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateAddDays",
+              "left": {
+                "entity": "{{dateEntity}}",
+                "field": "{{dateField}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": 7
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new DateArrayReturning(
+                new EachDateAddDays(
+                    new DateArrayReturning(new DateField(dateEntity, dateField)),
+                    new NumberReturning(new NumberScalar(7))
+                )
+            ),
+            _options
+        );
         Assert.Equal(expected, output);
     }
 }

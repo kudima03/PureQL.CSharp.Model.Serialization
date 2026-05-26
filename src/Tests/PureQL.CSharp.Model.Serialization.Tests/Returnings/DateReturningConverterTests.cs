@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.Date;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -194,5 +197,65 @@ public sealed record DateReturningConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<DateReturning>(input, _options)
         );
+    }
+
+    [Fact]
+    public void ReadDateAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_date",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              }
+            }
+            """;
+
+        DateAggregate aggregate = JsonSerializer
+            .Deserialize<DateReturning>(input, _options)!
+            .AsT2;
+        Assert.Equal(
+            new DateField(entity, field),
+            aggregate.AsT1.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteDateAggregate()
+    {
+        const string entity = "myEntity";
+        const string field = "myField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_date",
+              "arg": {
+                "entity": "{{entity}}",
+                "field": "{{field}}",
+                "type": {
+                  "name": "dateArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new DateReturning(
+                new DateAggregate(
+                    new MinDate(new DateArrayReturning(new DateField(entity, field)))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
     }
 }

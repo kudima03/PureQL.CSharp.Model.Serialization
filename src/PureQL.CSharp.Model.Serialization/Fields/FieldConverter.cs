@@ -21,6 +21,8 @@ internal sealed class FieldConverter : JsonConverter<Field>
                 ? new Field(date!)
             : JsonExtensions.TryDeserialize(root, options, out DateTimeField? dateTime)
                 ? new Field(dateTime!)
+            : JsonExtensions.TryDeserialize(root, options, out NullField? nullField)
+                ? new Field(nullField!)
             : JsonExtensions.TryDeserialize(root, options, out NumberField? number)
                 ? new Field(number!)
             : JsonExtensions.TryDeserialize(root, options, out TimeField? time)
@@ -62,23 +64,31 @@ internal sealed class FieldConverter : JsonConverter<Field>
         {
             JsonSerializer.Serialize(
                 writer,
-                new NumberFieldJsonModel(value.AsT3),
+                new NullFieldJsonModel(value.AsT3),
                 options
             );
         }
         else if (value.IsT4)
         {
-            JsonSerializer.Serialize(writer, new TimeFieldJsonModel(value.AsT4), options);
+            JsonSerializer.Serialize(
+                writer,
+                new NumberFieldJsonModel(value.AsT4),
+                options
+            );
         }
         else if (value.IsT5)
         {
-            JsonSerializer.Serialize(writer, new UuidFieldJsonModel(value.AsT5), options);
+            JsonSerializer.Serialize(writer, new TimeFieldJsonModel(value.AsT5), options);
         }
         else if (value.IsT6)
         {
+            JsonSerializer.Serialize(writer, new UuidFieldJsonModel(value.AsT6), options);
+        }
+        else if (value.IsT7)
+        {
             JsonSerializer.Serialize(
                 writer,
-                new StringFieldJsonModel(value.AsT6),
+                new StringFieldJsonModel(value.AsT7),
                 options
             );
         }
