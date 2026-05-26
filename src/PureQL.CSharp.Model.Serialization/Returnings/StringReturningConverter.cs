@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.String;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -25,6 +26,12 @@ internal sealed class StringReturningConverter : JsonConverter<StringReturning>
                 ? new StringReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out IStringScalar? scalar)
                 ? new StringReturning(new StringScalar(scalar!.Value))
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out StringAggregate? aggregate
+            )
+                ? new StringReturning(aggregate!)
             : throw new JsonException("Unable to determine StringReturning type.");
     }
 
@@ -41,6 +48,10 @@ internal sealed class StringReturningConverter : JsonConverter<StringReturning>
         else if (value.TryPickT1(out StringScalar? scalar, out _))
         {
             JsonSerializer.Serialize<IStringScalar>(writer, scalar, options);
+        }
+        else if (value.TryPickT2(out StringAggregate? aggregate, out _))
+        {
+            JsonSerializer.Serialize(writer, aggregate, options);
         }
         else
         {

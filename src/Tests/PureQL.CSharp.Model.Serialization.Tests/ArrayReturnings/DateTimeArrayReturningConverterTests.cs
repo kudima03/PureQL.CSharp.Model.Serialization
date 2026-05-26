@@ -3,7 +3,10 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachDateTimeArithmetics;
 using PureQL.CSharp.Model.Fields;
+using PureQL.CSharp.Model.Returnings;
+using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
 
@@ -186,6 +189,155 @@ public sealed record DateTimeArrayReturningConverterTests
             _options
         );
 
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachDateTimeAddSeconds()
+    {
+        const string dtEntity = "dtEntity";
+        const string dtField = "dtField";
+        const string numEntity = "numEntity";
+        const string numField = "numField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeAddSeconds",
+              "left": {
+                "entity": "{{dtEntity}}",
+                "field": "{{dtField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              },
+              "right": {
+                "entity": "{{numEntity}}",
+                "field": "{{numField}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        EachDateTimeAddSeconds addSeconds = JsonSerializer
+            .Deserialize<DateTimeArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.Equal(
+            new DateTimeField(dtEntity, dtField),
+            addSeconds.Left.AsT1.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteEachDateTimeAddSeconds()
+    {
+        const string dtEntity = "dtEntity";
+        const string dtField = "dtField";
+        const string numEntity = "numEntity";
+        const string numField = "numField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeAddSeconds",
+              "left": {
+                "entity": "{{dtEntity}}",
+                "field": "{{dtField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              },
+              "right": {
+                "entity": "{{numEntity}}",
+                "field": "{{numField}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new DateTimeArrayReturning(
+                new EachDateTimeAddSeconds(
+                    new DateTimeArrayReturning(new DateTimeField(dtEntity, dtField)),
+                    new NumberArrayReturning(new NumberField(numEntity, numField))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachDateTimeAddSecondsWithScalarRight()
+    {
+        const string dtEntity = "dtEntity";
+        const string dtField = "dtField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeAddSeconds",
+              "left": {
+                "entity": "{{dtEntity}}",
+                "field": "{{dtField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": 3600
+              }
+            }
+            """;
+
+        EachDateTimeAddSeconds addSeconds = JsonSerializer
+            .Deserialize<DateTimeArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.Equal(3600, addSeconds.Right.AsT0.AsT1.Value);
+    }
+
+    [Fact]
+    public void WriteEachDateTimeAddSecondsWithScalarRight()
+    {
+        const string dtEntity = "dtEntity";
+        const string dtField = "dtField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeAddSeconds",
+              "left": {
+                "entity": "{{dtEntity}}",
+                "field": "{{dtField}}",
+                "type": {
+                  "name": "datetimeArray"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": 3600
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new DateTimeArrayReturning(
+                new EachDateTimeAddSeconds(
+                    new DateTimeArrayReturning(new DateTimeField(dtEntity, dtField)),
+                    new NumberReturning(new NumberScalar(3600))
+                )
+            ),
+            _options
+        );
         Assert.Equal(expected, output);
     }
 }

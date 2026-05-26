@@ -153,34 +153,66 @@ public sealed record FromExpressionConverterTests
     }
 
     [Fact]
-    public void ThrowsExceptionOnUndefinedAlias()
+    public void ReadWithNoAlias()
     {
-        const string expected = /*lang=json,strict*/
+        const string expectedEntity = "refjhniu";
+
+        const string input = /*lang=json,strict*/
             $$"""
             {
-              "entity": "refjhniu"
+              "entity": "{{expectedEntity}}"
             }
             """;
 
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<FromExpression>(expected, _options)
-        );
+        FromExpression value = JsonSerializer.Deserialize<FromExpression>(
+            input,
+            _options
+        )!;
+
+        Assert.Equal(new FromExpression(expectedEntity), value);
+        Assert.Null(value.Alias);
     }
 
     [Fact]
-    public void ThrowsExceptionOnNullAlias()
+    public void ReadWithNullAlias()
     {
-        const string expected = /*lang=json,strict*/
+        const string expectedEntity = "dfahnjib";
+
+        const string input = /*lang=json,strict*/
             $$"""
             {
-              "entity": "dfahnjib",
+              "entity": "{{expectedEntity}}",
               "alias": null
             }
             """;
 
-        _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<FromExpression>(expected, _options)
+        FromExpression value = JsonSerializer.Deserialize<FromExpression>(
+            input,
+            _options
+        )!;
+
+        Assert.Equal(new FromExpression(expectedEntity), value);
+        Assert.Null(value.Alias);
+    }
+
+    [Fact]
+    public void WriteWithNoAlias()
+    {
+        const string expectedEntity = "refjhniu";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}"
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new FromExpression(expectedEntity),
+            _options
         );
+
+        Assert.Equal(expected, output);
     }
 
     [Fact]

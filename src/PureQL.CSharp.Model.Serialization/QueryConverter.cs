@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneOf;
+using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Returnings;
 
@@ -16,7 +18,8 @@ internal sealed record QueryJsonModel
             query.GroupBy,
             query.Having,
             query.OrderBy,
-            query.Pagination
+            query.Pagination,
+            query.Distinct
         )
     { }
 
@@ -24,12 +27,13 @@ internal sealed record QueryJsonModel
     public QueryJsonModel(
         FromExpression from,
         IEnumerable<SelectExpression> select,
-        BooleanReturning? where,
+        OneOf<BooleanReturning, BooleanArrayReturning>? where,
         IEnumerable<Join>? join,
         IEnumerable<Field>? groupBy,
         BooleanReturning? having,
-        IEnumerable<Field>? orderBy,
-        Pagination? pagination
+        IEnumerable<OrderByItem>? orderBy,
+        Pagination? pagination,
+        bool distinct = false
     )
     {
         From = from ?? throw new JsonException();
@@ -40,6 +44,7 @@ internal sealed record QueryJsonModel
         Having = having;
         OrderBy = orderBy;
         Pagination = pagination;
+        Distinct = distinct;
     }
 
     public FromExpression From { get; }
@@ -47,7 +52,7 @@ internal sealed record QueryJsonModel
     public IEnumerable<SelectExpression> Select { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public BooleanReturning? Where { get; }
+    public OneOf<BooleanReturning, BooleanArrayReturning>? Where { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<Join>? Join { get; }
@@ -59,10 +64,13 @@ internal sealed record QueryJsonModel
     public BooleanReturning? Having { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IEnumerable<Field>? OrderBy { get; }
+    public IEnumerable<OrderByItem>? OrderBy { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Pagination? Pagination { get; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Distinct { get; }
 }
 
 internal sealed class QueryConverter : JsonConverter<Query>
@@ -86,7 +94,8 @@ internal sealed class QueryConverter : JsonConverter<Query>
             model.GroupBy,
             model.Having,
             model.OrderBy,
-            model.Pagination
+            model.Pagination,
+            model.Distinct
         );
     }
 

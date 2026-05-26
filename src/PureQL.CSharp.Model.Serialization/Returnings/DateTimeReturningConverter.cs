@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.DateTime;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -25,6 +26,12 @@ internal sealed class DateTimeReturningConverter : JsonConverter<DateTimeReturni
                 ? new DateTimeReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out IDateTimeScalar? scalar)
                 ? new DateTimeReturning(new DateTimeScalar(scalar!.Value))
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out DateTimeAggregate? aggregate
+            )
+                ? new DateTimeReturning(aggregate!)
             : throw new JsonException("Unable to determine DateTimeReturning type.");
     }
 
@@ -41,6 +48,10 @@ internal sealed class DateTimeReturningConverter : JsonConverter<DateTimeReturni
         else if (value.IsT1)
         {
             JsonSerializer.Serialize<IDateTimeScalar>(writer, value.AsT1, options);
+        }
+        else if (value.IsT2)
+        {
+            JsonSerializer.Serialize(writer, value.AsT2, options);
         }
         else
         {

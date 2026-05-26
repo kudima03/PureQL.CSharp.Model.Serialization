@@ -193,7 +193,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(
             new NumberField(expectedEntity, expectedField),
-            JsonSerializer.Deserialize<Field>(input, _options)!.AsT3
+            JsonSerializer.Deserialize<Field>(input, _options)!.AsT4
         );
     }
 
@@ -243,7 +243,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(
             new TimeField(expectedEntity, expectedField),
-            JsonSerializer.Deserialize<Field>(input, _options)!.AsT4
+            JsonSerializer.Deserialize<Field>(input, _options)!.AsT5
         );
     }
 
@@ -293,7 +293,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(
             new UuidField(expectedEntity, expectedField),
-            JsonSerializer.Deserialize<Field>(input, _options)!.AsT5
+            JsonSerializer.Deserialize<Field>(input, _options)!.AsT6
         );
     }
 
@@ -343,7 +343,7 @@ public sealed record FieldConverterTests
 
         Assert.Equal(
             new StringField(expectedEntity, expectedField),
-            JsonSerializer.Deserialize<Field>(input, _options)!.AsT6
+            JsonSerializer.Deserialize<Field>(input, _options)!.AsT7
         );
     }
 

@@ -3,7 +3,10 @@ using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.ArrayParameters;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.ArrayScalars;
+using PureQL.CSharp.Model.EachTimeArithmetics;
 using PureQL.CSharp.Model.Fields;
+using PureQL.CSharp.Model.Returnings;
+using PureQL.CSharp.Model.Scalars;
 
 namespace PureQL.CSharp.Model.Serialization.Tests.ArrayReturnings;
 
@@ -184,6 +187,152 @@ public sealed record TimeArrayReturningConverterTests
             _options
         );
 
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachTimeAddSeconds()
+    {
+        const string timeEntity = "timeEntity";
+        const string timeField = "timeField";
+        const string numEntity = "numEntity";
+        const string numField = "numField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeAddSeconds",
+              "left": {
+                "entity": "{{timeEntity}}",
+                "field": "{{timeField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              },
+              "right": {
+                "entity": "{{numEntity}}",
+                "field": "{{numField}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        EachTimeAddSeconds addSeconds = JsonSerializer
+            .Deserialize<TimeArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.Equal(new TimeField(timeEntity, timeField), addSeconds.Left.AsT1.AsT1);
+    }
+
+    [Fact]
+    public void WriteEachTimeAddSeconds()
+    {
+        const string timeEntity = "timeEntity";
+        const string timeField = "timeField";
+        const string numEntity = "numEntity";
+        const string numField = "numField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeAddSeconds",
+              "left": {
+                "entity": "{{timeEntity}}",
+                "field": "{{timeField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              },
+              "right": {
+                "entity": "{{numEntity}}",
+                "field": "{{numField}}",
+                "type": {
+                  "name": "numberArray"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new TimeArrayReturning(
+                new EachTimeAddSeconds(
+                    new TimeArrayReturning(new TimeField(timeEntity, timeField)),
+                    new NumberArrayReturning(new NumberField(numEntity, numField))
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadEachTimeAddSecondsWithScalarRight()
+    {
+        const string timeEntity = "timeEntity";
+        const string timeField = "timeField";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeAddSeconds",
+              "left": {
+                "entity": "{{timeEntity}}",
+                "field": "{{timeField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": 60
+              }
+            }
+            """;
+
+        EachTimeAddSeconds addSeconds = JsonSerializer
+            .Deserialize<TimeArrayReturning>(input, _options)!
+            .AsT3;
+        Assert.Equal(60, addSeconds.Right.AsT0.AsT1.Value);
+    }
+
+    [Fact]
+    public void WriteEachTimeAddSecondsWithScalarRight()
+    {
+        const string timeEntity = "timeEntity";
+        const string timeField = "timeField";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeAddSeconds",
+              "left": {
+                "entity": "{{timeEntity}}",
+                "field": "{{timeField}}",
+                "type": {
+                  "name": "timeArray"
+                }
+              },
+              "right": {
+                "type": {
+                  "name": "number"
+                },
+                "value": 60
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new TimeArrayReturning(
+                new EachTimeAddSeconds(
+                    new TimeArrayReturning(new TimeField(timeEntity, timeField)),
+                    new NumberReturning(new NumberScalar(60))
+                )
+            ),
+            _options
+        );
         Assert.Equal(expected, output);
     }
 }

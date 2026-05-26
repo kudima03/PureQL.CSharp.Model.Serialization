@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.Time;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
@@ -21,6 +22,12 @@ internal sealed class TimeReturningConverter : JsonConverter<TimeReturning>
                 ? new TimeReturning(parameter!)
             : JsonExtensions.TryDeserialize(root, options, out ITimeScalar? scalar)
                 ? new TimeReturning(new TimeScalar(scalar!.Value))
+            : JsonExtensions.TryDeserialize(
+                root,
+                options,
+                out TimeAggregate? aggregate
+            )
+                ? new TimeReturning(aggregate!)
             : throw new JsonException("Unable to determine TimeReturning type.");
     }
 
@@ -37,6 +44,10 @@ internal sealed class TimeReturningConverter : JsonConverter<TimeReturning>
         else if (value.TryPickT1(out TimeScalar? scalar, out _))
         {
             JsonSerializer.Serialize<ITimeScalar>(writer, scalar, options);
+        }
+        else if (value.TryPickT2(out TimeAggregate? aggregate, out _))
+        {
+            JsonSerializer.Serialize(writer, aggregate, options);
         }
         else
         {
