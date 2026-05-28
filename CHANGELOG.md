@@ -7,7 +7,15 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
-## [Unreleased] — spec 0.1.0-preview.0.5.0
+## [Unreleased]
+
+### Changed
+
+- README updated.
+
+---
+
+## [0.1.0-preview.2.0.0]
 
 Migrates serialization support to `PureQL.CSharp.Model 0.1.0-preview.11.0.0`
 (spec `0.1.0-preview.0.2.0` through `0.1.0-preview.0.5.0`).
