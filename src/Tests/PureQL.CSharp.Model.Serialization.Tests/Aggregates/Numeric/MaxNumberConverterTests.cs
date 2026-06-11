@@ -41,7 +41,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -66,7 +66,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -91,7 +91,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -373,7 +373,7 @@ public sealed record MaxNumberConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -394,6 +394,7 @@ public sealed record MaxNumberConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("numberArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -440,7 +441,7 @@ public sealed record MaxNumberConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }

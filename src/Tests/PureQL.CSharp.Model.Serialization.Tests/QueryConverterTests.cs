@@ -43,7 +43,7 @@ public sealed record QueryConverterTests
                   "entity": "{{expectedAlias}}",
                   "field": "{{expectedField}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
               ]
@@ -88,7 +88,7 @@ public sealed record QueryConverterTests
                   "entity": "{{expectedAlias}}",
                   "field": "{{expectedField}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
               ]
@@ -134,14 +134,14 @@ public sealed record QueryConverterTests
                   "entity": "{{expectedAlias}}",
                   "field": "{{expectedField1}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 },
                 {
                   "entity": "{{expectedAlias}}",
                   "field": "{{expectedField2}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
               ]
@@ -196,14 +196,14 @@ public sealed record QueryConverterTests
                   "entity": "{{expectedAlias}}",
                   "field": "{{expectedField1}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 },
                 {
                   "entity": "{{expectedAlias}}",
                   "field": "{{expectedField2}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
               ]

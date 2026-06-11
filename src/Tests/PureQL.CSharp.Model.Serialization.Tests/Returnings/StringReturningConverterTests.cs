@@ -189,7 +189,7 @@ public sealed record StringReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               }
             }
@@ -218,7 +218,7 @@ public sealed record StringReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               }
             }

@@ -32,7 +32,7 @@ public sealed record BooleanFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record BooleanFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record BooleanFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "booleanArray"
+                    "name": "boolean"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record BooleanFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record BooleanFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               }
             }
             """;
@@ -142,6 +142,7 @@ public sealed record BooleanFieldConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("booleanArray")]
     [InlineData("")]
     public void ThrowsExceptionOnWrongType(string type)
     {

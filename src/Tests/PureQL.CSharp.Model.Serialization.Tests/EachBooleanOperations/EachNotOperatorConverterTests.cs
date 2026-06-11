@@ -188,7 +188,7 @@ public sealed record EachNotOperatorConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               }
             }
@@ -218,7 +218,7 @@ public sealed record EachNotOperatorConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               }
             }

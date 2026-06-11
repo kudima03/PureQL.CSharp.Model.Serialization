@@ -37,7 +37,7 @@ public sealed record CountConverterTests
                 "entity": "entityName",
                 "field": "fieldName",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -59,7 +59,7 @@ public sealed record CountConverterTests
                 "entity": "entityName",
                 "field": "fieldName",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -81,7 +81,7 @@ public sealed record CountConverterTests
                 "entity": "entityName",
                 "field": "fieldName",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -137,7 +137,7 @@ public sealed record CountConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -164,7 +164,7 @@ public sealed record CountConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -301,7 +301,7 @@ public sealed record CountConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               }
             }

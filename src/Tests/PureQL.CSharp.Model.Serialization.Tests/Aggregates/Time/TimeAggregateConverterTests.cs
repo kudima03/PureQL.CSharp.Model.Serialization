@@ -40,7 +40,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -377,7 +377,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -398,6 +398,7 @@ public sealed record TimeAggregateConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("timeArray")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -443,7 +444,7 @@ public sealed record TimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -475,7 +476,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -500,7 +501,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -525,7 +526,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -811,7 +812,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -832,6 +833,7 @@ public sealed record TimeAggregateConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("timeArray")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -878,7 +880,7 @@ public sealed record TimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -910,7 +912,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -935,7 +937,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -960,7 +962,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -1246,7 +1248,7 @@ public sealed record TimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -1267,6 +1269,7 @@ public sealed record TimeAggregateConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("timeArray")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -1313,7 +1316,7 @@ public sealed record TimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }

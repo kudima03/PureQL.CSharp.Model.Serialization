@@ -38,7 +38,7 @@ public sealed record TimeArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "timeArray"
+                "name": "time"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -68,7 +68,7 @@ public sealed record TimeArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "timeArray"
+                "name": "time"
               }
             }
             """;
@@ -206,14 +206,14 @@ public sealed record TimeArrayReturningConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -241,14 +241,14 @@ public sealed record TimeArrayReturningConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -280,7 +280,7 @@ public sealed record TimeArrayReturningConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -312,7 +312,7 @@ public sealed record TimeArrayReturningConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {

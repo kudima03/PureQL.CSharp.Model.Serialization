@@ -43,7 +43,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -79,7 +79,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               }
             }
             """;
@@ -210,13 +210,13 @@ public sealed record SelectExpressionConverterTests
     }
 
     [Theory]
-    [InlineData("booleanArray")]
-    [InlineData("datetimeArray")]
-    [InlineData("dateArray")]
-    [InlineData("numberArray")]
-    [InlineData("stringArray")]
-    [InlineData("timeArray")]
-    [InlineData("uuidArray")]
+    [InlineData("boolean")]
+    [InlineData("datetime")]
+    [InlineData("date")]
+    [InlineData("number")]
+    [InlineData("string")]
+    [InlineData("time")]
+    [InlineData("uuid")]
     public void ReadAlias(string typeName)
     {
         const string expectedEntity = "sadiJUNFH";
@@ -254,7 +254,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               },
               "alias": "{{expectedAlias}}"
             }
@@ -308,7 +308,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "dateArray"
+                "name": "date"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -342,7 +342,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "dateArray"
+                "name": "date"
               }
             }
             """;
@@ -474,7 +474,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "datetimeArray"
+                "name": "datetime"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -510,7 +510,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "datetimeArray"
+                "name": "datetime"
               }
             }
             """;
@@ -647,7 +647,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "numberArray"
+                "name": "number"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -683,7 +683,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "numberArray"
+                "name": "number"
               }
             }
             """;
@@ -820,7 +820,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "stringArray"
+                "name": "string"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -856,7 +856,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "stringArray"
+                "name": "string"
               }
             }
             """;
@@ -991,7 +991,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "timeArray"
+                "name": "time"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -1025,7 +1025,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "timeArray"
+                "name": "time"
               }
             }
             """;
@@ -1162,7 +1162,7 @@ public sealed record SelectExpressionConverterTests
             $$"""
             {
               "type": {
-                "name": "uuidArray"
+                "name": "uuid"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -1196,7 +1196,7 @@ public sealed record SelectExpressionConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "uuidArray"
+                "name": "uuid"
               }
             }
             """;

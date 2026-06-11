@@ -41,7 +41,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               },
               "right": {
@@ -73,7 +73,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               },
               "right": {
@@ -113,7 +113,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
@@ -145,7 +145,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
@@ -185,7 +185,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               },
               "right": {
@@ -217,7 +217,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               },
               "right": {
@@ -259,7 +259,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
@@ -293,7 +293,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
@@ -335,7 +335,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -369,7 +369,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -411,7 +411,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
@@ -445,7 +445,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
@@ -487,7 +487,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "uuidArray"
+                  "name": "uuid"
                 }
               },
               "right": {
@@ -521,7 +521,7 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
                 "type": {
-                  "name": "uuidArray"
+                  "name": "uuid"
                 }
               },
               "right": {
@@ -573,14 +573,14 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -608,14 +608,14 @@ public sealed record EachEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }

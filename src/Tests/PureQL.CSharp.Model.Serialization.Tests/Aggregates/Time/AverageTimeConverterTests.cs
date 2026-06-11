@@ -40,7 +40,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -375,7 +375,7 @@ public sealed record AverageTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -395,6 +395,7 @@ public sealed record AverageTimeConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("timeArray")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -440,7 +441,7 @@ public sealed record AverageTimeConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }

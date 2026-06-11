@@ -120,14 +120,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -162,14 +162,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               }
             }
@@ -350,14 +350,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -392,14 +392,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }
@@ -605,14 +605,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -647,14 +647,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -876,14 +876,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -918,14 +918,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -1111,14 +1111,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -1153,14 +1153,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               }
             }
@@ -1350,14 +1350,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -1392,14 +1392,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -1605,14 +1605,14 @@ public sealed record ArrayEqualityConverterTests
               "operator": "equal",
               "left": {
                 "type": {
-                  "name": "uuidArray"
+                  "name": "uuid"
                 },
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}"
               },
               "right": {
                 "type": {
-                  "name": "uuidArray"
+                  "name": "uuid"
                 },
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}"
@@ -1647,14 +1647,14 @@ public sealed record ArrayEqualityConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "uuidArray"
+                  "name": "uuid"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "uuidArray"
+                  "name": "uuid"
                 }
               }
             }

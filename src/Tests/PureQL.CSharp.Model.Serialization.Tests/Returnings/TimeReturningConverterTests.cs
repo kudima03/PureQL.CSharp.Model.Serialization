@@ -195,7 +195,7 @@ public sealed record TimeReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -224,7 +224,7 @@ public sealed record TimeReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }

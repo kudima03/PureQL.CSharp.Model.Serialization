@@ -37,7 +37,7 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
@@ -65,7 +65,7 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
@@ -98,14 +98,14 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{dtEntity}}",
                 "field": "{{dtField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -135,14 +135,14 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{dtEntity}}",
                 "field": "{{dtField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -172,7 +172,7 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{dtEntity}}",
                 "field": "{{dtField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
@@ -206,7 +206,7 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{dtEntity}}",
                 "field": "{{dtField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
@@ -238,14 +238,14 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "e2",
                 "field": "f2",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -267,14 +267,14 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "e2",
                 "field": "f2",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -301,14 +301,14 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -338,14 +338,14 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -383,7 +383,7 @@ public sealed record EachDateTimeArithmeticConverterTests
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }

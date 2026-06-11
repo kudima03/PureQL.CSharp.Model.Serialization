@@ -35,7 +35,7 @@ public sealed record NullFieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "nullArray"
+                "name": "null"
               }
             }
             """;
@@ -56,7 +56,7 @@ public sealed record NullFieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "nullArray"
+                "name": "null"
               }
             }
             """;
@@ -80,7 +80,7 @@ public sealed record NullFieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "nullArray"
+                "name": "null"
               }
             }
             """;
@@ -101,7 +101,7 @@ public sealed record NullFieldConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "nullArray"
+                "name": "null"
               }
             }
             """;
