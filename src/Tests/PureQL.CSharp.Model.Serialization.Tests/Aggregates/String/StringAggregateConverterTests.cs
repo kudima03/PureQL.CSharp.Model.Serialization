@@ -40,7 +40,7 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
             }
@@ -331,7 +331,7 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
             }
@@ -355,6 +355,7 @@ public sealed record StringAggregateConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("stringArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -401,7 +402,7 @@ public sealed record StringAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               }
             }
@@ -433,7 +434,7 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
             }
@@ -652,7 +653,7 @@ public sealed record StringAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
             }
@@ -676,6 +677,7 @@ public sealed record StringAggregateConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("stringArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -722,7 +724,7 @@ public sealed record StringAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               }
             }

@@ -99,14 +99,14 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -136,14 +136,14 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -173,7 +173,7 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
@@ -207,7 +207,7 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
@@ -239,14 +239,14 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "e2",
                 "field": "f2",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }
@@ -268,14 +268,14 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "e2",
                 "field": "f2",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }
@@ -302,14 +302,14 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }
@@ -339,14 +339,14 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }
@@ -384,7 +384,7 @@ public sealed record EachDateArithmeticConverterTests
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }

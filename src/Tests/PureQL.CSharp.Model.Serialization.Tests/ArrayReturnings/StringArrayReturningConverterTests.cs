@@ -35,7 +35,7 @@ public sealed record StringArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "stringArray"
+                "name": "string"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -65,7 +65,7 @@ public sealed record StringArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "stringArray"
+                "name": "string"
               }
             }
             """;

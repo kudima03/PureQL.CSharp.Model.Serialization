@@ -40,7 +40,7 @@ public sealed record BooleanArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -70,7 +70,7 @@ public sealed record BooleanArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "booleanArray"
+                "name": "boolean"
               }
             }
             """;
@@ -187,7 +187,7 @@ public sealed record BooleanArrayReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
@@ -222,7 +222,7 @@ public sealed record BooleanArrayReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "right": {
@@ -263,7 +263,7 @@ public sealed record BooleanArrayReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               },
               "right": {
@@ -298,7 +298,7 @@ public sealed record BooleanArrayReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "booleanArray"
+                  "name": "boolean"
                 }
               },
               "right": {

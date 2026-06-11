@@ -41,7 +41,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -285,7 +285,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -309,6 +309,7 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("numberArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -355,7 +356,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -388,7 +389,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -679,7 +680,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -703,6 +704,7 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("numberArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -749,7 +751,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -991,7 +993,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -1015,6 +1017,7 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("numberArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -1061,7 +1064,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -1304,7 +1307,7 @@ public sealed record NumberAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 }
             }
@@ -1325,6 +1328,7 @@ public sealed record NumberAggregateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("numberArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -1371,7 +1375,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -1402,7 +1406,7 @@ public sealed record NumberAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }

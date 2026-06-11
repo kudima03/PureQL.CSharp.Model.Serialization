@@ -229,7 +229,7 @@ public sealed record NumberReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -258,7 +258,7 @@ public sealed record NumberReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -289,7 +289,7 @@ public sealed record NumberReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -318,7 +318,7 @@ public sealed record NumberReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }

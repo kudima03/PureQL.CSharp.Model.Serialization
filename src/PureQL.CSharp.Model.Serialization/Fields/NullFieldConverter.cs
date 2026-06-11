@@ -1,17 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PureQL.CSharp.Model.ArrayTypes;
 using PureQL.CSharp.Model.Fields;
+using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Fields;
 
 internal sealed record NullFieldJsonModel
 {
     public NullFieldJsonModel(NullField field)
-        : this(field.Entity, field.Field, new NullArrayType()) { }
+        : this(field.Entity, field.Field, new NullType()) { }
 
     [JsonConstructor]
-    public NullFieldJsonModel(string entity, string field, NullArrayType type)
+    public NullFieldJsonModel(string entity, string field, NullType type)
     {
         Entity = entity ?? throw new JsonException();
         Field = field ?? throw new JsonException();
@@ -22,7 +22,7 @@ internal sealed record NullFieldJsonModel
 
     public string Field { get; }
 
-    public NullArrayType Type { get; }
+    public NullType Type { get; }
 }
 
 internal sealed class NullFieldConverter : JsonConverter<NullField>

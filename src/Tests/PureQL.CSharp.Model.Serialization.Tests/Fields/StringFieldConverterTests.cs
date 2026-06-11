@@ -32,7 +32,7 @@ public sealed record StringFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "stringArray"
+                "name": "string"
               },
               "entity": "{{expected}}",
               "field": "test"
@@ -53,7 +53,7 @@ public sealed record StringFieldConverterTests
             $$"""
             {
               "type": {
-                "name": "stringArray"
+                "name": "string"
               },
               "entity": "test",
               "field": "{{expected}}"
@@ -75,7 +75,7 @@ public sealed record StringFieldConverterTests
                   "entity": "auiheyrdsnf",
                   "field": "jinaudferv",
                   "type": {
-                    "name": "stringArray"
+                    "name": "string"
                   }
                 }
                 """;
@@ -96,7 +96,7 @@ public sealed record StringFieldConverterTests
             {
               "field": "jinaudferv",
               "type": {
-                "name": "stringArray"
+                "name": "string"
               }
             }
             """;
@@ -113,7 +113,7 @@ public sealed record StringFieldConverterTests
             {
               "entity": "auiheyrdsnf",
               "type": {
-                "name": "stringArray"
+                "name": "string"
               }
             }
             """;
@@ -142,6 +142,7 @@ public sealed record StringFieldConverterTests
     [InlineData("number")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("stringArray")]
     [InlineData("dateArray")]
     [InlineData("booleanArray")]
     [InlineData("nullArray")]

@@ -38,7 +38,7 @@ public sealed record DateArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "dateArray"
+                "name": "date"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -68,7 +68,7 @@ public sealed record DateArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "dateArray"
+                "name": "date"
               }
             }
             """;
@@ -208,14 +208,14 @@ public sealed record DateArrayReturningConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -243,14 +243,14 @@ public sealed record DateArrayReturningConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -282,7 +282,7 @@ public sealed record DateArrayReturningConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {
@@ -314,7 +314,7 @@ public sealed record DateArrayReturningConverterTests
                 "entity": "{{dateEntity}}",
                 "field": "{{dateField}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               },
               "right": {

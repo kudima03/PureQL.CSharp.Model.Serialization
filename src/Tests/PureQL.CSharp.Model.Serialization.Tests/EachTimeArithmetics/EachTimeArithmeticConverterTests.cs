@@ -37,7 +37,7 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -65,7 +65,7 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -98,14 +98,14 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -135,14 +135,14 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{numEntity}}",
                 "field": "{{numField}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -172,7 +172,7 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -206,7 +206,7 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{timeEntity}}",
                 "field": "{{timeField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
@@ -238,14 +238,14 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "e2",
                 "field": "f2",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -267,14 +267,14 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "e1",
                 "field": "f1",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "e2",
                 "field": "f2",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -301,14 +301,14 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -338,14 +338,14 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{leftEntity}}",
                 "field": "{{leftField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               },
               "right": {
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }
@@ -383,7 +383,7 @@ public sealed record EachTimeArithmeticConverterTests
                 "entity": "{{rightEntity}}",
                 "field": "{{rightField}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }

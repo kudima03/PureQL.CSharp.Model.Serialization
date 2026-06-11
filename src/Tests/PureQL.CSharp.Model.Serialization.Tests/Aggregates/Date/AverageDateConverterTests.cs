@@ -40,7 +40,7 @@ public sealed record AverageDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "dateArray"
+                    "name": "date"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record AverageDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "dateArray"
+                    "name": "date"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record AverageDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "dateArray"
+                    "name": "date"
                   }
                 }
             }
@@ -376,7 +376,7 @@ public sealed record AverageDateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "dateArray"
+                    "name": "date"
                   }
                 }
             }
@@ -396,6 +396,7 @@ public sealed record AverageDateConverterTests
     [InlineData("string")]
     [InlineData("time")]
     [InlineData("uuid")]
+    [InlineData("dateArray")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -442,7 +443,7 @@ public sealed record AverageDateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "dateArray"
+                  "name": "date"
                 }
               }
             }

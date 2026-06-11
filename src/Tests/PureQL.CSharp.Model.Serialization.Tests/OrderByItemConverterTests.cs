@@ -36,7 +36,7 @@ public sealed record OrderByItemConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "direction": "asc"
@@ -61,7 +61,7 @@ public sealed record OrderByItemConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "direction": "desc"
@@ -86,7 +86,7 @@ public sealed record OrderByItemConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -109,7 +109,7 @@ public sealed record OrderByItemConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               }
             }
@@ -138,7 +138,7 @@ public sealed record OrderByItemConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "numberArray"
+                  "name": "number"
                 }
               },
               "direction": "desc"
@@ -193,7 +193,7 @@ public sealed record OrderByItemConverterTests
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "stringArray"
+                  "name": "string"
                 }
               }
             }

@@ -216,7 +216,7 @@ public sealed record DateTimeReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -245,7 +245,7 @@ public sealed record DateTimeReturningConverterTests
                 "entity": "{{entity}}",
                 "field": "{{field}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }

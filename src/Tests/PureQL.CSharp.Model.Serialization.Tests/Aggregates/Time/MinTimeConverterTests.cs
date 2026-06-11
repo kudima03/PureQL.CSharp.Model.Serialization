@@ -40,7 +40,7 @@ public sealed record MinTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record MinTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record MinTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -376,7 +376,7 @@ public sealed record MinTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "timeArray"
+                    "name": "time"
                   }
                 }
             }
@@ -396,6 +396,7 @@ public sealed record MinTimeConverterTests
     [InlineData("string")]
     [InlineData("date")]
     [InlineData("uuid")]
+    [InlineData("timeArray")]
     [InlineData("booleanArray")]
     [InlineData("datetimeArray")]
     [InlineData("nullArray")]
@@ -442,7 +443,7 @@ public sealed record MinTimeConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "timeArray"
+                  "name": "time"
                 }
               }
             }

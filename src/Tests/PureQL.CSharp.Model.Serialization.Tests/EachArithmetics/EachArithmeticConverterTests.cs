@@ -289,7 +289,7 @@ public sealed record EachArithmeticConverterTests
                   "entity": "{{entity}}",
                   "field": "{{field}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 },
                 {
@@ -323,7 +323,7 @@ public sealed record EachArithmeticConverterTests
                   "entity": "{{entity}}",
                   "field": "{{field}}",
                   "type": {
-                    "name": "numberArray"
+                    "name": "number"
                   }
                 },
                 {

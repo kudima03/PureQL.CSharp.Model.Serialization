@@ -40,7 +40,7 @@ public sealed record DateTimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record DateTimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record DateTimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -391,7 +391,7 @@ public sealed record DateTimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -414,8 +414,8 @@ public sealed record DateTimeAggregateConverterTests
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
-    [InlineData("datetime")]
     [InlineData("uuid")]
+    [InlineData("datetimeArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -462,7 +462,7 @@ public sealed record DateTimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -724,7 +724,7 @@ public sealed record DateTimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -747,8 +747,8 @@ public sealed record DateTimeAggregateConverterTests
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
-    [InlineData("datetime")]
     [InlineData("uuid")]
+    [InlineData("datetimeArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -795,7 +795,7 @@ public sealed record DateTimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }
@@ -1057,7 +1057,7 @@ public sealed record DateTimeAggregateConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -1080,8 +1080,8 @@ public sealed record DateTimeAggregateConverterTests
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
-    [InlineData("datetime")]
     [InlineData("uuid")]
+    [InlineData("datetimeArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -1128,7 +1128,7 @@ public sealed record DateTimeAggregateConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }

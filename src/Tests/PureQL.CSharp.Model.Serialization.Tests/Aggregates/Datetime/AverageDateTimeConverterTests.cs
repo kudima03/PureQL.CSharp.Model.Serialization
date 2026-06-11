@@ -40,7 +40,7 @@ public sealed record AverageDateTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -65,7 +65,7 @@ public sealed record AverageDateTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -90,7 +90,7 @@ public sealed record AverageDateTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -382,7 +382,7 @@ public sealed record AverageDateTimeConverterTests
                   "entity": "{{expectedEntityName}}",
                   "field": "{{expectedFieldName}}",
                   "type": {
-                    "name": "datetimeArray"
+                    "name": "datetime"
                   }
                 }
             }
@@ -401,8 +401,8 @@ public sealed record AverageDateTimeConverterTests
     [InlineData("number")]
     [InlineData("string")]
     [InlineData("time")]
-    [InlineData("datetime")]
     [InlineData("uuid")]
+    [InlineData("datetimeArray")]
     [InlineData("booleanArray")]
     [InlineData("dateArray")]
     [InlineData("nullArray")]
@@ -449,7 +449,7 @@ public sealed record AverageDateTimeConverterTests
                 "entity": "{{expectedEntityName}}",
                 "field": "{{expectedFieldName}}",
                 "type": {
-                  "name": "datetimeArray"
+                  "name": "datetime"
                 }
               }
             }

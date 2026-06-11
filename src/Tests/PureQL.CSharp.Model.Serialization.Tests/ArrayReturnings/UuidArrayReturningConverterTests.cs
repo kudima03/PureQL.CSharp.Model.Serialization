@@ -35,7 +35,7 @@ public sealed record UuidArrayReturningConverterTests
             $$"""
             {
               "type": {
-                "name": "uuidArray"
+                "name": "uuid"
               },
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}"
@@ -65,7 +65,7 @@ public sealed record UuidArrayReturningConverterTests
               "entity": "{{expectedEntity}}",
               "field": "{{expectedField}}",
               "type": {
-                "name": "uuidArray"
+                "name": "uuid"
               }
             }
             """;
