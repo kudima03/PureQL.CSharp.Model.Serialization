@@ -9,9 +9,20 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ## [Unreleased]
 
-### Changed
+---
 
-- README updated.
+## [0.1.0-preview.2.0.1]
+
+Migrates serialization support to `PureQL.CSharp.Model 0.1.0-preview.11.0.1`.
+
+### Fixed
+
+- **`*FieldConverter`** — all eight field converters now serialize the `type`
+  field using the scalar type name (`"number"`, `"string"`, `"boolean"`,
+  `"null"`, `"date"`, `"time"`, `"datetime"`, `"uuid"`) as required by the
+  PureQL specification, instead of the array type name (`"numberArray"` etc.).
+  This corrects spec-invalid JSON emitted by the previous release and fixes
+  rejection of spec-valid JSON during deserialization.
 
 ---
 
