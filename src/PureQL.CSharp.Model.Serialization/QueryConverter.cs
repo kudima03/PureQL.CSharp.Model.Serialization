@@ -28,7 +28,7 @@ internal sealed record QueryJsonModel
         FromExpression from,
         IEnumerable<SelectExpression> select,
         OneOf<BooleanReturning, BooleanArrayReturning>? where,
-        IEnumerable<Join>? join,
+        IEnumerable<Join>? joins,
         IEnumerable<Field>? groupBy,
         BooleanReturning? having,
         IEnumerable<OrderByItem>? orderBy,
@@ -39,7 +39,7 @@ internal sealed record QueryJsonModel
         From = from ?? throw new JsonException();
         Select = select ?? throw new JsonException();
         Where = where;
-        Join = join;
+        Joins = joins;
         GroupBy = groupBy;
         Having = having;
         OrderBy = orderBy;
@@ -55,7 +55,7 @@ internal sealed record QueryJsonModel
     public OneOf<BooleanReturning, BooleanArrayReturning>? Where { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IEnumerable<Join>? Join { get; }
+    public IEnumerable<Join>? Joins { get; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IEnumerable<Field>? GroupBy { get; }
@@ -90,7 +90,7 @@ internal sealed class QueryConverter : JsonConverter<Query>
             model.From,
             model.Select,
             model.Where,
-            model.Join,
+            model.Joins,
             model.GroupBy,
             model.Having,
             model.OrderBy,
