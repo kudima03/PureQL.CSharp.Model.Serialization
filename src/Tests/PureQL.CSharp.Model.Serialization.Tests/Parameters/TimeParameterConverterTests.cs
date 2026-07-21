@@ -118,4 +118,19 @@ public sealed record TimeParameterConverterTests
             JsonSerializer.Deserialize<TimeParameter>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+                        {
+              "name": "{{expected}}"
+            }
+            
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<TimeParameter>(input, _options)
+        );
+    }
 }
