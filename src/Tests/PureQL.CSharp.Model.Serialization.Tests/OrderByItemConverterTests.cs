@@ -45,7 +45,10 @@ public sealed record OrderByItemConverterTests
 
         OrderByItem value = JsonSerializer.Deserialize<OrderByItem>(input, _options)!;
         Assert.Equal(SortDirection.Asc, value.Direction);
-        Assert.Equal(new NumberField(expectedEntity, expectedFieldName), value.Field.AsT4);
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedFieldName),
+            value.Field.AsT4
+        );
     }
 
     [Fact]
@@ -70,7 +73,10 @@ public sealed record OrderByItemConverterTests
 
         OrderByItem value = JsonSerializer.Deserialize<OrderByItem>(input, _options)!;
         Assert.Equal(SortDirection.Desc, value.Direction);
-        Assert.Equal(new NumberField(expectedEntity, expectedFieldName), value.Field.AsT4);
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedFieldName),
+            value.Field.AsT4
+        );
     }
 
     [Fact]
@@ -200,6 +206,50 @@ public sealed record OrderByItemConverterTests
             """;
 
         OrderByItem value = JsonSerializer.Deserialize<OrderByItem>(input, _options)!;
-        Assert.Equal(new StringField(expectedEntity, expectedFieldName), value.Field.AsT7);
+        Assert.Equal(
+            new StringField(expectedEntity, expectedFieldName),
+            value.Field.AsT7
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullField()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "field": null,
+              "direction": "asc"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<OrderByItem>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnInvalidDirection()
+    {
+        const string expectedEntity = "entityName";
+        const string expectedFieldName = "fieldName";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "field": {
+                "entity": "{{expectedEntity}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              },
+              "direction": "sideways"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<OrderByItem>(input, _options)
+        );
     }
 }

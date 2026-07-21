@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.Aggregates.Numeric;
+using PureQL.CSharp.Model.Arithmetics;
 using PureQL.CSharp.Model.ArrayReturnings;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Parameters;
@@ -1318,5 +1320,171 @@ public sealed record SelectExpressionConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<SelectExpression>(input, _options)
         );
+    }
+
+    // A scalar-returning expression (aggregate or arithmetic) reaches
+    // SelectExpression via its T0 (SingleValueReturning) branch, unlike every
+    // test above which goes through T1 (ArrayReturning, row-wise field
+    // select). This was previously exercised only once, incidentally, deep
+    // inside QueryConverterTests' "kitchen sink" query - never directly
+    // against SelectExpression itself.
+    [Fact]
+    public void ReadNumberAggregateSelect()
+    {
+        const string expectedEntity = "uheayfodrbniJ";
+        const string expectedField = "ubhjedwasuyhgbefrda";
+        const string expectedAlias = "total";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "entity": "{{expectedEntity}}",
+                "field": "{{expectedField}}",
+                "type": {
+                  "name": "number"
+                }
+              },
+              "alias": "{{expectedAlias}}"
+            }
+            """;
+
+        SelectExpression value = JsonSerializer.Deserialize<SelectExpression>(
+            input,
+            _options
+        )!;
+
+        Assert.Equal(expectedAlias, value.Alias);
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedField),
+            value.AsT0.AsT3.AsT3.AsT3.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteNumberAggregateSelect()
+    {
+        const string expectedEntity = "uheayfodrbniJ";
+        const string expectedField = "ubhjedwasuyhgbefrda";
+        const string expectedAlias = "total";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "entity": "{{expectedEntity}}",
+                "field": "{{expectedField}}",
+                "type": {
+                  "name": "number"
+                }
+              },
+              "alias": "{{expectedAlias}}"
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new SelectExpression(
+                new SingleValueReturning(
+                    new NumberReturning(
+                        new NumberAggregate(
+                            new SumNumber(
+                                new NumberArrayReturning(
+                                    new NumberField(expectedEntity, expectedField)
+                                )
+                            )
+                        )
+                    )
+                ),
+                expectedAlias
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ReadArithmeticSelect()
+    {
+        const string expectedAlias = "total";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "add",
+              "arguments": [
+                {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 1
+                },
+                {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 2
+                }
+              ],
+              "alias": "{{expectedAlias}}"
+            }
+            """;
+
+        SelectExpression value = JsonSerializer.Deserialize<SelectExpression>(
+            input,
+            _options
+        )!;
+
+        Assert.Equal(expectedAlias, value.Alias);
+        Assert.Equal(2, value.AsT0.AsT3.AsT2.AsT0.Arguments.Count());
+    }
+
+    [Fact]
+    public void WriteArithmeticSelect()
+    {
+        const string expectedAlias = "total";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "add",
+              "arguments": [
+                {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 1
+                },
+                {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 2
+                }
+              ],
+              "alias": "{{expectedAlias}}"
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new SelectExpression(
+                new SingleValueReturning(
+                    new NumberReturning(
+                        new Arithmetic(
+                            new Add([
+                                new NumberReturning(new NumberScalar(1)),
+                                new NumberReturning(new NumberScalar(2)),
+                            ])
+                        )
+                    )
+                ),
+                expectedAlias
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
     }
 }
