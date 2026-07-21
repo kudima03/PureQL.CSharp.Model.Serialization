@@ -821,4 +821,686 @@ public sealed record QueryConverterTests
 
         Assert.Equal(expected, output);
     }
+
+    /// <summary>
+    /// Query.GroupBy had no round-trip coverage through Query at all before this -
+    /// only the underlying Field converters were tested in isolation.
+    /// </summary>
+    [Fact]
+    public void ReadGroupByCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "groupBy": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.NotNull(query.GroupBy);
+        Assert.Equal(
+            new StringField(expectedEntity, expectedField),
+            query.GroupBy!.Single().AsT7
+        );
+    }
+
+    [Fact]
+    public void WriteGroupByCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "groupBy": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new StringArrayReturning(
+                                new StringField(expectedEntity, expectedField)
+                            )
+                        )
+                    ),
+                ],
+                where: null,
+                join: null,
+                groupBy: [new Field(new StringField(expectedEntity, expectedField))],
+                having: null,
+                orderBy: null,
+                pagination: null
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// Query.OrderBy had no round-trip coverage through Query at all before this -
+    /// only OrderByItemConverter was tested in isolation. Uses "desc" explicitly
+    /// since the default ("asc") is omitted on write, so this also exercises the
+    /// non-default direction path end-to-end.
+    /// </summary>
+    [Fact]
+    public void ReadOrderByCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "field": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{expectedField}}",
+                    "type": {
+                      "name": "string"
+                    }
+                  },
+                  "direction": "desc"
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.NotNull(query.OrderBy);
+        OrderByItem item = query.OrderBy!.Single();
+        Assert.Equal(SortDirection.Desc, item.Direction);
+        Assert.Equal(new StringField(expectedEntity, expectedField), item.Field.AsT7);
+    }
+
+    [Fact]
+    public void WriteOrderByCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "field": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{expectedField}}",
+                    "type": {
+                      "name": "string"
+                    }
+                  },
+                  "direction": "desc"
+                }
+              ]
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new StringArrayReturning(
+                                new StringField(expectedEntity, expectedField)
+                            )
+                        )
+                    ),
+                ],
+                where: null,
+                join: null,
+                groupBy: null,
+                having: null,
+                orderBy:
+                [
+                    new OrderByItem(
+                        new Field(new StringField(expectedEntity, expectedField)),
+                        SortDirection.Desc
+                    ),
+                ],
+                pagination: null
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// Query.Pagination had no round-trip coverage through Query at all before this -
+    /// only PaginationConverter was tested in isolation.
+    /// </summary>
+    [Fact]
+    public void ReadPaginationCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "pagination": {
+                "skip": 10,
+                "take": 25
+              }
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.NotNull(query.Pagination);
+        Assert.Equal(10, query.Pagination!.Skip);
+        Assert.Equal(25, query.Pagination!.Take);
+    }
+
+    [Fact]
+    public void WritePaginationCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "pagination": {
+                "skip": 10,
+                "take": 25
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new StringArrayReturning(
+                                new StringField(expectedEntity, expectedField)
+                            )
+                        )
+                    ),
+                ],
+                where: null,
+                join: null,
+                groupBy: null,
+                having: null,
+                orderBy: null,
+                pagination: new Pagination(10, 25)
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// Query.Distinct had no coverage anywhere in QueryConverterTests before this -
+    /// not even as an incidental default-value filler.
+    /// </summary>
+    [Fact]
+    public void ReadDistinctCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "distinct": true
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.True(query.Distinct);
+    }
+
+    [Fact]
+    public void WriteDistinctCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "distinct": true
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new StringArrayReturning(
+                                new StringField(expectedEntity, expectedField)
+                            )
+                        )
+                    ),
+                ],
+                where: null,
+                join: null,
+                groupBy: null,
+                having: null,
+                orderBy: null,
+                pagination: null,
+                distinct: true
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// Every existing joins fixture (ReadJoinsCase/WriteJoinsCase) used exactly one
+    /// join. A multi-table query - two joins in the same array - was never
+    /// exercised, despite the "joins" property name itself having been the subject
+    /// of a real production bug (kudima03/PureQL.CSharp.Model.Serialization#49):
+    /// nothing here would catch a regression that drops all but the first element.
+    /// </summary>
+    [Fact]
+    public void ReadMultipleJoinsCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string firstJoinEntity = "refnhbdjusi";
+        const string secondJoinEntity = "dfeuionmvbg";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "joins": [
+                {
+                  "type": "inner",
+                  "entity": "{{firstJoinEntity}}",
+                  "on": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
+                },
+                {
+                  "type": "left",
+                  "entity": "{{secondJoinEntity}}",
+                  "on": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": false
+                  }
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.NotNull(query.Join);
+        Assert.Equal(2, query.Join!.Count());
+        Assert.True(
+            Enumerable
+                .Empty<Join>()
+                .Append(
+                    new Join(
+                        JoinType.Inner,
+                        firstJoinEntity,
+                        new BooleanReturning(new BooleanScalar(true))
+                    )
+                )
+                .Append(
+                    new Join(
+                        JoinType.Left,
+                        secondJoinEntity,
+                        new BooleanReturning(new BooleanScalar(false))
+                    )
+                )
+                .SequenceEqual(query.Join!)
+        );
+    }
+
+    [Fact]
+    public void WriteMultipleJoinsCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string firstJoinEntity = "refnhbdjusi";
+        const string secondJoinEntity = "dfeuionmvbg";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "joins": [
+                {
+                  "type": "inner",
+                  "entity": "{{firstJoinEntity}}",
+                  "on": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
+                },
+                {
+                  "type": "left",
+                  "entity": "{{secondJoinEntity}}",
+                  "on": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": false
+                  }
+                }
+              ]
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new StringArrayReturning(
+                                new StringField(expectedEntity, expectedField)
+                            )
+                        )
+                    ),
+                ],
+                where: null,
+                join:
+                [
+                    new Join(
+                        JoinType.Inner,
+                        firstJoinEntity,
+                        new BooleanReturning(new BooleanScalar(true))
+                    ),
+                    new Join(
+                        JoinType.Left,
+                        secondJoinEntity,
+                        new BooleanReturning(new BooleanScalar(false))
+                    ),
+                ],
+                groupBy: null,
+                having: null,
+                orderBy: null,
+                pagination: null
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// A "kitchen sink" query combining every optional clause in one payload -
+    /// where, joins, groupBy, having, orderBy, pagination and distinct together.
+    /// No existing fixture combines more than two of these, so a property that
+    /// accidentally overwrites or shadows another during serialization (e.g. a
+    /// JsonIgnore condition or property-ordering bug) would not be caught by the
+    /// single-clause tests alone.
+    /// </summary>
+    [Fact]
+    public void ReadFullQueryWithAllClausesCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string joinEntity = "refnhbdjusi";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "distinct": true,
+              "where": {
+                "operator": "eachEqual",
+                "left": {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                },
+                "right": {
+                  "type": {
+                    "name": "string"
+                  },
+                  "value": "x"
+                }
+              },
+              "joins": [
+                {
+                  "type": "inner",
+                  "entity": "{{joinEntity}}",
+                  "on": {
+                    "type": {
+                      "name": "boolean"
+                    },
+                    "value": true
+                  }
+                }
+              ],
+              "groupBy": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "having": {
+                "operator": "greaterThan",
+                "left": {
+                  "operator": "sum",
+                  "arg": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{expectedField}}",
+                    "type": {
+                      "name": "number"
+                    }
+                  }
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 1
+                }
+              },
+              "orderBy": [
+                {
+                  "field": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{expectedField}}",
+                    "type": {
+                      "name": "string"
+                    }
+                  },
+                  "direction": "desc"
+                }
+              ],
+              "pagination": {
+                "skip": 0,
+                "take": 20
+              }
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.True(query.Distinct);
+        Assert.True(query.Where!.Value.IsT1);
+        Assert.NotNull(query.Having);
+
+        _ = Assert.Single(query.Join!);
+        _ = Assert.Single(query.GroupBy!);
+        _ = Assert.Single(query.OrderBy!);
+        Assert.Equal(0, query.Pagination!.Skip);
+        Assert.Equal(20, query.Pagination!.Take);
+    }
 }
