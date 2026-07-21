@@ -144,4 +144,69 @@ public sealed record NumberScalarConverterTests
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
         );
     }
+
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+                        {
+              "value": 0.5800537796011547
+            }
+
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<INumberScalar>(input, _options)
+        );
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-123456.789)]
+    [InlineData(double.MaxValue)]
+    [InlineData(double.MinValue)]
+    public void RoundTripsBoundaryValues(double value)
+    {
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "type": {
+                "name": "number"
+              },
+              "value": {{JsonSerializer.Serialize(value)}}
+            }
+            """;
+
+        INumberScalar scalar = JsonSerializer.Deserialize<INumberScalar>(
+            expected,
+            _options
+        )!;
+        Assert.Equal(value, scalar.Value);
+
+        string output = JsonSerializer.Serialize<INumberScalar>(
+            new NumberScalar(value),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnStringValueInsteadOfNumber()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "type": {
+                "name": "number"
+              },
+              "value": "5"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<INumberScalar>(input, _options)
+        );
+    }
 }

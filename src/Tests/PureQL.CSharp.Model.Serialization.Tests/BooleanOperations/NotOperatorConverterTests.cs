@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
+using PureQL.CSharp.Model.Comparisons;
 using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -525,6 +526,87 @@ public sealed record NotOperatorConverterTests
                             new BooleanReturning(new BooleanScalar(false)),
                             new BooleanReturning(new BooleanScalar(true)),
                         ])
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadComparisonCondition()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "greaterThan",
+                "left": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 42
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 24
+                }
+              }
+            }
+            """;
+
+        Assert.Equal(
+            new BooleanReturning(
+                new Comparison(
+                    new NumberComparison(
+                        ComparisonOperator.GreaterThan,
+                        new NumberReturning(new NumberScalar(42)),
+                        new NumberReturning(new NumberScalar(24))
+                    )
+                )
+            ),
+            JsonSerializer.Deserialize<NotOperator>(input, _options)!.Condition
+        );
+    }
+
+    [Fact]
+    public void WriteComparisonCondition()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "not",
+              "condition": {
+                "operator": "greaterThan",
+                "left": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 42
+                },
+                "right": {
+                  "type": {
+                    "name": "number"
+                  },
+                  "value": 24
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NotOperator(
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
+                        )
                     )
                 )
             ),

@@ -314,10 +314,8 @@ public sealed record EachDateTimeArithmeticConverterTests
             }
             """;
 
-        EachDateTimeDiffSeconds value = JsonSerializer.Deserialize<EachDateTimeDiffSeconds>(
-            input,
-            _options
-        )!;
+        EachDateTimeDiffSeconds value =
+            JsonSerializer.Deserialize<EachDateTimeDiffSeconds>(input, _options)!;
         Assert.Equal(new DateTimeField(leftEntity, leftField), value.Left.AsT1.AsT1);
         Assert.Equal(new DateTimeField(rightEntity, rightField), value.Right.AsT1.AsT1);
     }
@@ -389,11 +387,47 @@ public sealed record EachDateTimeArithmeticConverterTests
             }
             """;
 
-        EachDateTimeDiffSeconds value = JsonSerializer.Deserialize<EachDateTimeDiffSeconds>(
-            input,
-            _options
-        )!;
+        EachDateTimeDiffSeconds value =
+            JsonSerializer.Deserialize<EachDateTimeDiffSeconds>(input, _options)!;
         Assert.Equal(expectedDateTime, value.Left.AsT0.AsT1.Value);
         Assert.Equal(new DateTimeField(rightEntity, rightField), value.Right.AsT1.AsT1);
+    }
+
+    [Fact]
+    public void WriteDiffSecondsWithScalarLeft()
+    {
+        DateTime expectedDateTime = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        string expectedDateTimeStr = JsonSerializer.Serialize(expectedDateTime, _options);
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDatetimeDiffSeconds",
+              "left": {
+                "type": {
+                  "name": "datetime"
+                },
+                "value": {{expectedDateTimeStr}}
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "datetime"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new EachDateTimeDiffSeconds(
+                new DateTimeReturning(new DateTimeScalar(expectedDateTime)),
+                new DateTimeArrayReturning(new DateTimeField(rightEntity, rightField))
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
     }
 }

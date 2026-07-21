@@ -397,4 +397,42 @@ public sealed record EachDateArithmeticConverterTests
         Assert.Equal(expectedDate, value.Left.AsT0.AsT1.Value);
         Assert.Equal(new DateField(rightEntity, rightField), value.Right.AsT1.AsT1);
     }
+
+    [Fact]
+    public void WriteDiffDaysWithScalarLeft()
+    {
+        DateOnly expectedDate = new DateOnly(2024, 1, 1);
+        string expectedDateStr = JsonSerializer.Serialize(expectedDate, _options);
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachDateDiffDays",
+              "left": {
+                "type": {
+                  "name": "date"
+                },
+                "value": {{expectedDateStr}}
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "date"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new EachDateDiffDays(
+                new DateReturning(new DateScalar(expectedDate)),
+                new DateArrayReturning(new DateField(rightEntity, rightField))
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
 }

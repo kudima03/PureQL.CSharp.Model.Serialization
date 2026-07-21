@@ -183,4 +183,21 @@ public sealed record DateTimeArrayScalarConverterTests
             JsonSerializer.Deserialize<IDateTimeArrayScalar>(input, _options)
         );
     }
+
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "value": [
+                "2024-01-01T00:00:00"
+              ]
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IDateTimeArrayScalar>(input, _options)
+        );
+    }
 }

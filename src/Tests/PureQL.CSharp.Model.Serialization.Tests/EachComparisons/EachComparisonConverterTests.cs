@@ -27,16 +27,27 @@ public sealed record EachComparisonConverterTests
         }
     }
 
-    [Fact]
-    public void ReadNumberComparisonGreaterThan()
+    // Each operator value shares the same generic Read/Write code path across
+    // all five types (the converter never branches on which specific
+    // operator was used), but the previous Fact-per-type tests only spot
+    // checked one or two of the four EachComparisonOperator values per type.
+    // These Theory tests fill the full 5-type x 4-operator matrix, mirroring
+    // the exhaustive pattern already used by the plain (non-each)
+    // ComparisonConverterTests.
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void ReadNumberComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
 
-        const string input = /*lang=json,strict*/
+        string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThan",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -53,23 +64,30 @@ public sealed record EachComparisonConverterTests
             }
             """;
 
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
+        EachComparison value = JsonSerializer.Deserialize<EachComparison>(
+            input,
+            _options
+        )!;
         EachNumberComparison comp = value.AsT0;
-        Assert.Equal(EachComparisonOperator.EachGreaterThan, comp.Operator);
+        Assert.Equal(@operator, comp.Operator);
         Assert.Equal(new NumberField(expectedEntity, expectedField), comp.Left.AsT1);
         Assert.Equal(10, comp.Right.AsT0.AsT1.Value);
     }
 
-    [Fact]
-    public void WriteNumberComparisonGreaterThan()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void WriteNumberComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
 
-        const string expected = /*lang=json,strict*/
+        string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThan",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -89,7 +107,7 @@ public sealed record EachComparisonConverterTests
         string output = JsonSerializer.Serialize(
             new EachComparison(
                 new EachNumberComparison(
-                    EachComparisonOperator.EachGreaterThan,
+                    @operator,
                     new NumberArrayReturning(
                         new NumberField(expectedEntity, expectedField)
                     ),
@@ -101,88 +119,20 @@ public sealed record EachComparisonConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ReadNumberComparisonLessThan()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void ReadStringComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
 
-        const string input = /*lang=json,strict*/
+        string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachLessThan",
-              "left": {
-                "entity": "{{expectedEntity}}",
-                "field": "{{expectedField}}",
-                "type": {
-                  "name": "number"
-                }
-              },
-              "right": {
-                "type": {
-                  "name": "number"
-                },
-                "value": 10
-              }
-            }
-            """;
-
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
-        EachNumberComparison comp = value.AsT0;
-        Assert.Equal(EachComparisonOperator.EachLessThan, comp.Operator);
-    }
-
-    [Fact]
-    public void WriteNumberComparisonLessThan()
-    {
-        const string expectedEntity = "myEntity";
-        const string expectedField = "myField";
-
-        const string expected = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "eachLessThan",
-              "left": {
-                "entity": "{{expectedEntity}}",
-                "field": "{{expectedField}}",
-                "type": {
-                  "name": "number"
-                }
-              },
-              "right": {
-                "type": {
-                  "name": "number"
-                },
-                "value": 10
-              }
-            }
-            """;
-
-        string output = JsonSerializer.Serialize(
-            new EachComparison(
-                new EachNumberComparison(
-                    EachComparisonOperator.EachLessThan,
-                    new NumberArrayReturning(
-                        new NumberField(expectedEntity, expectedField)
-                    ),
-                    new NumberReturning(new NumberScalar(10))
-                )
-            ),
-            _options
-        );
-        Assert.Equal(expected, output);
-    }
-
-    [Fact]
-    public void ReadStringComparisonGreaterThan()
-    {
-        const string expectedEntity = "myEntity";
-        const string expectedField = "myField";
-
-        const string input = /*lang=json,strict*/
-            $$"""
-            {
-              "operator": "eachGreaterThan",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -199,23 +149,30 @@ public sealed record EachComparisonConverterTests
             }
             """;
 
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
+        EachComparison value = JsonSerializer.Deserialize<EachComparison>(
+            input,
+            _options
+        )!;
         EachStringComparison comp = value.AsT1;
-        Assert.Equal(EachComparisonOperator.EachGreaterThan, comp.Operator);
+        Assert.Equal(@operator, comp.Operator);
         Assert.Equal(new StringField(expectedEntity, expectedField), comp.Left.AsT1);
         Assert.Equal("alpha", comp.Right.AsT0.AsT1.Value);
     }
 
-    [Fact]
-    public void WriteStringComparisonGreaterThan()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void WriteStringComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
 
-        const string expected = /*lang=json,strict*/
+        string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThan",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -235,7 +192,7 @@ public sealed record EachComparisonConverterTests
         string output = JsonSerializer.Serialize(
             new EachComparison(
                 new EachStringComparison(
-                    EachComparisonOperator.EachGreaterThan,
+                    @operator,
                     new StringArrayReturning(
                         new StringField(expectedEntity, expectedField)
                     ),
@@ -247,8 +204,12 @@ public sealed record EachComparisonConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ReadDateComparisonLessThanOrEqual()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void ReadDateComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
@@ -258,7 +219,7 @@ public sealed record EachComparisonConverterTests
         string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachLessThanOrEqual",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -275,15 +236,22 @@ public sealed record EachComparisonConverterTests
             }
             """;
 
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
+        EachComparison value = JsonSerializer.Deserialize<EachComparison>(
+            input,
+            _options
+        )!;
         EachDateComparison comp = value.AsT2;
-        Assert.Equal(EachComparisonOperator.EachLessThanOrEqual, comp.Operator);
+        Assert.Equal(@operator, comp.Operator);
         Assert.Equal(new DateField(expectedEntity, expectedField), comp.Left.AsT1);
         Assert.Equal(expectedDate, comp.Right.AsT0.AsT1.Value);
     }
 
-    [Fact]
-    public void WriteDateComparisonLessThanOrEqual()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void WriteDateComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
@@ -293,7 +261,7 @@ public sealed record EachComparisonConverterTests
         string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachLessThanOrEqual",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -313,10 +281,8 @@ public sealed record EachComparisonConverterTests
         string output = JsonSerializer.Serialize(
             new EachComparison(
                 new EachDateComparison(
-                    EachComparisonOperator.EachLessThanOrEqual,
-                    new DateArrayReturning(
-                        new DateField(expectedEntity, expectedField)
-                    ),
+                    @operator,
+                    new DateArrayReturning(new DateField(expectedEntity, expectedField)),
                     new DateReturning(new DateScalar(expectedDate))
                 )
             ),
@@ -325,8 +291,12 @@ public sealed record EachComparisonConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ReadDateTimeComparisonGreaterThanOrEqual()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void ReadDateTimeComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
@@ -336,7 +306,7 @@ public sealed record EachComparisonConverterTests
         string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThanOrEqual",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -353,15 +323,22 @@ public sealed record EachComparisonConverterTests
             }
             """;
 
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
+        EachComparison value = JsonSerializer.Deserialize<EachComparison>(
+            input,
+            _options
+        )!;
         EachDateTimeComparison comp = value.AsT3;
-        Assert.Equal(EachComparisonOperator.EachGreaterThanOrEqual, comp.Operator);
+        Assert.Equal(@operator, comp.Operator);
         Assert.Equal(new DateTimeField(expectedEntity, expectedField), comp.Left.AsT1);
         Assert.Equal(expectedDateTime, comp.Right.AsT0.AsT1.Value);
     }
 
-    [Fact]
-    public void WriteDateTimeComparisonGreaterThanOrEqual()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void WriteDateTimeComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
@@ -371,7 +348,7 @@ public sealed record EachComparisonConverterTests
         string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThanOrEqual",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -391,7 +368,7 @@ public sealed record EachComparisonConverterTests
         string output = JsonSerializer.Serialize(
             new EachComparison(
                 new EachDateTimeComparison(
-                    EachComparisonOperator.EachGreaterThanOrEqual,
+                    @operator,
                     new DateTimeArrayReturning(
                         new DateTimeField(expectedEntity, expectedField)
                     ),
@@ -403,8 +380,12 @@ public sealed record EachComparisonConverterTests
         Assert.Equal(expected, output);
     }
 
-    [Fact]
-    public void ReadTimeComparisonGreaterThan()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void ReadTimeComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
@@ -414,7 +395,7 @@ public sealed record EachComparisonConverterTests
         string input = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThan",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -431,15 +412,22 @@ public sealed record EachComparisonConverterTests
             }
             """;
 
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
+        EachComparison value = JsonSerializer.Deserialize<EachComparison>(
+            input,
+            _options
+        )!;
         EachTimeComparison comp = value.AsT4;
-        Assert.Equal(EachComparisonOperator.EachGreaterThan, comp.Operator);
+        Assert.Equal(@operator, comp.Operator);
         Assert.Equal(new TimeField(expectedEntity, expectedField), comp.Left.AsT1);
         Assert.Equal(expectedTime, comp.Right.AsT0.AsT1.Value);
     }
 
-    [Fact]
-    public void WriteTimeComparisonGreaterThan()
+    [Theory]
+    [InlineData(EachComparisonOperator.EachGreaterThan)]
+    [InlineData(EachComparisonOperator.EachLessThan)]
+    [InlineData(EachComparisonOperator.EachGreaterThanOrEqual)]
+    [InlineData(EachComparisonOperator.EachLessThanOrEqual)]
+    public void WriteTimeComparison(EachComparisonOperator @operator)
     {
         const string expectedEntity = "myEntity";
         const string expectedField = "myField";
@@ -449,7 +437,7 @@ public sealed record EachComparisonConverterTests
         string expected = /*lang=json,strict*/
             $$"""
             {
-              "operator": "eachGreaterThan",
+              "operator": {{JsonSerializer.Serialize(@operator, _options)}},
               "left": {
                 "entity": "{{expectedEntity}}",
                 "field": "{{expectedField}}",
@@ -469,10 +457,8 @@ public sealed record EachComparisonConverterTests
         string output = JsonSerializer.Serialize(
             new EachComparison(
                 new EachTimeComparison(
-                    EachComparisonOperator.EachGreaterThan,
-                    new TimeArrayReturning(
-                        new TimeField(expectedEntity, expectedField)
-                    ),
+                    @operator,
+                    new TimeArrayReturning(new TimeField(expectedEntity, expectedField)),
                     new TimeReturning(new TimeScalar(expectedTime))
                 )
             ),
@@ -520,7 +506,10 @@ public sealed record EachComparisonConverterTests
             }
             """;
 
-        EachComparison value = JsonSerializer.Deserialize<EachComparison>(input, _options)!;
+        EachComparison value = JsonSerializer.Deserialize<EachComparison>(
+            input,
+            _options
+        )!;
         EachNumberComparison comp = value.AsT0;
         Assert.Equal(new NumberField(leftEntity, leftField), comp.Left.AsT1);
         Assert.Equal(new NumberField(rightEntity, rightField), comp.Right.AsT1.AsT1);
@@ -559,12 +548,8 @@ public sealed record EachComparisonConverterTests
             new EachComparison(
                 new EachNumberComparison(
                     EachComparisonOperator.EachGreaterThan,
-                    new NumberArrayReturning(
-                        new NumberField(leftEntity, leftField)
-                    ),
-                    new NumberArrayReturning(
-                        new NumberField(rightEntity, rightField)
-                    )
+                    new NumberArrayReturning(new NumberField(leftEntity, leftField)),
+                    new NumberArrayReturning(new NumberField(rightEntity, rightField))
                 )
             ),
             _options

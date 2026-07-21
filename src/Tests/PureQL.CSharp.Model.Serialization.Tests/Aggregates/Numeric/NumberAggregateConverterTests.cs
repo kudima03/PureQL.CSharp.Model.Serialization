@@ -1424,4 +1424,228 @@ public sealed record NumberAggregateConverterTests
         );
         Assert.Equal(expected, value);
     }
+
+    // The NumberAggregate union dispatcher previously had only one Write test
+    // (for the Sum branch) and no Read tests at all. The four tests below round
+    // trip every union member (Average/Max/Min/Sum) through NumberAggregate
+    // itself, not just through each leaf type's own converter.
+
+    [Fact]
+    public void ReadNumberAggregateWrappedAverage()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.AsT0.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteNumberAggregateWrappedAverage()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "average_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new AverageNumber(
+                    new NumberArrayReturning(
+                        new NumberField(expectedEntityName, expectedFieldName)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadNumberAggregateWrappedMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.AsT1.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteNumberAggregateWrappedMax()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "max_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new MaxNumber(
+                    new NumberArrayReturning(
+                        new NumberField(expectedEntityName, expectedFieldName)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadNumberAggregateWrappedMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.AsT2.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteNumberAggregateWrappedMin()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "min_number",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new NumberAggregate(
+                new MinNumber(
+                    new NumberArrayReturning(
+                        new NumberField(expectedEntityName, expectedFieldName)
+                    )
+                )
+            ),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadNumberAggregateWrappedSumNumber()
+    {
+        const string expectedEntityName = "aruhybfe";
+        const string expectedFieldName = "erafuhyobdng";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "sum",
+              "arg": {
+                "entity": "{{expectedEntityName}}",
+                "field": "{{expectedFieldName}}",
+                "type": {
+                  "name": "number"
+                }
+              }
+            }
+            """;
+
+        NumberAggregate value = JsonSerializer.Deserialize<NumberAggregate>(
+            input,
+            _options
+        )!;
+        Assert.Equal(
+            new NumberField(expectedEntityName, expectedFieldName),
+            value.AsT3.Argument.AsT1
+        );
+    }
 }

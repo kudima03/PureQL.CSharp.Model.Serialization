@@ -150,4 +150,23 @@ public sealed record StringArrayScalarConverterTests
             JsonSerializer.Deserialize<IStringArrayScalar>(input, _options)
         );
     }
+
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+                        {
+              "value": [
+                "ianhuedrfiuhaerfd",
+                "sdkfnjilhnsjkd"
+              ]
+            }
+
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IStringArrayScalar>(input, _options)
+        );
+    }
 }

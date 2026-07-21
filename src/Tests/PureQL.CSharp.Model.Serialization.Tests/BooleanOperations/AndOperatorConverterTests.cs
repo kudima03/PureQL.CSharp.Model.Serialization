@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PureQL.CSharp.Model.BooleanOperations;
+using PureQL.CSharp.Model.Comparisons;
 using PureQL.CSharp.Model.Equalities;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.Returnings;
@@ -1014,6 +1015,93 @@ public sealed record AndOperatorConverterTests
                                 new BooleanReturning(new BooleanScalar(true)),
                                 new BooleanReturning(new BooleanScalar(false))
                             )
+                        )
+                    )
+                ),
+            ]),
+            _options
+        );
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void ReadComparisonConditions()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "operator": "and",
+              "conditions": [
+                {
+                  "operator": "greaterThan",
+                  "left": {
+                    "type": {
+                      "name": "number"
+                    },
+                    "value": 42
+                  },
+                  "right": {
+                    "type": {
+                      "name": "number"
+                    },
+                    "value": 24
+                  }
+                }
+              ]
+            }
+            """;
+
+        Assert.Equal(
+            [
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
+                        )
+                    )
+                ),
+            ],
+            JsonSerializer.Deserialize<AndOperator>(input, _options)!.Conditions.AsT0
+        );
+    }
+
+    [Fact]
+    public void WriteComparisonConditions()
+    {
+        const string expected = /*lang=json,strict*/
+            """
+            {
+              "operator": "and",
+              "conditions": [
+                {
+                  "operator": "greaterThan",
+                  "left": {
+                    "type": {
+                      "name": "number"
+                    },
+                    "value": 42
+                  },
+                  "right": {
+                    "type": {
+                      "name": "number"
+                    },
+                    "value": 24
+                  }
+                }
+              ]
+            }
+            """;
+
+        string value = JsonSerializer.Serialize(
+            new AndOperator([
+                new BooleanReturning(
+                    new Comparison(
+                        new NumberComparison(
+                            ComparisonOperator.GreaterThan,
+                            new NumberReturning(new NumberScalar(42)),
+                            new NumberReturning(new NumberScalar(24))
                         )
                     )
                 ),

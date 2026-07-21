@@ -167,4 +167,20 @@ public sealed record DateFieldConverterTests
             JsonSerializer.Deserialize<DateField>(input, _options)
         );
     }
+
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+                  "entity": "auiheyrdsnf",
+                  "field": "jinaudferv"
+                }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<DateField>(input, _options)
+        );
+    }
 }
