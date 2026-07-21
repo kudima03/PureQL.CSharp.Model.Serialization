@@ -185,6 +185,7 @@ public sealed record DateArrayScalarConverterTests
             JsonSerializer.Deserialize<IDateArrayScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

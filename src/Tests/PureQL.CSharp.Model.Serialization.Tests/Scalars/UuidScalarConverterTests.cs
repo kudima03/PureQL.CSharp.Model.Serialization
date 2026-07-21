@@ -145,6 +145,7 @@ public sealed record UuidScalarConverterTests
             JsonSerializer.Deserialize<IUuidScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -159,6 +160,7 @@ public sealed record UuidScalarConverterTests
             JsonSerializer.Deserialize<IUuidScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMalformedValueString()
     {

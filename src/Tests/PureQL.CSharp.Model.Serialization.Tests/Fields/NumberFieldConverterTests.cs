@@ -167,6 +167,7 @@ public sealed record NumberFieldConverterTests
             JsonSerializer.Deserialize<NumberField>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

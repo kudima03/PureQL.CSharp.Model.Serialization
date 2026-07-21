@@ -167,6 +167,7 @@ public sealed record UuidFieldConverterTests
             JsonSerializer.Deserialize<UuidField>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

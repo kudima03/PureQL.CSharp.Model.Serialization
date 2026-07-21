@@ -167,6 +167,7 @@ public sealed record DateFieldConverterTests
             JsonSerializer.Deserialize<DateField>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

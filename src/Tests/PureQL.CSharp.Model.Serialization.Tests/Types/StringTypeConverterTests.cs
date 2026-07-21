@@ -73,6 +73,7 @@ public sealed record StringTypeConverterTests
             JsonSerializer.Deserialize<StringType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

@@ -118,6 +118,7 @@ public sealed record StringArrayParameterConverterTests
             JsonSerializer.Deserialize<StringArrayParameter>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -126,7 +127,7 @@ public sealed record StringArrayParameterConverterTests
                         {
               "name": "{{expected}}"
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>

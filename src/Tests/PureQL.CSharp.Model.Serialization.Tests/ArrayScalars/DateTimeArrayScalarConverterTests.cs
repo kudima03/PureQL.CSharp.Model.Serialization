@@ -183,6 +183,7 @@ public sealed record DateTimeArrayScalarConverterTests
             JsonSerializer.Deserialize<IDateTimeArrayScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

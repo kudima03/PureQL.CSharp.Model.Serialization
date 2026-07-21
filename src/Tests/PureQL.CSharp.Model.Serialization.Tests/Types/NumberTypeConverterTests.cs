@@ -73,6 +73,7 @@ public sealed record NumberTypeConverterTests
             JsonSerializer.Deserialize<NumberType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

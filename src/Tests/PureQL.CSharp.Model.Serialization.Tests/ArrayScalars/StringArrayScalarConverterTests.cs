@@ -150,6 +150,7 @@ public sealed record StringArrayScalarConverterTests
             JsonSerializer.Deserialize<IStringArrayScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -161,7 +162,7 @@ public sealed record StringArrayScalarConverterTests
                 "sdkfnjilhnsjkd"
               ]
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>

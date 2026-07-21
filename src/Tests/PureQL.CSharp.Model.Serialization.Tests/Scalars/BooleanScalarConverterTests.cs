@@ -178,6 +178,7 @@ public sealed record BooleanScalarConverterTests
             JsonSerializer.Deserialize<IBooleanScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

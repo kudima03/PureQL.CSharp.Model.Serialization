@@ -118,6 +118,7 @@ public sealed record NumberParameterConverterTests
             JsonSerializer.Deserialize<NumberParameter>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -126,7 +127,7 @@ public sealed record NumberParameterConverterTests
                         {
               "name": "{{expected}}"
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>

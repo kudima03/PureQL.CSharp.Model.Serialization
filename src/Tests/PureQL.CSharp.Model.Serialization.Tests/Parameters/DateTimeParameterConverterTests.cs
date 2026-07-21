@@ -118,6 +118,7 @@ public sealed record DateTimeParameterConverterTests
             JsonSerializer.Deserialize<DateTimeParameter>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -126,7 +127,7 @@ public sealed record DateTimeParameterConverterTests
                         {
               "name": "{{expected}}"
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>

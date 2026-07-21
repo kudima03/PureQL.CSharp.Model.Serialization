@@ -73,6 +73,7 @@ public sealed record NullTypeConverterTests
             JsonSerializer.Deserialize<NullType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

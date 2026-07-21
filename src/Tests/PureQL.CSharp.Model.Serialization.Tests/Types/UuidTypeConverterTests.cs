@@ -73,6 +73,7 @@ public sealed record UuidTypeConverterTests
             JsonSerializer.Deserialize<UuidType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

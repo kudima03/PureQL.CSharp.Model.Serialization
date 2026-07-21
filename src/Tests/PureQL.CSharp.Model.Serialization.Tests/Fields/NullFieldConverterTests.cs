@@ -124,6 +124,7 @@ public sealed record NullFieldConverterTests
             JsonSerializer.Deserialize<NullField>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

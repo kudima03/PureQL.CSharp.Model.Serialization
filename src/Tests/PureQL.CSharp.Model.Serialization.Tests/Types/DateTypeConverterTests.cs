@@ -73,6 +73,7 @@ public sealed record DateTypeConverterTests
             JsonSerializer.Deserialize<DateType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

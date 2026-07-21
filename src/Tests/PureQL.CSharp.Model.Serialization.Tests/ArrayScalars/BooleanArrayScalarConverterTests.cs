@@ -154,6 +154,7 @@ public sealed record BooleanArrayScalarConverterTests
             JsonSerializer.Deserialize<IBooleanArrayScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -166,7 +167,7 @@ public sealed record BooleanArrayScalarConverterTests
                 true
               ]
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>

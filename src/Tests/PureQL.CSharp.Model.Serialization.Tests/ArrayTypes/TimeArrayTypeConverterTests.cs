@@ -73,6 +73,7 @@ public sealed record TimeArrayTypeConverterTests
             JsonSerializer.Deserialize<TimeArrayType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

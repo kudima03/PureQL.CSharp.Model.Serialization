@@ -76,6 +76,7 @@ public sealed record BooleanArrayTypeConverterTests
             JsonSerializer.Deserialize<BooleanArrayType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {

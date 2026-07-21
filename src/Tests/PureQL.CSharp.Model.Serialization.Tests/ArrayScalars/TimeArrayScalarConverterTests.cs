@@ -182,6 +182,7 @@ public sealed record TimeArrayScalarConverterTests
             JsonSerializer.Deserialize<ITimeArrayScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

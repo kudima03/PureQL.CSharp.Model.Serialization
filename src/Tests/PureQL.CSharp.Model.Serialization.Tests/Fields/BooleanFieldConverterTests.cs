@@ -160,6 +160,7 @@ public sealed record BooleanFieldConverterTests
             JsonSerializer.Deserialize<BooleanField>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

@@ -116,6 +116,7 @@ public sealed record StringScalarConverterTests
             JsonSerializer.Deserialize<IStringScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -124,13 +125,14 @@ public sealed record StringScalarConverterTests
                         {
               "value": "ianhuedrfiuhaerfd"
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<IStringScalar>(input, _options)
         );
     }
+
     [Fact]
     public void RoundTripsEmptyString()
     {

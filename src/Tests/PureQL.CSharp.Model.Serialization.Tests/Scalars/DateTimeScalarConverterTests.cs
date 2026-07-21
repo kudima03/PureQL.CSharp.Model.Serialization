@@ -148,6 +148,7 @@ public sealed record DateTimeScalarConverterTests
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -162,6 +163,7 @@ public sealed record DateTimeScalarConverterTests
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMalformedValueString()
     {

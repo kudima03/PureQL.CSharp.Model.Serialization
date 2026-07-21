@@ -116,6 +116,7 @@ public sealed record BooleanArrayParameterConverterTests
             JsonSerializer.Deserialize<BooleanArrayParameter>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -124,7 +125,7 @@ public sealed record BooleanArrayParameterConverterTests
                         {
               "name": "{{expected}}"
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>

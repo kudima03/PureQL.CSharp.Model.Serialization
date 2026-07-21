@@ -167,6 +167,7 @@ public sealed record TimeFieldConverterTests
             JsonSerializer.Deserialize<TimeField>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {

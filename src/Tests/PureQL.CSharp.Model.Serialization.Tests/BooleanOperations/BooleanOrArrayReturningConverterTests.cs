@@ -101,10 +101,7 @@ public sealed record BooleanOrArrayReturningConverterTests
         >(input, _options);
 
         Assert.True(value.IsT1);
-        Assert.Equal(
-            new BooleanField(expectedEntity, expectedField),
-            value.AsT1.AsT1
-        );
+        Assert.Equal(new BooleanField(expectedEntity, expectedField), value.AsT1.AsT1);
     }
 
     [Fact]

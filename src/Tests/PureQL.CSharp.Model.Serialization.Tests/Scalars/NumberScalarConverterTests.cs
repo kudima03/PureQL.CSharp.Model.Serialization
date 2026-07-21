@@ -144,6 +144,7 @@ public sealed record NumberScalarConverterTests
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingTypeProperty()
     {
@@ -152,13 +153,14 @@ public sealed record NumberScalarConverterTests
                         {
               "value": 0.5800537796011547
             }
-            
+
             """;
 
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<INumberScalar>(input, _options)
         );
     }
+
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]

@@ -538,34 +538,32 @@ public sealed record JoinConverterTests
                 JoinType.Inner,
                 rightEntity,
                 new BooleanArrayReturning(
-                    new EachAndOperator(
-                        [
-                            new BooleanArrayReturning(
-                                new EachEquality(
-                                    new EachStringEquality(
-                                        new StringArrayReturning(
-                                            new StringField(leftEntity, "keyPart1")
-                                        ),
-                                        new StringArrayReturning(
-                                            new StringField(rightEntity, "keyPart1")
-                                        )
+                    new EachAndOperator([
+                        new BooleanArrayReturning(
+                            new EachEquality(
+                                new EachStringEquality(
+                                    new StringArrayReturning(
+                                        new StringField(leftEntity, "keyPart1")
+                                    ),
+                                    new StringArrayReturning(
+                                        new StringField(rightEntity, "keyPart1")
                                     )
                                 )
-                            ),
-                            new BooleanArrayReturning(
-                                new EachEquality(
-                                    new EachStringEquality(
-                                        new StringArrayReturning(
-                                            new StringField(leftEntity, "keyPart2")
-                                        ),
-                                        new StringArrayReturning(
-                                            new StringField(rightEntity, "keyPart2")
-                                        )
+                            )
+                        ),
+                        new BooleanArrayReturning(
+                            new EachEquality(
+                                new EachStringEquality(
+                                    new StringArrayReturning(
+                                        new StringField(leftEntity, "keyPart2")
+                                    ),
+                                    new StringArrayReturning(
+                                        new StringField(rightEntity, "keyPart2")
                                     )
                                 )
-                            ),
-                        ]
-                    )
+                            )
+                        ),
+                    ])
                 )
             ),
             _options

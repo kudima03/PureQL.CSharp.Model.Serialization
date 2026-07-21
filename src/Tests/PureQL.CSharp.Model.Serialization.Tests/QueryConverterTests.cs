@@ -646,30 +646,28 @@ public sealed record QueryConverterTests
                     ),
                 ],
                 where: new BooleanArrayReturning(
-                    new EachAndOperator(
-                        [
-                            new BooleanArrayReturning(
-                                new EachEquality(
-                                    new EachStringEquality(
-                                        new StringArrayReturning(
-                                            new StringField(expectedEntity, field1)
-                                        ),
-                                        new StringReturning(new StringScalar("x"))
-                                    )
+                    new EachAndOperator([
+                        new BooleanArrayReturning(
+                            new EachEquality(
+                                new EachStringEquality(
+                                    new StringArrayReturning(
+                                        new StringField(expectedEntity, field1)
+                                    ),
+                                    new StringReturning(new StringScalar("x"))
                                 )
-                            ),
-                            new BooleanArrayReturning(
-                                new EachEquality(
-                                    new EachStringEquality(
-                                        new StringArrayReturning(
-                                            new StringField(expectedEntity, field2)
-                                        ),
-                                        new StringReturning(new StringScalar("y"))
-                                    )
+                            )
+                        ),
+                        new BooleanArrayReturning(
+                            new EachEquality(
+                                new EachStringEquality(
+                                    new StringArrayReturning(
+                                        new StringField(expectedEntity, field2)
+                                    ),
+                                    new StringReturning(new StringScalar("y"))
                                 )
-                            ),
-                        ]
-                    )
+                            )
+                        ),
+                    ])
                 ),
                 join: null,
                 groupBy: null,
@@ -1543,10 +1541,7 @@ public sealed record QueryConverterTests
 
         SelectExpression select = query.SelectExpressions.Single();
         SumNumber sum = select.AsT0.AsT3.AsT3.AsT3;
-        Assert.Equal(
-            new NumberField(expectedEntity, expectedField),
-            sum.Argument.AsT1
-        );
+        Assert.Equal(new NumberField(expectedEntity, expectedField), sum.Argument.AsT1);
     }
 
     [Fact]
@@ -1649,14 +1644,8 @@ public sealed record QueryConverterTests
         SelectExpression select = query.SelectExpressions.Single();
         EachMultiply multiply = select.AsT1.AsT3.AsT3.AsT2;
         OneOf<NumberReturning, NumberArrayReturning>[] values = [.. multiply.Values];
-        Assert.Equal(
-            new NumberField(expectedEntity, priceField),
-            values[0].AsT1.AsT1
-        );
-        Assert.Equal(
-            new NumberField(expectedEntity, quantityField),
-            values[1].AsT1.AsT1
-        );
+        Assert.Equal(new NumberField(expectedEntity, priceField), values[0].AsT1.AsT1);
+        Assert.Equal(new NumberField(expectedEntity, quantityField), values[1].AsT1.AsT1);
     }
 
     [Fact]
@@ -1704,19 +1693,14 @@ public sealed record QueryConverterTests
                         new ArrayReturning(
                             new NumberArrayReturning(
                                 new EachArithmetic(
-                                    new EachMultiply(
-                                        [
-                                            new NumberArrayReturning(
-                                                new NumberField(expectedEntity, priceField)
-                                            ),
-                                            new NumberArrayReturning(
-                                                new NumberField(
-                                                    expectedEntity,
-                                                    quantityField
-                                                )
-                                            ),
-                                        ]
-                                    )
+                                    new EachMultiply([
+                                        new NumberArrayReturning(
+                                            new NumberField(expectedEntity, priceField)
+                                        ),
+                                        new NumberArrayReturning(
+                                            new NumberField(expectedEntity, quantityField)
+                                        ),
+                                    ])
                                 )
                             )
                         )
@@ -1989,9 +1973,7 @@ public sealed record QueryConverterTests
             }
             """;
 
-        NumberArrayReturning sumArg = new(
-            new NumberField(expectedEntity, expectedField)
-        );
+        NumberArrayReturning sumArg = new(new NumberField(expectedEntity, expectedField));
 
         string output = JsonSerializer.Serialize(
             new Query(
@@ -2010,32 +1992,30 @@ public sealed record QueryConverterTests
                 groupBy: null,
                 having: new BooleanReturning(
                     new BooleanOperator(
-                        new AndOperator(
-                            [
-                                new BooleanReturning(
-                                    new Comparison(
-                                        new NumberComparison(
-                                            ComparisonOperator.GreaterThan,
-                                            new NumberReturning(
-                                                new NumberAggregate(new SumNumber(sumArg))
-                                            ),
-                                            new NumberReturning(new NumberScalar(100))
-                                        )
+                        new AndOperator([
+                            new BooleanReturning(
+                                new Comparison(
+                                    new NumberComparison(
+                                        ComparisonOperator.GreaterThan,
+                                        new NumberReturning(
+                                            new NumberAggregate(new SumNumber(sumArg))
+                                        ),
+                                        new NumberReturning(new NumberScalar(100))
                                     )
-                                ),
-                                new BooleanReturning(
-                                    new Comparison(
-                                        new NumberComparison(
-                                            ComparisonOperator.LessThan,
-                                            new NumberReturning(
-                                                new NumberAggregate(new SumNumber(sumArg))
-                                            ),
-                                            new NumberReturning(new NumberScalar(1000))
-                                        )
+                                )
+                            ),
+                            new BooleanReturning(
+                                new Comparison(
+                                    new NumberComparison(
+                                        ComparisonOperator.LessThan,
+                                        new NumberReturning(
+                                            new NumberAggregate(new SumNumber(sumArg))
+                                        ),
+                                        new NumberReturning(new NumberScalar(1000))
                                     )
-                                ),
-                            ]
-                        )
+                                )
+                            ),
+                        ])
                     )
                 ),
                 orderBy: null,

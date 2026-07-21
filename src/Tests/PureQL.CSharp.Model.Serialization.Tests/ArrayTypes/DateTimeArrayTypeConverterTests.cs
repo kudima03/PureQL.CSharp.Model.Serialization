@@ -76,6 +76,7 @@ public sealed record DateTimeArrayTypeConverterTests
             JsonSerializer.Deserialize<DateTimeArrayType>(input, _options)
         );
     }
+
     [Fact]
     public void ThrowsExceptionOnMissingNameProperty()
     {
