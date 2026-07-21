@@ -73,4 +73,32 @@ public sealed record BooleanTypeConverterTests
             JsonSerializer.Deserialize<BooleanType>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingNameProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BooleanType>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullNameProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "name": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BooleanType>(input, _options)
+        );
+    }
 }

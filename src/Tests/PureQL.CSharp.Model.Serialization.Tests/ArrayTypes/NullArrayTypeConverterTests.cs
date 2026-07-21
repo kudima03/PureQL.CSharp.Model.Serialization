@@ -73,4 +73,32 @@ public sealed record NullArrayTypeConverterTests
             JsonSerializer.Deserialize<NullArrayType>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingNameProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NullArrayType>(input, _options)
+        );
+    }
+
+    [Fact]
+    public void ThrowsExceptionOnNullNameProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "name": null
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NullArrayType>(input, _options)
+        );
+    }
 }
