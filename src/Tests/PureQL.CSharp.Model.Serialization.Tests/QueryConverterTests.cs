@@ -1,8 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneOf;
 using PureQL.CSharp.Model.Aggregates.Numeric;
 using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.BooleanOperations;
 using PureQL.CSharp.Model.Comparisons;
+using PureQL.CSharp.Model.EachArithmetics;
 using PureQL.CSharp.Model.EachBooleanOperations;
 using PureQL.CSharp.Model.EachEqualities;
 using PureQL.CSharp.Model.Fields;
@@ -1502,5 +1505,545 @@ public sealed record QueryConverterTests
         _ = Assert.Single(query.OrderBy!);
         Assert.Equal(0, query.Pagination!.Skip);
         Assert.Equal(20, query.Pagination!.Take);
+    }
+
+    /// <summary>
+    /// A pure aggregate select ("SELECT SUM(field) FROM ..." with no groupBy) - a
+    /// very common query shape that was never exercised at the Query level.
+    /// Aggregates only ever appeared inside "having" fixtures before this.
+    /// </summary>
+    [Fact]
+    public void ReadAggregateSelectCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "operator": "sum",
+                  "arg": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{expectedField}}",
+                    "type": {
+                      "name": "number"
+                    }
+                  }
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        SelectExpression select = query.SelectExpressions.Single();
+        SumNumber sum = select.AsT0.AsT3.AsT3.AsT3;
+        Assert.Equal(
+            new NumberField(expectedEntity, expectedField),
+            sum.Argument.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteAggregateSelectCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "operator": "sum",
+                  "arg": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{expectedField}}",
+                    "type": {
+                      "name": "number"
+                    }
+                  }
+                }
+              ]
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new SingleValueReturning(
+                            new NumberReturning(
+                                new NumberAggregate(
+                                    new SumNumber(
+                                        new NumberArrayReturning(
+                                            new NumberField(expectedEntity, expectedField)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                ]
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// A computed row-wise select expression ("SELECT price * quantity ...") -
+    /// EachMultiply is a valid NumberArrayReturning member (see
+    /// NumberArrayReturningConverter), so it is directly selectable, but no
+    /// fixture ever exercised an arithmetic expression through Query.Select.
+    /// </summary>
+    [Fact]
+    public void ReadArithmeticSelectCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string priceField = "price";
+        const string quantityField = "quantity";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "operator": "eachMultiply",
+                  "values": [
+                    {
+                      "entity": "{{expectedEntity}}",
+                      "field": "{{priceField}}",
+                      "type": {
+                        "name": "number"
+                      }
+                    },
+                    {
+                      "entity": "{{expectedEntity}}",
+                      "field": "{{quantityField}}",
+                      "type": {
+                        "name": "number"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        SelectExpression select = query.SelectExpressions.Single();
+        EachMultiply multiply = select.AsT1.AsT3.AsT3.AsT2;
+        OneOf<NumberReturning, NumberArrayReturning>[] values = [.. multiply.Values];
+        Assert.Equal(
+            new NumberField(expectedEntity, priceField),
+            values[0].AsT1.AsT1
+        );
+        Assert.Equal(
+            new NumberField(expectedEntity, quantityField),
+            values[1].AsT1.AsT1
+        );
+    }
+
+    [Fact]
+    public void WriteArithmeticSelectCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string priceField = "price";
+        const string quantityField = "quantity";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "operator": "eachMultiply",
+                  "values": [
+                    {
+                      "entity": "{{expectedEntity}}",
+                      "field": "{{priceField}}",
+                      "type": {
+                        "name": "number"
+                      }
+                    },
+                    {
+                      "entity": "{{expectedEntity}}",
+                      "field": "{{quantityField}}",
+                      "type": {
+                        "name": "number"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new NumberArrayReturning(
+                                new EachArithmetic(
+                                    new EachMultiply(
+                                        [
+                                            new NumberArrayReturning(
+                                                new NumberField(expectedEntity, priceField)
+                                            ),
+                                            new NumberArrayReturning(
+                                                new NumberField(
+                                                    expectedEntity,
+                                                    quantityField
+                                                )
+                                            ),
+                                        ]
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                ]
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
+    }
+
+    /// <summary>
+    /// GroupBy on more than one column ("GROUP BY a, b") - every prior groupBy
+    /// fixture used exactly one field.
+    /// </summary>
+    [Fact]
+    public void ReadMultipleGroupByCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string field1 = "edrfghiujn";
+        const string field2 = "edfrgin";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{field1}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "groupBy": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{field1}}",
+                  "type": {
+                    "name": "string"
+                  }
+                },
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{field2}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Field[] groupBy = [.. query.GroupBy!];
+        Assert.Equal(2, groupBy.Length);
+        Assert.Equal(new StringField(expectedEntity, field1), groupBy[0].AsT7);
+        Assert.Equal(new StringField(expectedEntity, field2), groupBy[1].AsT7);
+    }
+
+    /// <summary>
+    /// Multi-column sort ("ORDER BY a ASC, b DESC") - every prior orderBy fixture
+    /// used exactly one item.
+    /// </summary>
+    [Fact]
+    public void ReadMultipleOrderByCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string field1 = "edrfghiujn";
+        const string field2 = "edfrgin";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{field1}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "field": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{field1}}",
+                    "type": {
+                      "name": "string"
+                    }
+                  }
+                },
+                {
+                  "field": {
+                    "entity": "{{expectedEntity}}",
+                    "field": "{{field2}}",
+                    "type": {
+                      "name": "string"
+                    }
+                  },
+                  "direction": "desc"
+                }
+              ]
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        OrderByItem[] orderBy = [.. query.OrderBy!];
+        Assert.Equal(2, orderBy.Length);
+        Assert.Equal(SortDirection.Asc, orderBy[0].Direction);
+        Assert.Equal(new StringField(expectedEntity, field1), orderBy[0].Field.AsT7);
+        Assert.Equal(SortDirection.Desc, orderBy[1].Direction);
+        Assert.Equal(new StringField(expectedEntity, field2), orderBy[1].Field.AsT7);
+    }
+
+    /// <summary>
+    /// A compound "HAVING SUM(x) > 100 AND SUM(x) &lt; 1000" - every prior Having
+    /// fixture used exactly one comparison. Having is scalar-only (BooleanReturning),
+    /// so the plain (non-each) AndOperator is the correct/only way to combine
+    /// conditions here - unlike Where, which needs eachAnd.
+    /// </summary>
+    [Fact]
+    public void ReadHavingCompoundAndCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "having": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "operator": "greaterThan",
+                    "left": {
+                      "operator": "sum",
+                      "arg": {
+                        "entity": "{{expectedEntity}}",
+                        "field": "{{expectedField}}",
+                        "type": {
+                          "name": "number"
+                        }
+                      }
+                    },
+                    "right": {
+                      "type": {
+                        "name": "number"
+                      },
+                      "value": 100
+                    }
+                  },
+                  {
+                    "operator": "lessThan",
+                    "left": {
+                      "operator": "sum",
+                      "arg": {
+                        "entity": "{{expectedEntity}}",
+                        "field": "{{expectedField}}",
+                        "type": {
+                          "name": "number"
+                        }
+                      }
+                    },
+                    "right": {
+                      "type": {
+                        "name": "number"
+                      },
+                      "value": 1000
+                    }
+                  }
+                ]
+              }
+            }
+            """;
+
+        Query query = JsonSerializer.Deserialize<Query>(input, _options)!;
+
+        Assert.NotNull(query.Having);
+        AndOperator and = query.Having!.AsT3.AsT0;
+        Assert.Equal(2, and.Conditions.AsT0.Count());
+    }
+
+    [Fact]
+    public void WriteHavingCompoundAndCase()
+    {
+        const string expectedEntity = "erfhduibgn";
+        const string expectedField = "edrfghiujn";
+
+        const string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "from": {
+                "entity": "{{expectedEntity}}"
+              },
+              "select": [
+                {
+                  "entity": "{{expectedEntity}}",
+                  "field": "{{expectedField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                }
+              ],
+              "having": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "operator": "greaterThan",
+                    "left": {
+                      "operator": "sum",
+                      "arg": {
+                        "entity": "{{expectedEntity}}",
+                        "field": "{{expectedField}}",
+                        "type": {
+                          "name": "number"
+                        }
+                      }
+                    },
+                    "right": {
+                      "type": {
+                        "name": "number"
+                      },
+                      "value": 100
+                    }
+                  },
+                  {
+                    "operator": "lessThan",
+                    "left": {
+                      "operator": "sum",
+                      "arg": {
+                        "entity": "{{expectedEntity}}",
+                        "field": "{{expectedField}}",
+                        "type": {
+                          "name": "number"
+                        }
+                      }
+                    },
+                    "right": {
+                      "type": {
+                        "name": "number"
+                      },
+                      "value": 1000
+                    }
+                  }
+                ]
+              }
+            }
+            """;
+
+        NumberArrayReturning sumArg = new(
+            new NumberField(expectedEntity, expectedField)
+        );
+
+        string output = JsonSerializer.Serialize(
+            new Query(
+                new FromExpression(expectedEntity),
+                [
+                    new SelectExpression(
+                        new ArrayReturning(
+                            new StringArrayReturning(
+                                new StringField(expectedEntity, expectedField)
+                            )
+                        )
+                    ),
+                ],
+                where: null,
+                join: null,
+                groupBy: null,
+                having: new BooleanReturning(
+                    new BooleanOperator(
+                        new AndOperator(
+                            [
+                                new BooleanReturning(
+                                    new Comparison(
+                                        new NumberComparison(
+                                            ComparisonOperator.GreaterThan,
+                                            new NumberReturning(
+                                                new NumberAggregate(new SumNumber(sumArg))
+                                            ),
+                                            new NumberReturning(new NumberScalar(100))
+                                        )
+                                    )
+                                ),
+                                new BooleanReturning(
+                                    new Comparison(
+                                        new NumberComparison(
+                                            ComparisonOperator.LessThan,
+                                            new NumberReturning(
+                                                new NumberAggregate(new SumNumber(sumArg))
+                                            ),
+                                            new NumberReturning(new NumberScalar(1000))
+                                        )
+                                    )
+                                ),
+                            ]
+                        )
+                    )
+                ),
+                orderBy: null,
+                pagination: null
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
     }
 }
