@@ -124,4 +124,19 @@ public sealed record NullFieldConverterTests
             JsonSerializer.Deserialize<NullField>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NullField>(input, _options)
+        );
+    }
 }

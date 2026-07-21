@@ -167,4 +167,19 @@ public sealed record StringFieldConverterTests
             JsonSerializer.Deserialize<StringField>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+                  "entity": "auiheyrdsnf",
+                  "field": "jinaudferv"
+                }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<StringField>(input, _options)
+        );
+    }
 }

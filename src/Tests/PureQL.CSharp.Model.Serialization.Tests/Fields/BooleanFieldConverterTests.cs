@@ -160,4 +160,19 @@ public sealed record BooleanFieldConverterTests
             JsonSerializer.Deserialize<BooleanField>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+                  "entity": "auiheyrdsnf",
+                  "field": "jinaudferv"
+                }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BooleanField>(input, _options)
+        );
+    }
 }

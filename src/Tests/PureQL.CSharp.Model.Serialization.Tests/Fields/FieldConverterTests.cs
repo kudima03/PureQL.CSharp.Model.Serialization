@@ -373,6 +373,60 @@ public sealed record FieldConverterTests
         Assert.Equal(expectedOutput, output);
     }
 
+    /// <summary>
+    /// Every other field type has Read/Write coverage through the Field union
+    /// dispatcher - NullField did not.
+    /// </summary>
+    [Fact]
+    public void ReadNullField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string input = /*lang=json,strict*/
+            $$"""
+            {
+              "type": {
+                "name": "null"
+              },
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}"
+            }
+            """;
+
+        Assert.Equal(
+            new NullField(expectedEntity, expectedField),
+            JsonSerializer.Deserialize<Field>(input, _options)!.AsT3
+        );
+    }
+
+    [Fact]
+    public void WriteNullField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "null"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new NullField(expectedEntity, expectedField),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
     [Fact]
     public void WriteFieldWrappedBooleanField()
     {
@@ -555,6 +609,53 @@ public sealed record FieldConverterTests
         Assert.Equal(expectedOutput, output);
     }
 
+    [Fact]
+    public void WriteFieldWrappedNullField()
+    {
+        const string expectedEntity = "ahbudnfs";
+
+        const string expectedField = "arfeinjuhg";
+
+        const string expectedOutput = /*lang=json,strict*/
+            $$"""
+            {
+              "entity": "{{expectedEntity}}",
+              "field": "{{expectedField}}",
+              "type": {
+                "name": "null"
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Field(new NullField(expectedEntity, expectedField)),
+            _options
+        );
+
+        Assert.Equal(expectedOutput, output);
+    }
+
+    /// <summary>
+    /// The prior "bad format" fixture deserialized as StringField, not Field -
+    /// it never actually exercised this class's own dispatcher failure path.
+    /// </summary>
+    [Fact]
+    public void ThrowsExceptionOnUnrecognizedButWellFormedInput()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "type": {
+                "name": "boolean"
+              }
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<Field>(input, _options)
+        );
+    }
+
     [Theory]
     [InlineData("{}")]
     [InlineData("{asdasdasd}")]
@@ -563,7 +664,7 @@ public sealed record FieldConverterTests
     public void ThrowsExceptionOnBadFormat(string input)
     {
         _ = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<StringField>(input, _options)
+            JsonSerializer.Deserialize<Field>(input, _options)
         );
     }
 }
