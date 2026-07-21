@@ -396,4 +396,42 @@ public sealed record EachTimeArithmeticConverterTests
         Assert.Equal(expectedTime, value.Left.AsT0.AsT1.Value);
         Assert.Equal(new TimeField(rightEntity, rightField), value.Right.AsT1.AsT1);
     }
+
+    [Fact]
+    public void WriteDiffSecondsWithScalarLeft()
+    {
+        TimeOnly expectedTime = new TimeOnly(8, 0, 0);
+        string expectedTimeStr = JsonSerializer.Serialize(expectedTime, _options);
+        const string rightEntity = "rightEntity";
+        const string rightField = "rightField";
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "operator": "eachTimeDiffSeconds",
+              "left": {
+                "type": {
+                  "name": "time"
+                },
+                "value": {{expectedTimeStr}}
+              },
+              "right": {
+                "entity": "{{rightEntity}}",
+                "field": "{{rightField}}",
+                "type": {
+                  "name": "time"
+                }
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new EachTimeDiffSeconds(
+                new TimeReturning(new TimeScalar(expectedTime)),
+                new TimeArrayReturning(new TimeField(rightEntity, rightField))
+            ),
+            _options
+        );
+        Assert.Equal(expected, output);
+    }
 }
