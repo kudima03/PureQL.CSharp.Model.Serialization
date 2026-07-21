@@ -1,5 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PureQL.CSharp.Model.ArrayReturnings;
+using PureQL.CSharp.Model.EachBooleanOperations;
+using PureQL.CSharp.Model.EachEqualities;
+using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.Returnings;
 using PureQL.CSharp.Model.Scalars;
 
@@ -323,5 +327,250 @@ public sealed record JoinConverterTests
         _ = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<Join>(expected, _options)
         );
+    }
+
+    /// <summary>
+    /// The realistic join key shape - "ON left.fk = right.id" - built from a
+    /// field-to-field eachEqual condition. Every "on" fixture before this only
+    /// exercised a trivial boolean literal, never an actual key comparison.
+    /// </summary>
+    [Fact]
+    public void ReadOnFieldToFieldEachEqualityCase()
+    {
+        const string leftEntity = "people";
+        const string leftField = "specialtyId";
+        const string rightEntity = "specialties";
+        const string rightField = "id";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "type": "inner",
+              "entity": "{{rightEntity}}",
+              "on": {
+                "operator": "eachEqual",
+                "left": {
+                  "entity": "{{leftEntity}}",
+                  "field": "{{leftField}}",
+                  "type": {
+                    "name": "uuid"
+                  }
+                },
+                "right": {
+                  "entity": "{{rightEntity}}",
+                  "field": "{{rightField}}",
+                  "type": {
+                    "name": "uuid"
+                  }
+                }
+              }
+            }
+            """;
+
+        Join value = JsonSerializer.Deserialize<Join>(input, _options)!;
+
+        Assert.True(value.On.IsT1);
+        EachUuidEquality equality = value.On.AsT1.AsT4.AsT6;
+        Assert.Equal(new UuidField(leftEntity, leftField), equality.Left.AsT1);
+        Assert.Equal(new UuidField(rightEntity, rightField), equality.Right.AsT1.AsT1);
+    }
+
+    /// <summary>
+    /// A join condition against a literal instead of a key column - only valid
+    /// through the row-wise eachEqual family, same as a WHERE filter.
+    /// </summary>
+    [Fact]
+    public void ReadOnFieldToLiteralEachEqualityCase()
+    {
+        const string joinEntity = "specialties";
+        const string joinField = "name";
+        const string expectedValue = "Foreman";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "type": "inner",
+              "entity": "{{joinEntity}}",
+              "on": {
+                "operator": "eachEqual",
+                "left": {
+                  "entity": "{{joinEntity}}",
+                  "field": "{{joinField}}",
+                  "type": {
+                    "name": "string"
+                  }
+                },
+                "right": {
+                  "type": {
+                    "name": "string"
+                  },
+                  "value": "{{expectedValue}}"
+                }
+              }
+            }
+            """;
+
+        Join value = JsonSerializer.Deserialize<Join>(input, _options)!;
+
+        Assert.True(value.On.IsT1);
+        EachStringEquality equality = value.On.AsT1.AsT4.AsT2;
+        Assert.Equal(expectedValue, equality.Right.AsT0.AsT1.Value);
+    }
+
+    /// <summary>
+    /// A compound, multi-column join key: "ON a.x = b.x AND a.y = b.y".
+    /// </summary>
+    [Fact]
+    public void ReadOnCompoundEachAndCase()
+    {
+        const string leftEntity = "left";
+        const string rightEntity = "right";
+
+        string input = /*lang=json,strict*/
+            $$"""
+            {
+              "type": "inner",
+              "entity": "{{rightEntity}}",
+              "on": {
+                "operator": "eachAnd",
+                "conditions": [
+                  {
+                    "operator": "eachEqual",
+                    "left": {
+                      "entity": "{{leftEntity}}",
+                      "field": "keyPart1",
+                      "type": {
+                        "name": "string"
+                      }
+                    },
+                    "right": {
+                      "entity": "{{rightEntity}}",
+                      "field": "keyPart1",
+                      "type": {
+                        "name": "string"
+                      }
+                    }
+                  },
+                  {
+                    "operator": "eachEqual",
+                    "left": {
+                      "entity": "{{leftEntity}}",
+                      "field": "keyPart2",
+                      "type": {
+                        "name": "string"
+                      }
+                    },
+                    "right": {
+                      "entity": "{{rightEntity}}",
+                      "field": "keyPart2",
+                      "type": {
+                        "name": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+            """;
+
+        Join value = JsonSerializer.Deserialize<Join>(input, _options)!;
+
+        Assert.True(value.On.IsT1);
+        EachAndOperator and = value.On.AsT1.AsT5;
+        Assert.Equal(2, and.Conditions.Count());
+    }
+
+    [Fact]
+    public void WriteOnCompoundEachAndCase()
+    {
+        const string leftEntity = "left";
+        const string rightEntity = "right";
+
+        string expected = /*lang=json,strict*/
+            $$"""
+            {
+              "type": "inner",
+              "entity": "{{rightEntity}}",
+              "on": {
+                "operator": "eachAnd",
+                "conditions": [
+                  {
+                    "operator": "eachEqual",
+                    "left": {
+                      "entity": "{{leftEntity}}",
+                      "field": "keyPart1",
+                      "type": {
+                        "name": "string"
+                      }
+                    },
+                    "right": {
+                      "entity": "{{rightEntity}}",
+                      "field": "keyPart1",
+                      "type": {
+                        "name": "string"
+                      }
+                    }
+                  },
+                  {
+                    "operator": "eachEqual",
+                    "left": {
+                      "entity": "{{leftEntity}}",
+                      "field": "keyPart2",
+                      "type": {
+                        "name": "string"
+                      }
+                    },
+                    "right": {
+                      "entity": "{{rightEntity}}",
+                      "field": "keyPart2",
+                      "type": {
+                        "name": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+            """;
+
+        string output = JsonSerializer.Serialize(
+            new Join(
+                JoinType.Inner,
+                rightEntity,
+                new BooleanArrayReturning(
+                    new EachAndOperator(
+                        [
+                            new BooleanArrayReturning(
+                                new EachEquality(
+                                    new EachStringEquality(
+                                        new StringArrayReturning(
+                                            new StringField(leftEntity, "keyPart1")
+                                        ),
+                                        new StringArrayReturning(
+                                            new StringField(rightEntity, "keyPart1")
+                                        )
+                                    )
+                                )
+                            ),
+                            new BooleanArrayReturning(
+                                new EachEquality(
+                                    new EachStringEquality(
+                                        new StringArrayReturning(
+                                            new StringField(leftEntity, "keyPart2")
+                                        ),
+                                        new StringArrayReturning(
+                                            new StringField(rightEntity, "keyPart2")
+                                        )
+                                    )
+                                )
+                            ),
+                        ]
+                    )
+                )
+            ),
+            _options
+        );
+
+        Assert.Equal(expected, output);
     }
 }
