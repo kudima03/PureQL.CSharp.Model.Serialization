@@ -145,4 +145,35 @@ public sealed record TimeScalarConverterTests
             JsonSerializer.Deserialize<ITimeScalar>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "value": "00:00:00"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<ITimeScalar>(input, _options)
+        );
+    }
+    [Fact]
+    public void ThrowsExceptionOnMalformedValueString()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "type": {
+                "name": "time"
+              },
+              "value": "not-a-time"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<ITimeScalar>(input, _options)
+        );
+    }
 }

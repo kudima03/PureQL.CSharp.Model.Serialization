@@ -154,4 +154,23 @@ public sealed record BooleanArrayScalarConverterTests
             JsonSerializer.Deserialize<IBooleanArrayScalar>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+                        {
+              "value": [
+                true,
+                false,
+                true
+              ]
+            }
+            
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IBooleanArrayScalar>(input, _options)
+        );
+    }
 }

@@ -148,4 +148,35 @@ public sealed record DateTimeScalarConverterTests
             JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "value": "2024-01-01T00:00:00"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
+        );
+    }
+    [Fact]
+    public void ThrowsExceptionOnMalformedValueString()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "type": {
+                "name": "datetime"
+              },
+              "value": "not-a-datetime"
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IDateTimeScalar>(input, _options)
+        );
+    }
 }

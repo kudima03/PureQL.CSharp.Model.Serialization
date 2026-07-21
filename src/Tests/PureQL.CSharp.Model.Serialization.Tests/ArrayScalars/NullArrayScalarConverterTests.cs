@@ -142,4 +142,23 @@ public sealed record NullArrayScalarConverterTests
             JsonSerializer.Deserialize<INullArrayScalar>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+                        {
+              "value": [
+                null,
+                null,
+                null
+              ]
+            }
+            
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<INullArrayScalar>(input, _options)
+        );
+    }
 }

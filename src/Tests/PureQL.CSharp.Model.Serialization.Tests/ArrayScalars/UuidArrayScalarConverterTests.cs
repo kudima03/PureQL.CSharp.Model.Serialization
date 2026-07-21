@@ -165,4 +165,20 @@ public sealed record UuidArrayScalarConverterTests
             JsonSerializer.Deserialize<IUuidArrayScalar>(input, _options)
         );
     }
+    [Fact]
+    public void ThrowsExceptionOnMissingTypeProperty()
+    {
+        const string input = /*lang=json,strict*/
+            """
+            {
+              "value": [
+                "b0a37327-9a2f-4d1e-8e3e-2a7f6f2b6b8a"
+              ]
+            }
+            """;
+
+        _ = Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<IUuidArrayScalar>(input, _options)
+        );
+    }
 }
