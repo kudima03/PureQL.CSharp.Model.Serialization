@@ -33,17 +33,9 @@ internal sealed class EqualityConverter : JsonConverter<Equality>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out SingleValueEquality? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out ArrayEquality? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine Equality type.");
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }

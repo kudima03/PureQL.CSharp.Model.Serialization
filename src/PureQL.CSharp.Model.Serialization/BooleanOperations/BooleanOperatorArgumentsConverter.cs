@@ -45,17 +45,9 @@ internal sealed class BooleanOperatorArgumentsConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out IEnumerable<BooleanReturning>? returnings, out _))
-        {
-            JsonSerializer.Serialize(writer, returnings, options);
-        }
-        else if (value.TryPickT1(out BooleanArrayReturning? booleanArray, out _))
-        {
-            JsonSerializer.Serialize(writer, booleanArray, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine BooleanOperatorArguments type.");
-        }
+        value.Switch(
+            returnings => JsonSerializer.Serialize(writer, returnings, options),
+            booleanArray => JsonSerializer.Serialize(writer, booleanArray, options)
+        );
     }
 }

@@ -41,18 +41,10 @@ internal sealed class NumberReturningOrArrayConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out NumberReturning? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out NumberArrayReturning? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine NumberReturningOrArray type.");
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }
 
@@ -91,18 +83,10 @@ internal sealed class StringReturningOrArrayConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out StringReturning? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out StringArrayReturning? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine StringReturningOrArray type.");
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }
 
@@ -141,18 +125,10 @@ internal sealed class DateReturningOrArrayConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out DateReturning? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out DateArrayReturning? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine DateReturningOrArray type.");
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }
 
@@ -191,18 +167,10 @@ internal sealed class TimeReturningOrArrayConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out TimeReturning? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out TimeArrayReturning? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine TimeReturningOrArray type.");
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }
 
@@ -241,20 +209,10 @@ internal sealed class DateTimeReturningOrArrayConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out DateTimeReturning? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out DateTimeArrayReturning? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException(
-                "Unable to determine DateTimeReturningOrArray type."
-            );
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }
 
@@ -293,17 +251,9 @@ internal sealed class UuidReturningOrArrayConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out UuidReturning? single, out _))
-        {
-            JsonSerializer.Serialize(writer, single, options);
-        }
-        else if (value.TryPickT1(out UuidArrayReturning? array, out _))
-        {
-            JsonSerializer.Serialize(writer, array, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine UuidReturningOrArray type.");
-        }
+        value.Switch(
+            single => JsonSerializer.Serialize(writer, single, options),
+            array => JsonSerializer.Serialize(writer, array, options)
+        );
     }
 }

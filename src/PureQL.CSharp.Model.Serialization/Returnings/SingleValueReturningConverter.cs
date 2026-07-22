@@ -46,37 +46,14 @@ internal sealed class SingleValueReturningConverter : JsonConverter<SingleValueR
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out BooleanReturning? boolean, out _))
-        {
-            JsonSerializer.Serialize(writer, boolean, options);
-        }
-        else if (value.TryPickT1(out DateReturning? date, out _))
-        {
-            JsonSerializer.Serialize(writer, date, options);
-        }
-        else if (value.TryPickT2(out DateTimeReturning? dateTime, out _))
-        {
-            JsonSerializer.Serialize(writer, dateTime, options);
-        }
-        else if (value.TryPickT3(out NumberReturning? number, out _))
-        {
-            JsonSerializer.Serialize(writer, number, options);
-        }
-        else if (value.TryPickT4(out StringReturning? stringValue, out _))
-        {
-            JsonSerializer.Serialize(writer, stringValue, options);
-        }
-        else if (value.TryPickT5(out TimeReturning? time, out _))
-        {
-            JsonSerializer.Serialize(writer, time, options);
-        }
-        else if (value.TryPickT6(out UuidReturning? uuid, out _))
-        {
-            JsonSerializer.Serialize(writer, uuid, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine SingleValueReturning type.");
-        }
+        value.Switch(
+            boolean => JsonSerializer.Serialize(writer, boolean, options),
+            date => JsonSerializer.Serialize(writer, date, options),
+            dateTime => JsonSerializer.Serialize(writer, dateTime, options),
+            number => JsonSerializer.Serialize(writer, number, options),
+            stringValue => JsonSerializer.Serialize(writer, stringValue, options),
+            time => JsonSerializer.Serialize(writer, time, options),
+            uuid => JsonSerializer.Serialize(writer, uuid, options)
+        );
     }
 }

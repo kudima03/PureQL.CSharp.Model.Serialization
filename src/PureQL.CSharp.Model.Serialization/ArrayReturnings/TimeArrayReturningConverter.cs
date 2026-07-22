@@ -44,25 +44,11 @@ internal sealed class TimeArrayReturningConverter : JsonConverter<TimeArrayRetur
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out TimeArrayParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out TimeField? field, out _))
-        {
-            JsonSerializer.Serialize(writer, field, options);
-        }
-        else if (value.TryPickT2(out TimeArrayScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<ITimeArrayScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT3(out EachTimeAddSeconds? addSeconds, out _))
-        {
-            JsonSerializer.Serialize(writer, addSeconds, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine TimeArrayReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            field => JsonSerializer.Serialize(writer, field, options),
+            scalar => JsonSerializer.Serialize<ITimeArrayScalar>(writer, scalar, options),
+            addSeconds => JsonSerializer.Serialize(writer, addSeconds, options)
+        );
     }
 }

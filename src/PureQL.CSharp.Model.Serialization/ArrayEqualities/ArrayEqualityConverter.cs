@@ -66,37 +66,14 @@ internal sealed class ArrayEqualityConverter : JsonConverter<ArrayEquality>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out BooleanArrayEquality? booleanArray, out _))
-        {
-            JsonSerializer.Serialize(writer, booleanArray, options);
-        }
-        else if (value.TryPickT1(out DateArrayEquality? dateArray, out _))
-        {
-            JsonSerializer.Serialize(writer, dateArray, options);
-        }
-        else if (value.TryPickT2(out DateTimeArrayEquality? dateTimeArray, out _))
-        {
-            JsonSerializer.Serialize(writer, dateTimeArray, options);
-        }
-        else if (value.TryPickT3(out NumberArrayEquality? numberArray, out _))
-        {
-            JsonSerializer.Serialize(writer, numberArray, options);
-        }
-        else if (value.TryPickT4(out StringArrayEquality? stringArray, out _))
-        {
-            JsonSerializer.Serialize(writer, stringArray, options);
-        }
-        else if (value.TryPickT5(out TimeArrayEquality? timeArray, out _))
-        {
-            JsonSerializer.Serialize(writer, timeArray, options);
-        }
-        else if (value.TryPickT6(out UuidArrayEquality? uuidArray, out _))
-        {
-            JsonSerializer.Serialize(writer, uuidArray, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine ArrayEquality type.");
-        }
+        value.Switch(
+            booleanArray => JsonSerializer.Serialize(writer, booleanArray, options),
+            dateArray => JsonSerializer.Serialize(writer, dateArray, options),
+            dateTimeArray => JsonSerializer.Serialize(writer, dateTimeArray, options),
+            numberArray => JsonSerializer.Serialize(writer, numberArray, options),
+            stringArray => JsonSerializer.Serialize(writer, stringArray, options),
+            timeArray => JsonSerializer.Serialize(writer, timeArray, options),
+            uuidArray => JsonSerializer.Serialize(writer, uuidArray, options)
+        );
     }
 }

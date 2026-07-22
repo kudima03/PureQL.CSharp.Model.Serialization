@@ -37,21 +37,10 @@ internal sealed class StringArrayReturningConverter : JsonConverter<StringArrayR
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out StringArrayParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out StringField? field, out _))
-        {
-            JsonSerializer.Serialize(writer, field, options);
-        }
-        else if (value.TryPickT2(out StringArrayScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<IStringArrayScalar>(writer, scalar, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine StringArrayReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            field => JsonSerializer.Serialize(writer, field, options),
+            scalar => JsonSerializer.Serialize<IStringArrayScalar>(writer, scalar, options)
+        );
     }
 }

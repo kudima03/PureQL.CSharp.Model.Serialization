@@ -51,29 +51,12 @@ internal sealed class NumberReturningConverter : JsonConverter<NumberReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out NumberParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out NumberScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<INumberScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT2(out Arithmetic? arithmetic, out _))
-        {
-            JsonSerializer.Serialize(writer, arithmetic, options);
-        }
-        else if (value.TryPickT3(out NumberAggregate? numberAgg, out _))
-        {
-            JsonSerializer.Serialize(writer, numberAgg, options);
-        }
-        else if (value.TryPickT4(out Count? count, out _))
-        {
-            JsonSerializer.Serialize(writer, count, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine NumberReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            scalar => JsonSerializer.Serialize<INumberScalar>(writer, scalar, options),
+            arithmetic => JsonSerializer.Serialize(writer, arithmetic, options),
+            numberAgg => JsonSerializer.Serialize(writer, numberAgg, options),
+            count => JsonSerializer.Serialize(writer, count, options)
+        );
     }
 }

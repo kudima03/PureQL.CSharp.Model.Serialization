@@ -41,21 +41,10 @@ internal sealed class StringReturningConverter : JsonConverter<StringReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out StringParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out StringScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<IStringScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT2(out StringAggregate? aggregate, out _))
-        {
-            JsonSerializer.Serialize(writer, aggregate, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine StringReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            scalar => JsonSerializer.Serialize<IStringScalar>(writer, scalar, options),
+            aggregate => JsonSerializer.Serialize(writer, aggregate, options)
+        );
     }
 }

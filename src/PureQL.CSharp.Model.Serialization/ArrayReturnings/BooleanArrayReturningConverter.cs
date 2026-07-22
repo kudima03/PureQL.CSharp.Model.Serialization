@@ -61,43 +61,15 @@ internal sealed class BooleanArrayReturningConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out BooleanArrayScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<IBooleanArrayScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT1(out BooleanField? field, out _))
-        {
-            JsonSerializer.Serialize(writer, field, options);
-        }
-        else if (value.TryPickT2(out BooleanArrayParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT3(out EachComparison? comparison, out _))
-        {
-            JsonSerializer.Serialize(writer, comparison, options);
-        }
-        else if (value.TryPickT4(out EachEquality? equality, out _))
-        {
-            JsonSerializer.Serialize(writer, equality, options);
-        }
-        else if (value.TryPickT5(out EachAndOperator? andOp, out _))
-        {
-            JsonSerializer.Serialize(writer, andOp, options);
-        }
-        else if (value.TryPickT6(out EachOrOperator? orOp, out _))
-        {
-            JsonSerializer.Serialize(writer, orOp, options);
-        }
-        else if (value.TryPickT7(out EachNotOperator? notOp, out _))
-        {
-            JsonSerializer.Serialize(writer, notOp, options);
-        }
-        else
-        {
-            throw new JsonException(
-                "Unable to determine BooleanArrayReturning type."
-            );
-        }
+        value.Switch(
+            scalar => JsonSerializer.Serialize<IBooleanArrayScalar>(writer, scalar, options),
+            field => JsonSerializer.Serialize(writer, field, options),
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            comparison => JsonSerializer.Serialize(writer, comparison, options),
+            equality => JsonSerializer.Serialize(writer, equality, options),
+            andOp => JsonSerializer.Serialize(writer, andOp, options),
+            orOp => JsonSerializer.Serialize(writer, orOp, options),
+            notOp => JsonSerializer.Serialize(writer, notOp, options)
+        );
     }
 }
