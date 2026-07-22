@@ -67,39 +67,14 @@ internal sealed class NumberArrayReturningConverter : JsonConverter<NumberArrayR
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out NumberArrayParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out NumberField? field, out _))
-        {
-            JsonSerializer.Serialize(writer, field, options);
-        }
-        else if (value.TryPickT2(out NumberArrayScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<INumberArrayScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT3(out EachArithmetic? arithmetic, out _))
-        {
-            JsonSerializer.Serialize(writer, arithmetic, options);
-        }
-        else if (value.TryPickT4(out EachDateDiffDays? dateDiff, out _))
-        {
-            JsonSerializer.Serialize(writer, dateDiff, options);
-        }
-        else if (value.TryPickT5(out EachDateTimeDiffSeconds? dateTimeDiff, out _))
-        {
-            JsonSerializer.Serialize(writer, dateTimeDiff, options);
-        }
-        else if (value.TryPickT6(out EachTimeDiffSeconds? timeDiff, out _))
-        {
-            JsonSerializer.Serialize(writer, timeDiff, options);
-        }
-        else
-        {
-            throw new JsonException(
-                "Unable to determine NumberArrayReturning type."
-            );
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            field => JsonSerializer.Serialize(writer, field, options),
+            scalar => JsonSerializer.Serialize<INumberArrayScalar>(writer, scalar, options),
+            arithmetic => JsonSerializer.Serialize(writer, arithmetic, options),
+            dateDiff => JsonSerializer.Serialize(writer, dateDiff, options),
+            dateTimeDiff => JsonSerializer.Serialize(writer, dateTimeDiff, options),
+            timeDiff => JsonSerializer.Serialize(writer, timeDiff, options)
+        );
     }
 }

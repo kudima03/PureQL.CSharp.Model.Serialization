@@ -30,17 +30,9 @@ internal sealed class UuidReturningConverter : JsonConverter<UuidReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out UuidParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out UuidScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<IUuidScalar>(writer, scalar, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine UuidReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            scalar => JsonSerializer.Serialize<IUuidScalar>(writer, scalar, options)
+        );
     }
 }

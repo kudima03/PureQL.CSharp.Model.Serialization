@@ -37,21 +37,10 @@ internal sealed class TimeReturningConverter : JsonConverter<TimeReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out TimeParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out TimeScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<ITimeScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT2(out TimeAggregate? aggregate, out _))
-        {
-            JsonSerializer.Serialize(writer, aggregate, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine TimeReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            scalar => JsonSerializer.Serialize<ITimeScalar>(writer, scalar, options),
+            aggregate => JsonSerializer.Serialize(writer, aggregate, options)
+        );
     }
 }

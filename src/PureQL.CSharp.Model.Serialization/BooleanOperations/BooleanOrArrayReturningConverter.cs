@@ -41,19 +41,9 @@ internal sealed class BooleanOrArrayReturningConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out BooleanReturning? booleanReturning, out _))
-        {
-            JsonSerializer.Serialize(writer, booleanReturning, options);
-        }
-        else if (value.TryPickT1(out BooleanArrayReturning? booleanArray, out _))
-        {
-            JsonSerializer.Serialize(writer, booleanArray, options);
-        }
-        else
-        {
-            throw new JsonException(
-                "Unable to determine BooleanOrArrayReturning type."
-            );
-        }
+        value.Switch(
+            booleanReturning => JsonSerializer.Serialize(writer, booleanReturning, options),
+            booleanArray => JsonSerializer.Serialize(writer, booleanArray, options)
+        );
     }
 }

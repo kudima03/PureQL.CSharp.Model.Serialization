@@ -44,25 +44,11 @@ internal sealed class DateArrayReturningConverter : JsonConverter<DateArrayRetur
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out DateArrayParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out DateField? field, out _))
-        {
-            JsonSerializer.Serialize(writer, field, options);
-        }
-        else if (value.TryPickT2(out DateArrayScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<IDateArrayScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT3(out EachDateAddDays? addDays, out _))
-        {
-            JsonSerializer.Serialize(writer, addDays, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine DateArrayReturning type.");
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            field => JsonSerializer.Serialize(writer, field, options),
+            scalar => JsonSerializer.Serialize<IDateArrayScalar>(writer, scalar, options),
+            addDays => JsonSerializer.Serialize(writer, addDays, options)
+        );
     }
 }

@@ -66,37 +66,14 @@ internal sealed class ArrayReturningConverter : JsonConverter<ArrayReturning>
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out BooleanArrayReturning? booleanArray, out _))
-        {
-            JsonSerializer.Serialize(writer, booleanArray, options);
-        }
-        else if (value.TryPickT1(out DateArrayReturning? dateArray, out _))
-        {
-            JsonSerializer.Serialize(writer, dateArray, options);
-        }
-        else if (value.TryPickT2(out DateTimeArrayReturning? dateTimeArray, out _))
-        {
-            JsonSerializer.Serialize(writer, dateTimeArray, options);
-        }
-        else if (value.TryPickT3(out NumberArrayReturning? numberArray, out _))
-        {
-            JsonSerializer.Serialize(writer, numberArray, options);
-        }
-        else if (value.TryPickT4(out StringArrayReturning? stringArray, out _))
-        {
-            JsonSerializer.Serialize(writer, stringArray, options);
-        }
-        else if (value.TryPickT5(out TimeArrayReturning? timeArray, out _))
-        {
-            JsonSerializer.Serialize(writer, timeArray, options);
-        }
-        else if (value.TryPickT6(out UuidArrayReturning? uuidArray, out _))
-        {
-            JsonSerializer.Serialize(writer, uuidArray, options);
-        }
-        else
-        {
-            throw new JsonException("Unable to determine ArrayReturning type.");
-        }
+        value.Switch(
+            booleanArray => JsonSerializer.Serialize(writer, booleanArray, options),
+            dateArray => JsonSerializer.Serialize(writer, dateArray, options),
+            dateTimeArray => JsonSerializer.Serialize(writer, dateTimeArray, options),
+            numberArray => JsonSerializer.Serialize(writer, numberArray, options),
+            stringArray => JsonSerializer.Serialize(writer, stringArray, options),
+            timeArray => JsonSerializer.Serialize(writer, timeArray, options),
+            uuidArray => JsonSerializer.Serialize(writer, uuidArray, options)
+        );
     }
 }

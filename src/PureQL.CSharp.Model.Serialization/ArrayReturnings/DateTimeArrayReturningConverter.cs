@@ -51,27 +51,12 @@ internal sealed class DateTimeArrayReturningConverter
         JsonSerializerOptions options
     )
     {
-        if (value.TryPickT0(out DateTimeArrayParameter? parameter, out _))
-        {
-            JsonSerializer.Serialize(writer, parameter, options);
-        }
-        else if (value.TryPickT1(out DateTimeField? field, out _))
-        {
-            JsonSerializer.Serialize(writer, field, options);
-        }
-        else if (value.TryPickT2(out DateTimeArrayScalar? scalar, out _))
-        {
-            JsonSerializer.Serialize<IDateTimeArrayScalar>(writer, scalar, options);
-        }
-        else if (value.TryPickT3(out EachDateTimeAddSeconds? addSeconds, out _))
-        {
-            JsonSerializer.Serialize(writer, addSeconds, options);
-        }
-        else
-        {
-            throw new JsonException(
-                "Unable to determine DateTimeArrayReturning type."
-            );
-        }
+        value.Switch(
+            parameter => JsonSerializer.Serialize(writer, parameter, options),
+            field => JsonSerializer.Serialize(writer, field, options),
+            scalar =>
+                JsonSerializer.Serialize<IDateTimeArrayScalar>(writer, scalar, options),
+            addSeconds => JsonSerializer.Serialize(writer, addSeconds, options)
+        );
     }
 }
