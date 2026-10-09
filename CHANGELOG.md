@@ -9,6 +9,10 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ## [Unreleased]
 
+---
+
+## [0.1.0-preview.4.0.0] - 2026-10-09
+
 Rewrites serialization for `PureQL.CSharp.Model 0.1.0-preview.12.0.0`, which mirrors
 PureQL specification `0.1.0-preview.1.0.0`. All previous converters are replaced.
 
@@ -29,6 +33,9 @@ PureQL specification `0.1.0-preview.1.0.0`. All previous converters are replaced
   with an offset.
 - The converters no longer use reflection; the package is marked trim- and
   AOT-compatible on net8.0 and later.
+- The assembly version is now derived from the release tag's major version, so
+  `0.x` releases carry `AssemblyVersion` `0.0.0.0` (previous releases carried
+  `1.0.0.0`) and `FileVersion` matches the release.
 
 ### Removed
 
