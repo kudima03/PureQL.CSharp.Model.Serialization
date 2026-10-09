@@ -1,6 +1,9 @@
 namespace PureQL.CSharp.Model.Serialization.Tests;
 
-/// <summary>The fixtures of PureQL specification 0.1.0-preview.1.0.0.</summary>
+/// <summary>
+/// The fixtures of PureQL specification 0.1.0-preview.1.0.0, from the
+/// <c>src/Tests/PureQL-Specification</c> submodule.
+/// </summary>
 internal static class SpecificationFiles
 {
     private static readonly string Root = Path.Combine(
@@ -10,12 +13,12 @@ internal static class SpecificationFiles
 
     public static IReadOnlyList<string> Valid()
     {
-        return Names("samples", "*.json", "valid", "*.jsonc");
+        return Names("samples", "*.json", "tests/valid", "*.jsonc");
     }
 
     public static IReadOnlyList<string> Invalid()
     {
-        return Names("invalid", "*.jsonc");
+        return Names("tests/invalid", "*.jsonc");
     }
 
     public static TheoryData<string> Data(IEnumerable<string> names)
@@ -40,6 +43,14 @@ internal static class SpecificationFiles
         for (int i = 0; i < folderAndPattern.Length; i += 2)
         {
             string folder = folderAndPattern[i];
+            if (!Directory.Exists(Path.Combine(Root, folder)))
+            {
+                throw new DirectoryNotFoundException(
+                    $"Specification fixtures not found in {Root}; "
+                        + "run 'git submodule update --init'"
+                );
+            }
+
             IEnumerable<string> files = Directory
                 .GetFiles(Path.Combine(Root, folder), folderAndPattern[i + 1])
                 .Select(Path.GetFileName)

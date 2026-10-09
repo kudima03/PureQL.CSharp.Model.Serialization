@@ -1,5 +1,0 @@
-// select column whose expression is JSON null
-{
-  "from": { "entity": "orders" },
-  "select": [{ "alias": "id", "type": { "name": "uuid", "nullable": true }, "expression": null }]
-}

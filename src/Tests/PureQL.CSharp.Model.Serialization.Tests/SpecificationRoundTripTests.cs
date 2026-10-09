@@ -5,7 +5,7 @@ namespace PureQL.CSharp.Model.Serialization.Tests;
 
 public sealed record SpecificationRoundTripTests
 {
-    private const string LiteralEdgeValues = "valid/002_literal_edge_values.jsonc";
+    private const string LiteralEdgeValues = "tests/valid/002_literal_edge_values.jsonc";
 
     /// <summary>
     /// Columns of <see cref="LiteralEdgeValues"/> whose literal the model's CLR types

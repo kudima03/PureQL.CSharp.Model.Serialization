@@ -22,7 +22,26 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Fixtures of PureQL specification 0.1.0-preview.1.0.0, copied unchanged. -->
-    <None Include="Specification\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The PureQL-Specification submodule, pinned to tag 0.1.0-preview.1.0.0. -->
+    <None
+      Include="..\PureQL-Specification\PureQL-Specification.json"
+      Link="Specification\PureQL-Specification.json"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+    <None
+      Include="..\PureQL-Specification\samples\*.json"
+      LinkBase="Specification\samples"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+    <None
+      Include="..\PureQL-Specification\tests\valid\*.jsonc"
+      LinkBase="Specification\tests\valid"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+    <None
+      Include="..\PureQL-Specification\tests\invalid\*.jsonc"
+      LinkBase="Specification\tests\invalid"
+      CopyToOutputDirectory="PreserveNewest"
+    />
   </ItemGroup>
 </Project>

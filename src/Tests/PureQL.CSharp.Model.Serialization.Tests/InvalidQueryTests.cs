@@ -82,7 +82,7 @@ public sealed record InvalidQueryTests
     {
         Assert.All(
             AcceptedByModel.Keys,
-            file => Assert.Contains($"invalid/{file}", SpecificationFiles.Invalid())
+            file => Assert.Contains($"tests/invalid/{file}", SpecificationFiles.Invalid())
         );
     }
 
@@ -102,7 +102,7 @@ public sealed record InvalidQueryTests
             SpecificationFiles
                 .Invalid()
                 .Where(name =>
-                    AcceptedByModel.ContainsKey(name["invalid/".Length..]) == accepted
+                    AcceptedByModel.ContainsKey(Path.GetFileName(name)) == accepted
                 )
         );
     }

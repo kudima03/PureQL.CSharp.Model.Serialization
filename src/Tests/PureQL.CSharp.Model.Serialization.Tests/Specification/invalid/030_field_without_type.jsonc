@@ -1,7 +1,0 @@
-// Field reference without a type
-{
-  "from": { "entity": "orders" },
-  "select": [
-    { "alias": "c", "type": { "name": "uuid" }, "expression": { "source": "orders", "field": "id" } }
-  ]
-}

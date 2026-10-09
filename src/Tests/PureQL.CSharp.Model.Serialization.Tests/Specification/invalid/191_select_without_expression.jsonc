@@ -1,2 +1,0 @@
-// select column without an expression
-{ "from": { "entity": "orders" }, "select": [{ "alias": "id", "type": { "name": "uuid" } }] }

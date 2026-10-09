@@ -1,2 +1,0 @@
-// Query without select
-{ "from": { "entity": "orders" } }
