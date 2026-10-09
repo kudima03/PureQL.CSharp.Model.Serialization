@@ -9,6 +9,31 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ## [Unreleased]
 
+Rewrites serialization for `PureQL.CSharp.Model 0.1.0-preview.12.0.0`, which mirrors
+PureQL specification `0.1.0-preview.1.0.0`. All previous converters are replaced.
+
+### Changed
+
+- **`PureQLConverters`** now yields one converter per model type (788 types:
+  queries, sources, joins, pagination, order items, select items, group keys, every
+  `*Row` / `*Projection` / `*Group` expression, fields, parameters, keys, literals and
+  lists).
+- Variants are chosen as the schema chooses them: queries by `groupBy`, `from` /
+  `join` by `subquery`, operator nodes by `operator`, leaves by shape and declared
+  type, and `equal` / `notEqual` / `in` / comparisons / `orderBy` keys by the type
+  family of their operand (`probe.*`).
+- Reading is strict: unknown, duplicate or missing properties and values outside the
+  literal formats raise `JsonException` with the JSON path.
+- Writing omits schema defaults (`nullable: false`, default `over`, `direction: "asc"`,
+  `distinct: false`), writes nullable literals as `"value": null` and every `datetime`
+  with an offset.
+- The converters no longer use reflection; the package is marked trim- and
+  AOT-compatible on net8.0 and later.
+
+### Removed
+
+- The public enum `ComparisonOperatorJsonModel` and all previous internal converters.
+
 ---
 
 ## [0.1.0-preview.2.0.1]

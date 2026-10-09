@@ -21,4 +21,8 @@
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Fixtures of PureQL specification 0.1.0-preview.1.0.0, copied unchanged. -->
+    <None Include="Specification\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
