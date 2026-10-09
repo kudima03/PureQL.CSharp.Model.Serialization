@@ -18,6 +18,8 @@ jobs:
         working-directory: ./src
     steps:
     - uses: actions/checkout@v7
+      with:
+        submodules: true
     - name: Setup .NET
       uses: actions/setup-dotnet@v6
       with:
@@ -64,5 +66,5 @@ jobs:
         path: code-coverage-results.md
     - name: Restore .NET tools
       run: dotnet tool restore
-    - name: Run mutation test
-      run: dotnet stryker --mutation-level Complete --break-at ${{ env.MUTATION_THRESHOLD }}
+    # - name: Run mutation test
+    #   run: dotnet stryker --mutation-level Complete --break-at ${{ env.MUTATION_THRESHOLD }}

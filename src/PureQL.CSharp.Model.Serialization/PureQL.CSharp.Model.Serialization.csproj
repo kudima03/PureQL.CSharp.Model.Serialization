@@ -4,7 +4,10 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsAotCompatible>false</IsAotCompatible>
+    <!-- The trim and AOT analyzers support net8.0 and later only. -->
+    <IsAotCompatible
+      Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))"
+      >true</IsAotCompatible>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>0.1.0-preview.3.0.1</PackageValidationBaselineVersion>
   </PropertyGroup>
@@ -17,6 +20,9 @@
     <PackageProjectUrl>https://github.com/kudima03/PureQL.CSharp.Model.Serialization</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.11.0.1" />
+    <InternalsVisibleTo Include="PureQL.CSharp.Model.Serialization.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.12.0.0" />
   </ItemGroup>
 </Project>

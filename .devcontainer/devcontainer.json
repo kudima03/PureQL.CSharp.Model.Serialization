@@ -16,6 +16,6 @@
       "settings": { "editor.formatOnSave": true }
     }
   },
-  "postCreateCommand": "cd src && dotnet restore && dotnet tool restore",
+  "postCreateCommand": "git submodule update --init && cd src && dotnet restore && dotnet tool restore",
   "remoteUser": "vscode"
 }
