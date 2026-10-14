@@ -11,14 +11,14 @@ internal static class QueryRegistrations
     public static void Register(ModelRegistry registry)
     {
         registry.ByPresence(
-            "groupBy",
-            UnionCase.Of((MainGroupedQuery x) => new PureQLQuery(x)),
-            UnionCase.Of((MainPlainQuery x) => new PureQLQuery(x))
+            UnionCase.Of((MainPlainQuery x) => new PureQLQuery(x)),
+            ("groupBy", UnionCase.Of((MainGroupedQuery x) => new PureQLQuery(x))),
+            ("aggregate", UnionCase.Of((MainTotalQuery x) => new PureQLQuery(x)))
         );
         registry.ByPresence(
-            "groupBy",
-            UnionCase.Of((GroupedQuery x) => new Query(x)),
-            UnionCase.Of((PlainQuery x) => new Query(x))
+            UnionCase.Of((PlainQuery x) => new Query(x)),
+            ("groupBy", UnionCase.Of((GroupedQuery x) => new Query(x))),
+            ("aggregate", UnionCase.Of((TotalQuery x) => new Query(x)))
         );
         registry.Record(
             r => new MainGroupedQuery(
@@ -31,7 +31,7 @@ internal static class QueryRegistrations
                 r.Optional<BooleanGroup>("having"),
                 r.OptionalMany<OrderItemGroup>("orderBy"),
                 r.Optional<Pagination>("pagination"),
-                r.Flag("distinct")
+                r.OptionalStrings("distinctBy")
             ),
             (w, x) =>
             {
@@ -42,7 +42,7 @@ internal static class QueryRegistrations
                 w.Many("groupBy", x.GroupBy);
                 w.Optional("having", x.Having);
                 w.Many("select", x.Select);
-                w.Flag("distinct", x.Distinct);
+                w.OptionalStrings("distinctBy", x.DistinctBy);
                 w.OptionalMany("orderBy", x.OrderBy);
                 w.Optional("pagination", x.Pagination);
             }
@@ -56,7 +56,7 @@ internal static class QueryRegistrations
                 r.Optional<BooleanRow>("where"),
                 r.OptionalMany<OrderItemProjection>("orderBy"),
                 r.Optional<Pagination>("pagination"),
-                r.Flag("distinct")
+                r.OptionalStrings("distinctBy")
             ),
             (w, x) =>
             {
@@ -65,9 +65,26 @@ internal static class QueryRegistrations
                 w.OptionalMany("joins", x.Joins);
                 w.Optional("where", x.Where);
                 w.Many("select", x.Select);
-                w.Flag("distinct", x.Distinct);
+                w.OptionalStrings("distinctBy", x.DistinctBy);
                 w.OptionalMany("orderBy", x.OrderBy);
                 w.Optional("pagination", x.Pagination);
+            }
+        );
+        registry.Record(
+            r => new MainTotalQuery(
+                r.One<From>("from"),
+                r.Many<SelectItemTotal>("aggregate"),
+                r.OptionalMany<Subquery>("subqueries"),
+                r.OptionalMany<Join>("joins"),
+                r.Optional<BooleanRow>("where")
+            ),
+            (w, x) =>
+            {
+                w.OptionalMany("subqueries", x.Subqueries);
+                w.One("from", x.From);
+                w.OptionalMany("joins", x.Joins);
+                w.Optional("where", x.Where);
+                w.Many("aggregate", x.Aggregate);
             }
         );
         registry.Record(
@@ -80,7 +97,7 @@ internal static class QueryRegistrations
                 r.Optional<BooleanGroup>("having"),
                 r.OptionalMany<OrderItemGroup>("orderBy"),
                 r.Optional<Pagination>("pagination"),
-                r.Flag("distinct")
+                r.OptionalStrings("distinctBy")
             ),
             (w, x) =>
             {
@@ -90,7 +107,7 @@ internal static class QueryRegistrations
                 w.Many("groupBy", x.GroupBy);
                 w.Optional("having", x.Having);
                 w.Many("select", x.Select);
-                w.Flag("distinct", x.Distinct);
+                w.OptionalStrings("distinctBy", x.DistinctBy);
                 w.OptionalMany("orderBy", x.OrderBy);
                 w.Optional("pagination", x.Pagination);
             }
@@ -103,7 +120,7 @@ internal static class QueryRegistrations
                 r.Optional<BooleanRow>("where"),
                 r.OptionalMany<OrderItemProjection>("orderBy"),
                 r.Optional<Pagination>("pagination"),
-                r.Flag("distinct")
+                r.OptionalStrings("distinctBy")
             ),
             (w, x) =>
             {
@@ -111,9 +128,24 @@ internal static class QueryRegistrations
                 w.OptionalMany("joins", x.Joins);
                 w.Optional("where", x.Where);
                 w.Many("select", x.Select);
-                w.Flag("distinct", x.Distinct);
+                w.OptionalStrings("distinctBy", x.DistinctBy);
                 w.OptionalMany("orderBy", x.OrderBy);
                 w.Optional("pagination", x.Pagination);
+            }
+        );
+        registry.Record(
+            r => new TotalQuery(
+                r.One<From>("from"),
+                r.Many<SelectItemTotal>("aggregate"),
+                r.OptionalMany<Join>("joins"),
+                r.Optional<BooleanRow>("where")
+            ),
+            (w, x) =>
+            {
+                w.One("from", x.From);
+                w.OptionalMany("joins", x.Joins);
+                w.Optional("where", x.Where);
+                w.Many("aggregate", x.Aggregate);
             }
         );
         registry.Record(
@@ -134,7 +166,7 @@ internal static class QueryRegistrations
             }
         );
         registry.Record(
-            r => new OrderItemGroup(r.One<ValueGroup>("expression"), r.Direction()),
+            r => new OrderItemGroup(r.One<ExprGroup>("expression"), r.Direction()),
             (w, x) =>
             {
                 w.One("expression", x.Expression);
@@ -143,7 +175,7 @@ internal static class QueryRegistrations
         );
         registry.Record(
             r => new OrderItemProjection(
-                r.One<ValueProjection>("expression"),
+                r.One<ExprProjection>("expression"),
                 r.Direction()
             ),
             (w, x) =>
@@ -157,9 +189,8 @@ internal static class QueryRegistrations
     private static void RegisterSources(ModelRegistry registry)
     {
         registry.ByPresence(
-            "subquery",
-            UnionCase.Of((FromSubquery x) => new From(x)),
-            UnionCase.Of((FromEntity x) => new From(x))
+            UnionCase.Of((FromEntity x) => new From(x)),
+            ("subquery", UnionCase.Of((FromSubquery x) => new From(x)))
         );
         registry.Record(
             r => new FromEntity(r.String("entity"), r.OptionalString("alias")),
@@ -178,20 +209,19 @@ internal static class QueryRegistrations
             }
         );
         registry.ByPresence(
-            "subquery",
-            UnionCase.Of((JoinSubquery x) => new Join(x)),
-            UnionCase.Of((JoinEntity x) => new Join(x))
+            UnionCase.Of((JoinEntity x) => new Join(x)),
+            ("subquery", UnionCase.Of((JoinSubquery x) => new Join(x)))
         );
         registry.Record(
             r => new JoinEntity(
-                r.JoinType(),
+                r.Kind(),
                 r.String("entity"),
                 r.One<BooleanRow>("on"),
                 r.OptionalString("alias")
             ),
             (w, x) =>
             {
-                w.JoinType(x.Type);
+                w.Kind(x.Kind);
                 w.String("entity", x.Entity);
                 w.OptionalString("alias", x.Alias);
                 w.One("on", x.On);
@@ -199,14 +229,14 @@ internal static class QueryRegistrations
         );
         registry.Record(
             r => new JoinSubquery(
-                r.JoinType(),
+                r.Kind(),
                 r.String("subquery"),
                 r.One<BooleanRow>("on"),
                 r.OptionalString("alias")
             ),
             (w, x) =>
             {
-                w.JoinType(x.Type);
+                w.Kind(x.Kind);
                 w.String("subquery", x.Subquery);
                 w.OptionalString("alias", x.Alias);
                 w.One("on", x.On);

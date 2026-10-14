@@ -8,7 +8,10 @@ namespace PureQL.CSharp.Model.Serialization.Tests;
 /// <summary>
 /// Builds instances of every model type by reflection: one per case of a union, and
 /// for a record one with every optional value set (and non-default <c>over</c> /
-/// <c>direction</c>) and one with none.
+/// <c>direction</c>) and one with none. The items of a list differ, as list literals
+/// and <c>distinctBy</c> repeat no value, and the operands of an operator give it the
+/// type it declares: a nullable operator gets nullable operands and a non-null one
+/// non-null operands (a non-null <c>coalesce</c> one of each).
 /// </summary>
 internal static class ModelSamples
 {
@@ -38,30 +41,59 @@ internal static class ModelSamples
         yield return Create(type, false);
     }
 
-    private static object Create(Type type, bool full)
+    private static object Create(Type type, bool full, bool? nullable = null)
     {
         if (IsUnion(type, out Type[] cases))
         {
-            return Wrap(type, cases[0], Create(cases[0], false));
+            bool wanted = nullable ?? IsNullable(type);
+            Type pick = cases.FirstOrDefault(c => IsNullable(c) == wanted) ?? cases[0];
+            return Wrap(type, pick, Create(pick, false));
         }
 
         ConstructorInfo constructor = type.GetConstructors()
             .OrderByDescending(c => c.GetParameters().Length)
             .First();
+        bool operands = IsNullable(type);
+        bool coalesce =
+            type.Name.StartsWith("Coalesce", StringComparison.Ordinal) && !operands;
         return constructor.Invoke([
-            .. constructor.GetParameters().Select(p => Value(p, full)),
+            .. constructor
+                .GetParameters()
+                .Select(p => Value(p, full, operands, coalesce)),
         ]);
     }
 
-    private static object? Value(ParameterInfo parameter, bool full)
+    private static bool IsNullable(Type type)
+    {
+        return type.Name.Contains("Nullable", StringComparison.Ordinal);
+    }
+
+    private static object? Value(
+        ParameterInfo parameter,
+        bool full,
+        bool nullable,
+        bool coalesce
+    )
     {
         Type type = parameter.ParameterType;
         return !type.IsValueType && parameter.HasDefaultValue && !full
             ? null
-            : Value(Nullable.GetUnderlyingType(type) ?? type, full);
+            : Value(
+                Nullable.GetUnderlyingType(type) ?? type,
+                full,
+                0,
+                nullable,
+                coalesce
+            );
     }
 
-    private static object Value(Type type, bool full)
+    private static object Value(
+        Type type,
+        bool full,
+        int variant = 0,
+        bool nullable = false,
+        bool coalesce = false
+    )
     {
         if (type == typeof(OneOf<long, ParamInteger>))
         {
@@ -77,21 +109,26 @@ internal static class ModelSamples
         {
             Type item = type.GetGenericArguments()[0];
             Array items = Array.CreateInstance(item, 2);
-            items.SetValue(Value(item, false), 0);
-            items.SetValue(Value(item, false), 1);
+            for (int i = 0; i < 2; i++)
+            {
+                // A non-null coalesce has exactly one non-null operand.
+                bool wanted = nullable || (coalesce && (i == 0));
+                items.SetValue(Value(item, false, i, wanted), i);
+            }
+
             return items;
         }
 
         return type switch
         {
-            _ when type == typeof(string) => "name",
-            _ when type == typeof(long) => -42L,
+            _ when type == typeof(string) => $"name{variant}",
+            _ when type == typeof(long) => -42L + variant,
             _ when type == typeof(int) => 3,
-            _ when type == typeof(decimal) => 12.50m,
-            _ when type == typeof(bool) => full,
-            _ when type == typeof(DateOnly) => new DateOnly(2024, 2, 29),
+            _ when type == typeof(decimal) => 12.50m + variant,
+            _ when type == typeof(bool) => full ^ (variant == 1),
+            _ when type == typeof(DateOnly) => new DateOnly(2024, 2, 29).AddDays(variant),
             _ when type == typeof(TimeOnly) => new TimeOnly(23, 59, 59).Add(
-                TimeSpan.FromTicks(1234567)
+                TimeSpan.FromTicks((1234560 + variant) * 10)
             ),
             _ when type == typeof(DateTimeOffset) => new DateTimeOffset(
                 2024,
@@ -99,11 +136,11 @@ internal static class ModelSamples
                 31,
                 18,
                 30,
-                0,
-                TimeSpan.FromMinutes(-330)
+                variant,
+                TimeSpan.Zero
             ),
             _ when type == typeof(Guid) => Guid.Parse(
-                "3f2a6c1e-8b4d-4e2a-9c1f-1a2b3c4d5e6f"
+                $"3f2a6c1e-8b4d-4e2a-9c1f-1a2b3c4d5e6{variant}"
             ),
             _ when type == typeof(AggregateOver) => full
                 ? AggregateOver.All
@@ -111,8 +148,8 @@ internal static class ModelSamples
             _ when type == typeof(SortDirection) => full
                 ? SortDirection.Desc
                 : SortDirection.Asc,
-            _ when type == typeof(JoinType) => JoinType.Right,
-            _ => Create(type, full),
+            _ when type == typeof(JoinKind) => JoinKind.Right,
+            _ => Create(type, full, nullable),
         };
     }
 

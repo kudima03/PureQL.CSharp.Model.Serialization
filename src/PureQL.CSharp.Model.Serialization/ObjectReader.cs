@@ -89,18 +89,27 @@ internal sealed class ObjectReader
             : null;
     }
 
-    public int Index(string name)
+    /// <summary>
+    /// An optional list of names, such as <c>distinctBy</c>: at least one, each of them
+    /// once.
+    /// </summary>
+    public IReadOnlyList<string>? OptionalStrings(string name)
     {
-        JsonElement value = Required(name);
-        return value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out int index)
-            ? index
-            : throw JsonErrors.At(Child(name), "Expected a 32-bit integer");
-    }
+        if (!TryGet(name, out JsonElement value))
+        {
+            return null;
+        }
 
-    public bool Flag(string name)
-    {
-        return TryGet(name, out JsonElement value)
-            && LiteralValues.Boolean.Read(value, Child(name));
+        IReadOnlyList<string> items = Array(
+            value,
+            Child(name),
+            LiteralValues.String.Read
+        );
+        return items.Count == 0
+                ? throw JsonErrors.At(Child(name), "Expected at least one item")
+            : items.Distinct(StringComparer.Ordinal).Count() != items.Count
+                ? throw JsonErrors.At(Child(name), "Items must be unique")
+            : items;
     }
 
     public TValue Value<TValue>(LiteralValue<TValue> literal)
@@ -110,7 +119,14 @@ internal sealed class ObjectReader
 
     public IReadOnlyList<TValue> Values<TValue>(LiteralValue<TValue> literal)
     {
-        return Array(Required("value"), Child("value"), literal.Read);
+        IReadOnlyList<TValue> values = Array(
+            Required("value"),
+            Child("value"),
+            literal.Read
+        );
+        return values.Distinct().Count() == values.Count
+            ? values
+            : throw JsonErrors.At(Child("value"), "A list literal repeats no value");
     }
 
     public void NullValue()
@@ -130,58 +146,29 @@ internal sealed class ObjectReader
     }
 
     /// <summary>
-    /// Reads <c>over</c> where the schema allows both values; it defaults to
-    /// <c>group</c>.
+    /// Reads <c>over</c>, which the schema allows only as <c>all</c>: <c>group</c>, the
+    /// default, is never written.
     /// </summary>
     public AggregateOver Over()
     {
-        return Enum(
-            "over",
-            AggregateOver.Group,
-            ("group", AggregateOver.Group),
-            ("all", AggregateOver.All)
-        );
-    }
-
-    /// <summary>
-    /// Accepts <c>over</c> where the schema allows only one value, which the model does
-    /// not store.
-    /// </summary>
-    public void FixedOver(string value)
-    {
-        if (
-            TryGet("over", out JsonElement over)
-            && !string.Equals(
-                LiteralValues.String.Read(over, Child("over")),
-                value,
-                StringComparison.Ordinal
-            )
-        )
-        {
-            throw JsonErrors.At(Child("over"), $"Only '{value}' is allowed here");
-        }
+        return Enum("over", AggregateOver.Group, ("all", AggregateOver.All));
     }
 
     public SortDirection Direction()
     {
-        return Enum(
-            "direction",
-            SortDirection.Asc,
-            ("asc", SortDirection.Asc),
-            ("desc", SortDirection.Desc)
-        );
+        return Enum("direction", SortDirection.Asc, ("desc", SortDirection.Desc));
     }
 
-    public JoinType JoinType()
+    public JoinKind Kind()
     {
-        _ = Required("type");
+        _ = Required("kind");
         return Enum(
-            "type",
-            Model.JoinType.Inner,
-            ("inner", Model.JoinType.Inner),
-            ("left", Model.JoinType.Left),
-            ("right", Model.JoinType.Right),
-            ("full", Model.JoinType.Full)
+            "kind",
+            JoinKind.Inner,
+            ("inner", JoinKind.Inner),
+            ("left", JoinKind.Left),
+            ("right", JoinKind.Right),
+            ("full", JoinKind.Full)
         );
     }
 

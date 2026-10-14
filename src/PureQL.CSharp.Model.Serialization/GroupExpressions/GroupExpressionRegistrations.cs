@@ -4,6 +4,7 @@ using PureQL.CSharp.Model.Lists;
 using PureQL.CSharp.Model.Literals;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.RowExpressions;
+using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.GroupExpressions;
 
@@ -13,27 +14,41 @@ internal static class GroupExpressionRegistrations
     {
         registry.Operator(
             "add",
+            new TypeDecimal(),
             r => new AddDecimalGroup(r.Many<DecimalGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
+            new TypeDecimalNullable(),
             r => new AddDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
+            new TypeInteger(),
             r => new AddIntegerGroup(r.Many<IntegerGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
+            new TypeIntegerNullable(),
             r => new AddIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
+            UnionCase.Of((MinBooleanGroup x) => new AggregateBooleanGroup(x)),
+            UnionCase.Of((MaxBooleanGroup x) => new AggregateBooleanGroup(x)),
             UnionCase.Of((AnyGroup x) => new AggregateBooleanGroup(x)),
             UnionCase.Of((AllGroup x) => new AggregateBooleanGroup(x))
+        );
+        registry.Union(
+            UnionCase.Of(
+                (MinBooleanNullableGroup x) => new AggregateBooleanNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (MaxBooleanNullableGroup x) => new AggregateBooleanNullableGroup(x)
+            )
         );
         registry.Union(
             UnionCase.Of((AverageDateGroup x) => new AggregateDateGroup(x)),
@@ -64,15 +79,12 @@ internal static class GroupExpressionRegistrations
             )
         );
         registry.Union(
-            UnionCase.Of((CountGroup x) => new AggregateDecimalGroup(x)),
             UnionCase.Of((SumDecimalGroup x) => new AggregateDecimalGroup(x)),
             UnionCase.Of((AverageDecimalGroup x) => new AggregateDecimalGroup(x)),
             UnionCase.Of((MinDecimalGroup x) => new AggregateDecimalGroup(x)),
             UnionCase.Of((MaxDecimalGroup x) => new AggregateDecimalGroup(x))
         );
         registry.Union(
-            UnionCase.Of((CountGroup x) => new AggregateDecimalNullableGroup(x)),
-            UnionCase.Of((SumDecimalGroup x) => new AggregateDecimalNullableGroup(x)),
             UnionCase.Of(
                 (AverageDecimalNullableGroup x) => new AggregateDecimalNullableGroup(x)
             ),
@@ -90,8 +102,6 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((MaxIntegerGroup x) => new AggregateIntegerGroup(x))
         );
         registry.Union(
-            UnionCase.Of((CountGroup x) => new AggregateIntegerNullableGroup(x)),
-            UnionCase.Of((SumIntegerGroup x) => new AggregateIntegerNullableGroup(x)),
             UnionCase.Of(
                 (MinIntegerNullableGroup x) => new AggregateIntegerNullableGroup(x)
             ),
@@ -123,36 +133,45 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((MinTimeNullableGroup x) => new AggregateTimeNullableGroup(x)),
             UnionCase.Of((MaxTimeNullableGroup x) => new AggregateTimeNullableGroup(x))
         );
+        registry.Union(
+            UnionCase.Of((MinUuidGroup x) => new AggregateUuidGroup(x)),
+            UnionCase.Of((MaxUuidGroup x) => new AggregateUuidGroup(x))
+        );
+        registry.Union(
+            UnionCase.Of((MinUuidNullableGroup x) => new AggregateUuidNullableGroup(x)),
+            UnionCase.Of((MaxUuidNullableGroup x) => new AggregateUuidNullableGroup(x))
+        );
         registry.Operator(
             "all",
+            new TypeBoolean(),
             r => new AllGroup(r.One<BooleanRow>("predicate"), r.Over()),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "and",
+            new TypeBoolean(),
             r => new AndGroup(r.Many<BooleanGroup>("conditions")),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
             "any",
+            new TypeBoolean(),
             r => new AnyGroup(r.One<BooleanRow>("predicate"), r.Over()),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Union(
             UnionCase.Of((AddDecimalGroup x) => new ArithmeticDecimalGroup(x)),
             UnionCase.Of((SubtractDecimalGroup x) => new ArithmeticDecimalGroup(x)),
             UnionCase.Of((MultiplyDecimalGroup x) => new ArithmeticDecimalGroup(x)),
-            UnionCase.Of((DivideDecimalGroup x) => new ArithmeticDecimalGroup(x)),
-            UnionCase.Of((IntegerDivideIntegerGroup x) => new ArithmeticDecimalGroup(x)),
-            UnionCase.Of((ModuloIntegerGroup x) => new ArithmeticDecimalGroup(x))
+            UnionCase.Of((DivideDecimalGroup x) => new ArithmeticDecimalGroup(x))
         );
         registry.Union(
             UnionCase.Of(
@@ -166,13 +185,6 @@ internal static class GroupExpressionRegistrations
             ),
             UnionCase.Of(
                 (DivideDecimalNullableGroup x) => new ArithmeticDecimalNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (IntegerDivideIntegerNullableGroup x) =>
-                    new ArithmeticDecimalNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (ModuloIntegerNullableGroup x) => new ArithmeticDecimalNullableGroup(x)
             )
         );
         registry.Union(
@@ -202,15 +214,17 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "average",
-            r =>
+            new TypeDate(),
+            r => new AverageDateGroup(r.One<DateRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new AverageDateGroup(r.One<DateRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "average",
+            new TypeDateNullable(),
             r => new AverageDateNullableGroup(
                 r.One<DateNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -218,22 +232,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "average",
-            r =>
+            new TypeDatetime(),
+            r => new AverageDatetimeGroup(r.One<DatetimeRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new AverageDatetimeGroup(r.One<DatetimeRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "average",
+            new TypeDatetimeNullable(),
             r => new AverageDatetimeNullableGroup(
                 r.One<DatetimeNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -241,22 +257,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "average",
-            r =>
+            new TypeDecimal(),
+            r => new AverageDecimalGroup(r.One<DecimalRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new AverageDecimalGroup(r.One<DecimalRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "average",
+            new TypeDecimalNullable(),
             r => new AverageDecimalNullableGroup(
                 r.One<DecimalNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -264,22 +282,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "average",
-            r =>
+            new TypeTime(),
+            r => new AverageTimeGroup(r.One<TimeRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new AverageTimeGroup(r.One<TimeRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "average",
+            new TypeTimeNullable(),
             r => new AverageTimeNullableGroup(
                 r.One<TimeNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -287,9 +307,9 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Union(
@@ -302,53 +322,54 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((AggregateBooleanGroup x) => new BooleanGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsBooleanNullable x) => new BooleanNullableGroup(x)),
-            UnionCase.Of((ParamAsBooleanNullable x) => new BooleanNullableGroup(x)),
-            UnionCase.Of((LiteralAsBooleanNullable x) => new BooleanNullableGroup(x)),
-            UnionCase.Of((LogicalGroup x) => new BooleanNullableGroup(x)),
-            UnionCase.Of((ComparisonGroup x) => new BooleanNullableGroup(x)),
-            UnionCase.Of(
-                (ConditionalBooleanNullableGroup x) => new BooleanNullableGroup(x)
-            ),
-            UnionCase.Of((AggregateBooleanGroup x) => new BooleanNullableGroup(x))
+            UnionCase.Of((BooleanGroup x) => new BooleanNullableGroup(x)),
+            UnionCase.Of((ExactBooleanNullableGroup x) => new BooleanNullableGroup(x))
         );
         registry.Operator(
             "ceiling",
-            r => new CeilingIntegerGroup(r.One<DecimalGroup>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeInteger(),
+            r => new CeilingIntegerGroup(r.One<DecimalGroup>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "ceiling",
-            r => new CeilingIntegerNullableGroup(r.One<DecimalNullableGroup>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeIntegerNullable(),
+            r => new CeilingIntegerNullableGroup(r.One<DecimalNullableGroup>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "coalesce",
+            new TypeBoolean(),
             r => new CoalesceBooleanGroup(r.Many<BooleanNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeBooleanNullable(),
             r => new CoalesceBooleanNullableGroup(r.Many<BooleanNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDate(),
             r => new CoalesceDateGroup(r.Many<DateNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDateNullable(),
             r => new CoalesceDateNullableGroup(r.Many<DateNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDatetime(),
             r => new CoalesceDatetimeGroup(r.Many<DatetimeNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDatetimeNullable(),
             r => new CoalesceDatetimeNullableGroup(
                 r.Many<DatetimeNullableGroup>("values")
             ),
@@ -356,51 +377,61 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "coalesce",
+            new TypeDecimal(),
             r => new CoalesceDecimalGroup(r.Many<DecimalNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDecimalNullable(),
             r => new CoalesceDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeInteger(),
             r => new CoalesceIntegerGroup(r.Many<IntegerNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeIntegerNullable(),
             r => new CoalesceIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeString(),
             r => new CoalesceStringGroup(r.Many<StringNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeStringNullable(),
             r => new CoalesceStringNullableGroup(r.Many<StringNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeTime(),
             r => new CoalesceTimeGroup(r.Many<TimeNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeTimeNullable(),
             r => new CoalesceTimeNullableGroup(r.Many<TimeNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeUuid(),
             r => new CoalesceUuidGroup(r.Many<UuidNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeUuidNullable(),
             r => new CoalesceUuidNullableGroup(r.Many<UuidNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
@@ -415,11 +446,13 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "concat",
+            new TypeString(),
             r => new ConcatStringGroup(r.Many<StringGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "concat",
+            new TypeStringNullable(),
             r => new ConcatStringNullableGroup(r.Many<StringNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
@@ -516,15 +549,17 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "count",
+            new TypeInteger(),
             r => new CountGroup(r.Optional<BooleanRow>("predicate"), r.Over()),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "dateAddDays",
+            new TypeDate(),
             r => new DateAddDaysDateGroup(
                 r.One<DateGroup>("left"),
                 r.One<IntegerGroup>("right")
@@ -537,6 +572,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "dateAddDays",
+            new TypeDateNullable(),
             r => new DateAddDaysDateNullableGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<IntegerNullableGroup>("right")
@@ -549,6 +585,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "dateDiffDays",
+            new TypeInteger(),
             r => new DateDiffDaysIntegerGroup(
                 r.One<DateGroup>("left"),
                 r.One<DateGroup>("right")
@@ -561,6 +598,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "dateDiffDays",
+            new TypeIntegerNullable(),
             r => new DateDiffDaysIntegerNullableGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -580,15 +618,12 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((AggregateDateGroup x) => new DateGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsDateNullable x) => new DateNullableGroup(x)),
-            UnionCase.Of((ParamAsDateNullable x) => new DateNullableGroup(x)),
-            UnionCase.Of((LiteralAsDateNullable x) => new DateNullableGroup(x)),
-            UnionCase.Of((DateAddDaysDateNullableGroup x) => new DateNullableGroup(x)),
-            UnionCase.Of((ConditionalDateNullableGroup x) => new DateNullableGroup(x)),
-            UnionCase.Of((AggregateDateNullableGroup x) => new DateNullableGroup(x))
+            UnionCase.Of((DateGroup x) => new DateNullableGroup(x)),
+            UnionCase.Of((ExactDateNullableGroup x) => new DateNullableGroup(x))
         );
         registry.Operator(
             "datetimeAddSeconds",
+            new TypeDatetime(),
             r => new DatetimeAddSecondsDatetimeGroup(
                 r.One<DatetimeGroup>("left"),
                 r.One<DecimalGroup>("right")
@@ -601,6 +636,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "datetimeAddSeconds",
+            new TypeDatetimeNullable(),
             r => new DatetimeAddSecondsDatetimeNullableGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -613,6 +649,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "datetimeDiffSeconds",
+            new TypeDecimal(),
             r => new DatetimeDiffSecondsDecimalGroup(
                 r.One<DatetimeGroup>("left"),
                 r.One<DatetimeGroup>("right")
@@ -625,6 +662,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "datetimeDiffSeconds",
+            new TypeDecimalNullable(),
             r => new DatetimeDiffSecondsDecimalNullableGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -644,48 +682,20 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((AggregateDatetimeGroup x) => new DatetimeGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsDatetimeNullable x) => new DatetimeNullableGroup(x)),
-            UnionCase.Of((ParamAsDatetimeNullable x) => new DatetimeNullableGroup(x)),
-            UnionCase.Of((LiteralAsDatetimeNullable x) => new DatetimeNullableGroup(x)),
-            UnionCase.Of(
-                (DatetimeAddSecondsDatetimeNullableGroup x) =>
-                    new DatetimeNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (ConditionalDatetimeNullableGroup x) => new DatetimeNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (AggregateDatetimeNullableGroup x) => new DatetimeNullableGroup(x)
-            )
+            UnionCase.Of((DatetimeGroup x) => new DatetimeNullableGroup(x)),
+            UnionCase.Of((ExactDatetimeNullableGroup x) => new DatetimeNullableGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsDecimal x) => new DecimalGroup(x)),
-            UnionCase.Of((ParamAsDecimal x) => new DecimalGroup(x)),
-            UnionCase.Of((LiteralAsDecimal x) => new DecimalGroup(x)),
-            UnionCase.Of((ArithmeticDecimalGroup x) => new DecimalGroup(x)),
-            UnionCase.Of((RoundingDecimalGroup x) => new DecimalGroup(x)),
-            UnionCase.Of((DifferenceDecimalGroup x) => new DecimalGroup(x)),
-            UnionCase.Of((ConditionalDecimalGroup x) => new DecimalGroup(x)),
-            UnionCase.Of((AggregateDecimalGroup x) => new DecimalGroup(x))
+            UnionCase.Of((ExactDecimalGroup x) => new DecimalGroup(x)),
+            UnionCase.Of((IntegerGroup x) => new DecimalGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsDecimalNullable x) => new DecimalNullableGroup(x)),
-            UnionCase.Of((ParamAsDecimalNullable x) => new DecimalNullableGroup(x)),
-            UnionCase.Of((LiteralAsDecimalNullable x) => new DecimalNullableGroup(x)),
-            UnionCase.Of(
-                (ArithmeticDecimalNullableGroup x) => new DecimalNullableGroup(x)
-            ),
-            UnionCase.Of((RoundingDecimalNullableGroup x) => new DecimalNullableGroup(x)),
-            UnionCase.Of(
-                (DifferenceDecimalNullableGroup x) => new DecimalNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (ConditionalDecimalNullableGroup x) => new DecimalNullableGroup(x)
-            ),
-            UnionCase.Of((AggregateDecimalNullableGroup x) => new DecimalNullableGroup(x))
+            UnionCase.Of((ExactDecimalGroup x) => new DecimalNullableGroup(x)),
+            UnionCase.Of((ExactDecimalNullableGroup x) => new DecimalNullableGroup(x)),
+            UnionCase.Of((IntegerGroup x) => new DecimalNullableGroup(x)),
+            UnionCase.Of((ExactIntegerNullableGroup x) => new DecimalNullableGroup(x))
         );
         registry.Union(
-            UnionCase.Of((DateDiffDaysIntegerGroup x) => new DifferenceDecimalGroup(x)),
             UnionCase.Of(
                 (TimeDiffSecondsDecimalGroup x) => new DifferenceDecimalGroup(x)
             ),
@@ -694,10 +704,6 @@ internal static class GroupExpressionRegistrations
             )
         );
         registry.Union(
-            UnionCase.Of(
-                (DateDiffDaysIntegerNullableGroup x) =>
-                    new DifferenceDecimalNullableGroup(x)
-            ),
             UnionCase.Of(
                 (TimeDiffSecondsDecimalNullableGroup x) =>
                     new DifferenceDecimalNullableGroup(x)
@@ -709,16 +715,19 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "divide",
+            new TypeDecimal(),
             r => new DivideDecimalGroup(r.Many<DecimalGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "divide",
+            new TypeDecimalNullable(),
             r => new DivideDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualBooleanGroup(
                 r.One<BooleanNullableGroup>("left"),
                 r.One<BooleanNullableGroup>("right")
@@ -731,6 +740,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualDateGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -743,6 +753,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualDatetimeGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -755,6 +766,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualDecimalGroup(
                 r.One<DecimalNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -780,6 +792,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualStringGroup(
                 r.One<StringNullableGroup>("left"),
                 r.One<StringNullableGroup>("right")
@@ -792,6 +805,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualTimeGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
@@ -804,6 +818,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualUuidGroup(
                 r.One<UuidNullableGroup>("left"),
                 r.One<UuidNullableGroup>("right")
@@ -814,18 +829,168 @@ internal static class GroupExpressionRegistrations
                 w.One("right", x.Right);
             }
         );
-        registry.Operator(
-            "floor",
-            r => new FloorIntegerGroup(r.One<DecimalGroup>("value")),
-            (w, x) => w.One("value", x.Value)
+        registry.Union(
+            UnionCase.Of((KeyBooleanNullable x) => new ExactBooleanNullableGroup(x)),
+            UnionCase.Of((ParamBooleanNullable x) => new ExactBooleanNullableGroup(x)),
+            UnionCase.Of((LiteralBooleanNullable x) => new ExactBooleanNullableGroup(x)),
+            UnionCase.Of(
+                (ConditionalBooleanNullableGroup x) => new ExactBooleanNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (AggregateBooleanNullableGroup x) => new ExactBooleanNullableGroup(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((KeyDateNullable x) => new ExactDateNullableGroup(x)),
+            UnionCase.Of((ParamDateNullable x) => new ExactDateNullableGroup(x)),
+            UnionCase.Of((LiteralDateNullable x) => new ExactDateNullableGroup(x)),
+            UnionCase.Of(
+                (DateAddDaysDateNullableGroup x) => new ExactDateNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (ConditionalDateNullableGroup x) => new ExactDateNullableGroup(x)
+            ),
+            UnionCase.Of((AggregateDateNullableGroup x) => new ExactDateNullableGroup(x))
+        );
+        registry.Union(
+            UnionCase.Of((KeyDatetimeNullable x) => new ExactDatetimeNullableGroup(x)),
+            UnionCase.Of((ParamDatetimeNullable x) => new ExactDatetimeNullableGroup(x)),
+            UnionCase.Of(
+                (LiteralDatetimeNullable x) => new ExactDatetimeNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (DatetimeAddSecondsDatetimeNullableGroup x) =>
+                    new ExactDatetimeNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (ConditionalDatetimeNullableGroup x) => new ExactDatetimeNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (AggregateDatetimeNullableGroup x) => new ExactDatetimeNullableGroup(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((KeyDecimal x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((ParamDecimal x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((LiteralDecimal x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((ArithmeticDecimalGroup x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((RoundDecimalGroup x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((DifferenceDecimalGroup x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((ConditionalDecimalGroup x) => new ExactDecimalGroup(x)),
+            UnionCase.Of((AggregateDecimalGroup x) => new ExactDecimalGroup(x))
+        );
+        registry.Union(
+            UnionCase.Of((KeyDecimalNullable x) => new ExactDecimalNullableGroup(x)),
+            UnionCase.Of((ParamDecimalNullable x) => new ExactDecimalNullableGroup(x)),
+            UnionCase.Of((LiteralDecimalNullable x) => new ExactDecimalNullableGroup(x)),
+            UnionCase.Of(
+                (ArithmeticDecimalNullableGroup x) => new ExactDecimalNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (RoundDecimalNullableGroup x) => new ExactDecimalNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (DifferenceDecimalNullableGroup x) => new ExactDecimalNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (ConditionalDecimalNullableGroup x) => new ExactDecimalNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (AggregateDecimalNullableGroup x) => new ExactDecimalNullableGroup(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((KeyIntegerNullable x) => new ExactIntegerNullableGroup(x)),
+            UnionCase.Of((ParamIntegerNullable x) => new ExactIntegerNullableGroup(x)),
+            UnionCase.Of((LiteralIntegerNullable x) => new ExactIntegerNullableGroup(x)),
+            UnionCase.Of(
+                (ArithmeticIntegerNullableGroup x) => new ExactIntegerNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (RoundingIntegerNullableGroup x) => new ExactIntegerNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (DateDiffDaysIntegerNullableGroup x) => new ExactIntegerNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (ConditionalIntegerNullableGroup x) => new ExactIntegerNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (AggregateIntegerNullableGroup x) => new ExactIntegerNullableGroup(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((KeyStringNullable x) => new ExactStringNullableGroup(x)),
+            UnionCase.Of((ParamStringNullable x) => new ExactStringNullableGroup(x)),
+            UnionCase.Of((LiteralStringNullable x) => new ExactStringNullableGroup(x)),
+            UnionCase.Of(
+                (ConcatStringNullableGroup x) => new ExactStringNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (ConditionalStringNullableGroup x) => new ExactStringNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (AggregateStringNullableGroup x) => new ExactStringNullableGroup(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((KeyTimeNullable x) => new ExactTimeNullableGroup(x)),
+            UnionCase.Of((ParamTimeNullable x) => new ExactTimeNullableGroup(x)),
+            UnionCase.Of((LiteralTimeNullable x) => new ExactTimeNullableGroup(x)),
+            UnionCase.Of(
+                (TimeAddSecondsTimeNullableGroup x) => new ExactTimeNullableGroup(x)
+            ),
+            UnionCase.Of(
+                (ConditionalTimeNullableGroup x) => new ExactTimeNullableGroup(x)
+            ),
+            UnionCase.Of((AggregateTimeNullableGroup x) => new ExactTimeNullableGroup(x))
+        );
+        registry.Union(
+            UnionCase.Of((KeyUuidNullable x) => new ExactUuidNullableGroup(x)),
+            UnionCase.Of((ParamUuidNullable x) => new ExactUuidNullableGroup(x)),
+            UnionCase.Of((LiteralUuidNullable x) => new ExactUuidNullableGroup(x)),
+            UnionCase.Of(
+                (ConditionalUuidNullableGroup x) => new ExactUuidNullableGroup(x)
+            ),
+            UnionCase.Of((AggregateUuidNullableGroup x) => new ExactUuidNullableGroup(x))
+        );
+        registry.Union(
+            UnionCase.Of((DecimalNullableGroup x) => new ExprGroup(x)),
+            UnionCase.Of((StringNullableGroup x) => new ExprGroup(x)),
+            UnionCase.Of((BooleanNullableGroup x) => new ExprGroup(x)),
+            UnionCase.Of((DateNullableGroup x) => new ExprGroup(x)),
+            UnionCase.Of((TimeNullableGroup x) => new ExprGroup(x)),
+            UnionCase.Of((DatetimeNullableGroup x) => new ExprGroup(x)),
+            UnionCase.Of((UuidNullableGroup x) => new ExprGroup(x))
         );
         registry.Operator(
             "floor",
-            r => new FloorIntegerNullableGroup(r.One<DecimalNullableGroup>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeInteger(),
+            r => new FloorIntegerGroup(r.One<DecimalGroup>("operand")),
+            (w, x) => w.One("operand", x.Operand)
+        );
+        registry.Operator(
+            "floor",
+            new TypeIntegerNullable(),
+            r => new FloorIntegerNullableGroup(r.One<DecimalNullableGroup>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
+            r => new GreaterThanBooleanGroup(
+                r.One<BooleanNullableGroup>("left"),
+                r.One<BooleanNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanDateGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -838,6 +1003,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanDatetimeGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -850,6 +1016,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanDecimalGroup(
                 r.One<DecimalNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -871,6 +1038,10 @@ internal static class GroupExpressionRegistrations
                 (GreaterThanStringGroup x) => new GreaterThanGroup(x)
             ),
             UnionCase.Of(
+                TypeFamily.Boolean,
+                (GreaterThanBooleanGroup x) => new GreaterThanGroup(x)
+            ),
+            UnionCase.Of(
                 TypeFamily.Date,
                 (GreaterThanDateGroup x) => new GreaterThanGroup(x)
             ),
@@ -881,10 +1052,28 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (GreaterThanDatetimeGroup x) => new GreaterThanGroup(x)
+            ),
+            UnionCase.Of(
+                TypeFamily.Uuid,
+                (GreaterThanUuidGroup x) => new GreaterThanGroup(x)
             )
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
+            r => new GreaterThanOrEqualBooleanGroup(
+                r.One<BooleanNullableGroup>("left"),
+                r.One<BooleanNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualDateGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -897,6 +1086,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualDatetimeGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -909,6 +1099,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualDecimalGroup(
                 r.One<DecimalNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -930,6 +1121,10 @@ internal static class GroupExpressionRegistrations
                 (GreaterThanOrEqualStringGroup x) => new GreaterThanOrEqualGroup(x)
             ),
             UnionCase.Of(
+                TypeFamily.Boolean,
+                (GreaterThanOrEqualBooleanGroup x) => new GreaterThanOrEqualGroup(x)
+            ),
+            UnionCase.Of(
                 TypeFamily.Date,
                 (GreaterThanOrEqualDateGroup x) => new GreaterThanOrEqualGroup(x)
             ),
@@ -940,10 +1135,15 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (GreaterThanOrEqualDatetimeGroup x) => new GreaterThanOrEqualGroup(x)
+            ),
+            UnionCase.Of(
+                TypeFamily.Uuid,
+                (GreaterThanOrEqualUuidGroup x) => new GreaterThanOrEqualGroup(x)
             )
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualStringGroup(
                 r.One<StringNullableGroup>("left"),
                 r.One<StringNullableGroup>("right")
@@ -956,6 +1156,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualTimeGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
@@ -967,7 +1168,21 @@ internal static class GroupExpressionRegistrations
             }
         );
         registry.Operator(
+            "greaterThanOrEqual",
+            new TypeBoolean(),
+            r => new GreaterThanOrEqualUuidGroup(
+                r.One<UuidNullableGroup>("left"),
+                r.One<UuidNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanStringGroup(
                 r.One<StringNullableGroup>("left"),
                 r.One<StringNullableGroup>("right")
@@ -980,6 +1195,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanTimeGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
@@ -991,7 +1207,21 @@ internal static class GroupExpressionRegistrations
             }
         );
         registry.Operator(
+            "greaterThan",
+            new TypeBoolean(),
+            r => new GreaterThanUuidGroup(
+                r.One<UuidNullableGroup>("left"),
+                r.One<UuidNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
             "if",
+            new TypeBoolean(),
             r => new IfBooleanGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<BooleanGroup>("then"),
@@ -1006,6 +1236,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeBooleanNullable(),
             r => new IfBooleanNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<BooleanNullableGroup>("then"),
@@ -1020,6 +1251,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDate(),
             r => new IfDateGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<DateGroup>("then"),
@@ -1034,6 +1266,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDateNullable(),
             r => new IfDateNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<DateNullableGroup>("then"),
@@ -1048,6 +1281,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDatetime(),
             r => new IfDatetimeGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<DatetimeGroup>("then"),
@@ -1062,6 +1296,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDatetimeNullable(),
             r => new IfDatetimeNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<DatetimeNullableGroup>("then"),
@@ -1076,6 +1311,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDecimal(),
             r => new IfDecimalGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<DecimalGroup>("then"),
@@ -1090,6 +1326,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDecimalNullable(),
             r => new IfDecimalNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<DecimalNullableGroup>("then"),
@@ -1104,6 +1341,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeInteger(),
             r => new IfIntegerGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<IntegerGroup>("then"),
@@ -1118,6 +1356,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeIntegerNullable(),
             r => new IfIntegerNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<IntegerNullableGroup>("then"),
@@ -1132,6 +1371,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeString(),
             r => new IfStringGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<StringGroup>("then"),
@@ -1146,6 +1386,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeStringNullable(),
             r => new IfStringNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<StringNullableGroup>("then"),
@@ -1160,6 +1401,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeTime(),
             r => new IfTimeGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<TimeGroup>("then"),
@@ -1174,6 +1416,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeTimeNullable(),
             r => new IfTimeNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<TimeNullableGroup>("then"),
@@ -1188,6 +1431,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeUuid(),
             r => new IfUuidGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<UuidGroup>("then"),
@@ -1202,6 +1446,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeUuidNullable(),
             r => new IfUuidNullableGroup(
                 r.One<BooleanGroup>("condition"),
                 r.One<UuidNullableGroup>("then"),
@@ -1216,54 +1461,58 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InBooleanGroup(
-                r.One<BooleanNullableGroup>("value"),
+                r.One<BooleanNullableGroup>("operand"),
                 r.One<ListBoolean>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InDateGroup(
-                r.One<DateNullableGroup>("value"),
+                r.One<DateNullableGroup>("operand"),
                 r.One<ListDate>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InDatetimeGroup(
-                r.One<DatetimeNullableGroup>("value"),
+                r.One<DatetimeNullableGroup>("operand"),
                 r.One<ListDatetime>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InDecimalGroup(
-                r.One<DecimalNullableGroup>("value"),
+                r.One<DecimalNullableGroup>("operand"),
                 r.One<ListDecimal>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Probe(
-            "value",
+            "operand",
             UnionCase.Of(TypeFamily.Decimal, (InDecimalGroup x) => new InGroup(x)),
             UnionCase.Of(TypeFamily.String, (InStringGroup x) => new InGroup(x)),
             UnionCase.Of(TypeFamily.Boolean, (InBooleanGroup x) => new InGroup(x)),
@@ -1274,42 +1523,46 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InStringGroup(
-                r.One<StringNullableGroup>("value"),
+                r.One<StringNullableGroup>("operand"),
                 r.One<ListString>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InTimeGroup(
-                r.One<TimeNullableGroup>("value"),
+                r.One<TimeNullableGroup>("operand"),
                 r.One<ListTime>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InUuidGroup(
-                r.One<UuidNullableGroup>("value"),
+                r.One<UuidNullableGroup>("operand"),
                 r.One<ListUuid>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "integerDivide",
+            new TypeInteger(),
             r => new IntegerDivideIntegerGroup(
                 r.One<IntegerGroup>("left"),
                 r.One<IntegerGroup>("right")
@@ -1322,6 +1575,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "integerDivide",
+            new TypeIntegerNullable(),
             r => new IntegerDivideIntegerNullableGroup(
                 r.One<IntegerNullableGroup>("left"),
                 r.One<IntegerNullableGroup>("right")
@@ -1343,23 +1597,25 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((AggregateIntegerGroup x) => new IntegerGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsIntegerNullable x) => new IntegerNullableGroup(x)),
-            UnionCase.Of((ParamAsIntegerNullable x) => new IntegerNullableGroup(x)),
-            UnionCase.Of((LiteralAsIntegerNullable x) => new IntegerNullableGroup(x)),
-            UnionCase.Of(
-                (ArithmeticIntegerNullableGroup x) => new IntegerNullableGroup(x)
-            ),
-            UnionCase.Of((RoundingIntegerNullableGroup x) => new IntegerNullableGroup(x)),
-            UnionCase.Of(
-                (DateDiffDaysIntegerNullableGroup x) => new IntegerNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (ConditionalIntegerNullableGroup x) => new IntegerNullableGroup(x)
-            ),
-            UnionCase.Of((AggregateIntegerNullableGroup x) => new IntegerNullableGroup(x))
+            UnionCase.Of((IntegerGroup x) => new IntegerNullableGroup(x)),
+            UnionCase.Of((ExactIntegerNullableGroup x) => new IntegerNullableGroup(x))
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
+            r => new LessThanBooleanGroup(
+                r.One<BooleanNullableGroup>("left"),
+                r.One<BooleanNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThan",
+            new TypeBoolean(),
             r => new LessThanDateGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -1372,6 +1628,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanDatetimeGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -1384,6 +1641,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanDecimalGroup(
                 r.One<DecimalNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -1404,15 +1662,34 @@ internal static class GroupExpressionRegistrations
                 TypeFamily.String,
                 (LessThanStringGroup x) => new LessThanGroup(x)
             ),
+            UnionCase.Of(
+                TypeFamily.Boolean,
+                (LessThanBooleanGroup x) => new LessThanGroup(x)
+            ),
             UnionCase.Of(TypeFamily.Date, (LessThanDateGroup x) => new LessThanGroup(x)),
             UnionCase.Of(TypeFamily.Time, (LessThanTimeGroup x) => new LessThanGroup(x)),
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (LessThanDatetimeGroup x) => new LessThanGroup(x)
-            )
+            ),
+            UnionCase.Of(TypeFamily.Uuid, (LessThanUuidGroup x) => new LessThanGroup(x))
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
+            r => new LessThanOrEqualBooleanGroup(
+                r.One<BooleanNullableGroup>("left"),
+                r.One<BooleanNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualDateGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -1425,6 +1702,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualDatetimeGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -1437,6 +1715,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualDecimalGroup(
                 r.One<DecimalNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -1458,6 +1737,10 @@ internal static class GroupExpressionRegistrations
                 (LessThanOrEqualStringGroup x) => new LessThanOrEqualGroup(x)
             ),
             UnionCase.Of(
+                TypeFamily.Boolean,
+                (LessThanOrEqualBooleanGroup x) => new LessThanOrEqualGroup(x)
+            ),
+            UnionCase.Of(
                 TypeFamily.Date,
                 (LessThanOrEqualDateGroup x) => new LessThanOrEqualGroup(x)
             ),
@@ -1468,10 +1751,15 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (LessThanOrEqualDatetimeGroup x) => new LessThanOrEqualGroup(x)
+            ),
+            UnionCase.Of(
+                TypeFamily.Uuid,
+                (LessThanOrEqualUuidGroup x) => new LessThanOrEqualGroup(x)
             )
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualStringGroup(
                 r.One<StringNullableGroup>("left"),
                 r.One<StringNullableGroup>("right")
@@ -1484,6 +1772,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualTimeGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
@@ -1495,7 +1784,21 @@ internal static class GroupExpressionRegistrations
             }
         );
         registry.Operator(
+            "lessThanOrEqual",
+            new TypeBoolean(),
+            r => new LessThanOrEqualUuidGroup(
+                r.One<UuidNullableGroup>("left"),
+                r.One<UuidNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanStringGroup(
                 r.One<StringNullableGroup>("left"),
                 r.One<StringNullableGroup>("right")
@@ -1508,9 +1811,23 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanTimeGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThan",
+            new TypeBoolean(),
+            r => new LessThanUuidGroup(
+                r.One<UuidNullableGroup>("left"),
+                r.One<UuidNullableGroup>("right")
             ),
             (w, x) =>
             {
@@ -1525,15 +1842,42 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "max",
-            r =>
+            new TypeBoolean(),
+            r => new MaxBooleanGroup(r.One<BooleanRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MaxDateGroup(r.One<DateRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "max",
+            new TypeBooleanNullable(),
+            r => new MaxBooleanNullableGroup(
+                r.One<BooleanNullableRow>("selector"),
+                r.Optional<BooleanRow>("predicate"),
+                r.Over()
+            ),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "max",
+            new TypeDate(),
+            r => new MaxDateGroup(r.One<DateRow>("selector"), r.Over()),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "max",
+            new TypeDateNullable(),
             r => new MaxDateNullableGroup(
                 r.One<DateNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1541,22 +1885,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "max",
-            r =>
+            new TypeDatetime(),
+            r => new MaxDatetimeGroup(r.One<DatetimeRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MaxDatetimeGroup(r.One<DatetimeRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "max",
+            new TypeDatetimeNullable(),
             r => new MaxDatetimeNullableGroup(
                 r.One<DatetimeNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1564,22 +1910,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "max",
-            r =>
+            new TypeDecimal(),
+            r => new MaxDecimalGroup(r.One<DecimalRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MaxDecimalGroup(r.One<DecimalRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "max",
+            new TypeDecimalNullable(),
             r => new MaxDecimalNullableGroup(
                 r.One<DecimalNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1587,22 +1935,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "max",
-            r =>
+            new TypeInteger(),
+            r => new MaxIntegerGroup(r.One<IntegerRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MaxIntegerGroup(r.One<IntegerRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "max",
+            new TypeIntegerNullable(),
             r => new MaxIntegerNullableGroup(
                 r.One<IntegerNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1610,22 +1960,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "max",
-            r =>
+            new TypeString(),
+            r => new MaxStringGroup(r.One<StringRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MaxStringGroup(r.One<StringRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "max",
+            new TypeStringNullable(),
             r => new MaxStringNullableGroup(
                 r.One<StringNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1633,22 +1985,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "max",
-            r =>
+            new TypeTime(),
+            r => new MaxTimeGroup(r.One<TimeRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MaxTimeGroup(r.One<TimeRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "max",
+            new TypeTimeNullable(),
             r => new MaxTimeNullableGroup(
                 r.One<TimeNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1656,22 +2010,74 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "max",
+            new TypeUuid(),
+            r => new MaxUuidGroup(r.One<UuidRow>("selector"), r.Over()),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "max",
+            new TypeUuidNullable(),
+            r => new MaxUuidNullableGroup(
+                r.One<UuidNullableRow>("selector"),
+                r.Optional<BooleanRow>("predicate"),
+                r.Over()
+            ),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "min",
-            r =>
+            new TypeBoolean(),
+            r => new MinBooleanGroup(r.One<BooleanRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MinDateGroup(r.One<DateRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "min",
+            new TypeBooleanNullable(),
+            r => new MinBooleanNullableGroup(
+                r.One<BooleanNullableRow>("selector"),
+                r.Optional<BooleanRow>("predicate"),
+                r.Over()
+            ),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "min",
+            new TypeDate(),
+            r => new MinDateGroup(r.One<DateRow>("selector"), r.Over()),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "min",
+            new TypeDateNullable(),
             r => new MinDateNullableGroup(
                 r.One<DateNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1679,22 +2085,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "min",
-            r =>
+            new TypeDatetime(),
+            r => new MinDatetimeGroup(r.One<DatetimeRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MinDatetimeGroup(r.One<DatetimeRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "min",
+            new TypeDatetimeNullable(),
             r => new MinDatetimeNullableGroup(
                 r.One<DatetimeNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1702,22 +2110,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "min",
-            r =>
+            new TypeDecimal(),
+            r => new MinDecimalGroup(r.One<DecimalRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MinDecimalGroup(r.One<DecimalRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "min",
+            new TypeDecimalNullable(),
             r => new MinDecimalNullableGroup(
                 r.One<DecimalNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1725,22 +2135,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "min",
-            r =>
+            new TypeInteger(),
+            r => new MinIntegerGroup(r.One<IntegerRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MinIntegerGroup(r.One<IntegerRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "min",
+            new TypeIntegerNullable(),
             r => new MinIntegerNullableGroup(
                 r.One<IntegerNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1748,22 +2160,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "min",
-            r =>
+            new TypeString(),
+            r => new MinStringGroup(r.One<StringRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MinStringGroup(r.One<StringRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "min",
+            new TypeStringNullable(),
             r => new MinStringNullableGroup(
                 r.One<StringNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1771,22 +2185,24 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "min",
-            r =>
+            new TypeTime(),
+            r => new MinTimeGroup(r.One<TimeRow>("selector"), r.Over()),
+            (w, x) =>
             {
-                r.FixedOver("group");
-                return new MinTimeGroup(r.One<TimeRow>("selector"));
-            },
-            (w, x) => w.One("selector", x.Selector)
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
         );
         registry.Operator(
             "min",
+            new TypeTimeNullable(),
             r => new MinTimeNullableGroup(
                 r.One<TimeNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -1794,13 +2210,39 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "min",
+            new TypeUuid(),
+            r => new MinUuidGroup(r.One<UuidRow>("selector"), r.Over()),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Over(x.Over);
+            }
+        );
+        registry.Operator(
+            "min",
+            new TypeUuidNullable(),
+            r => new MinUuidNullableGroup(
+                r.One<UuidNullableRow>("selector"),
+                r.Optional<BooleanRow>("predicate"),
+                r.Over()
+            ),
+            (w, x) =>
+            {
+                w.One("selector", x.Selector);
+                w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "modulo",
+            new TypeInteger(),
             r => new ModuloIntegerGroup(
                 r.One<IntegerGroup>("left"),
                 r.One<IntegerGroup>("right")
@@ -1813,6 +2255,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "modulo",
+            new TypeIntegerNullable(),
             r => new ModuloIntegerNullableGroup(
                 r.One<IntegerNullableGroup>("left"),
                 r.One<IntegerNullableGroup>("right")
@@ -1825,26 +2268,31 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "multiply",
+            new TypeDecimal(),
             r => new MultiplyDecimalGroup(r.Many<DecimalGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
+            new TypeDecimalNullable(),
             r => new MultiplyDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
+            new TypeInteger(),
             r => new MultiplyIntegerGroup(r.Many<IntegerGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
+            new TypeIntegerNullable(),
             r => new MultiplyIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualBooleanGroup(
                 r.One<BooleanNullableGroup>("left"),
                 r.One<BooleanNullableGroup>("right")
@@ -1857,6 +2305,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualDateGroup(
                 r.One<DateNullableGroup>("left"),
                 r.One<DateNullableGroup>("right")
@@ -1869,6 +2318,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualDatetimeGroup(
                 r.One<DatetimeNullableGroup>("left"),
                 r.One<DatetimeNullableGroup>("right")
@@ -1881,6 +2331,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualDecimalGroup(
                 r.One<DecimalNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -1915,6 +2366,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualStringGroup(
                 r.One<StringNullableGroup>("left"),
                 r.One<StringNullableGroup>("right")
@@ -1927,6 +2379,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualTimeGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
@@ -1939,6 +2392,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualUuidGroup(
                 r.One<UuidNullableGroup>("left"),
                 r.One<UuidNullableGroup>("right")
@@ -1951,69 +2405,53 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "not",
+            new TypeBoolean(),
             r => new NotGroup(r.One<BooleanGroup>("condition")),
             (w, x) => w.One("condition", x.Condition)
         );
         registry.Operator(
             "or",
+            new TypeBoolean(),
             r => new OrGroup(r.Many<BooleanGroup>("conditions")),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
             "round",
-            r => new RoundDecimalDigitsGroup(
-                r.One<DecimalGroup>("value"),
+            new TypeDecimal(),
+            r => new RoundDecimalGroup(
+                r.One<DecimalGroup>("operand"),
                 r.One<IntegerGroup>("digits")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("digits", x.Digits);
-            },
-            digits: true
+            }
         );
         registry.Operator(
             "round",
-            r => new RoundDecimalDigitsNullableGroup(
-                r.One<DecimalNullableGroup>("value"),
+            new TypeDecimalNullable(),
+            r => new RoundDecimalNullableGroup(
+                r.One<DecimalNullableGroup>("operand"),
                 r.One<IntegerGroup>("digits")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("digits", x.Digits);
-            },
-            digits: true
+            }
         );
         registry.Operator(
             "round",
-            r => new RoundIntegerGroup(r.One<DecimalGroup>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeInteger(),
+            r => new RoundIntegerGroup(r.One<DecimalGroup>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "round",
-            r => new RoundIntegerNullableGroup(r.One<DecimalNullableGroup>("value")),
-            (w, x) => w.One("value", x.Value)
-        );
-        registry.Union(
-            UnionCase.Of((FloorIntegerGroup x) => new RoundingDecimalGroup(x)),
-            UnionCase.Of((CeilingIntegerGroup x) => new RoundingDecimalGroup(x)),
-            UnionCase.Of((RoundDecimalDigitsGroup x) => new RoundingDecimalGroup(x)),
-            UnionCase.Of((RoundIntegerGroup x) => new RoundingDecimalGroup(x))
-        );
-        registry.Union(
-            UnionCase.Of(
-                (FloorIntegerNullableGroup x) => new RoundingDecimalNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (CeilingIntegerNullableGroup x) => new RoundingDecimalNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (RoundDecimalDigitsNullableGroup x) => new RoundingDecimalNullableGroup(x)
-            ),
-            UnionCase.Of(
-                (RoundIntegerNullableGroup x) => new RoundingDecimalNullableGroup(x)
-            )
+            new TypeIntegerNullable(),
+            r => new RoundIntegerNullableGroup(r.One<DecimalNullableGroup>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Union(
             UnionCase.Of((FloorIntegerGroup x) => new RoundingIntegerGroup(x)),
@@ -2040,37 +2478,36 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((AggregateStringGroup x) => new StringGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsStringNullable x) => new StringNullableGroup(x)),
-            UnionCase.Of((ParamAsStringNullable x) => new StringNullableGroup(x)),
-            UnionCase.Of((LiteralAsStringNullable x) => new StringNullableGroup(x)),
-            UnionCase.Of((ConcatStringNullableGroup x) => new StringNullableGroup(x)),
-            UnionCase.Of(
-                (ConditionalStringNullableGroup x) => new StringNullableGroup(x)
-            ),
-            UnionCase.Of((AggregateStringNullableGroup x) => new StringNullableGroup(x))
+            UnionCase.Of((StringGroup x) => new StringNullableGroup(x)),
+            UnionCase.Of((ExactStringNullableGroup x) => new StringNullableGroup(x))
         );
         registry.Operator(
             "subtract",
+            new TypeDecimal(),
             r => new SubtractDecimalGroup(r.Many<DecimalGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
+            new TypeDecimalNullable(),
             r => new SubtractDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
+            new TypeInteger(),
             r => new SubtractIntegerGroup(r.Many<IntegerGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
+            new TypeIntegerNullable(),
             r => new SubtractIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "sum",
+            new TypeDecimal(),
             r => new SumDecimalGroup(
                 r.One<DecimalNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -2078,13 +2515,14 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "sum",
+            new TypeInteger(),
             r => new SumIntegerGroup(
                 r.One<IntegerNullableRow>("selector"),
                 r.Optional<BooleanRow>("predicate"),
@@ -2092,13 +2530,14 @@ internal static class GroupExpressionRegistrations
             ),
             (w, x) =>
             {
-                w.Over(x.Over);
                 w.One("selector", x.Selector);
                 w.Optional("predicate", x.Predicate);
+                w.Over(x.Over);
             }
         );
         registry.Operator(
             "timeAddSeconds",
+            new TypeTime(),
             r => new TimeAddSecondsTimeGroup(
                 r.One<TimeGroup>("left"),
                 r.One<DecimalGroup>("right")
@@ -2111,6 +2550,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "timeAddSeconds",
+            new TypeTimeNullable(),
             r => new TimeAddSecondsTimeNullableGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<DecimalNullableGroup>("right")
@@ -2123,6 +2563,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "timeDiffSeconds",
+            new TypeDecimal(),
             r => new TimeDiffSecondsDecimalGroup(
                 r.One<TimeGroup>("left"),
                 r.One<TimeGroup>("right")
@@ -2135,6 +2576,7 @@ internal static class GroupExpressionRegistrations
         );
         registry.Operator(
             "timeDiffSeconds",
+            new TypeDecimalNullable(),
             r => new TimeDiffSecondsDecimalNullableGroup(
                 r.One<TimeNullableGroup>("left"),
                 r.One<TimeNullableGroup>("right")
@@ -2154,43 +2596,19 @@ internal static class GroupExpressionRegistrations
             UnionCase.Of((AggregateTimeGroup x) => new TimeGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsTimeNullable x) => new TimeNullableGroup(x)),
-            UnionCase.Of((ParamAsTimeNullable x) => new TimeNullableGroup(x)),
-            UnionCase.Of((LiteralAsTimeNullable x) => new TimeNullableGroup(x)),
-            UnionCase.Of((TimeAddSecondsTimeNullableGroup x) => new TimeNullableGroup(x)),
-            UnionCase.Of((ConditionalTimeNullableGroup x) => new TimeNullableGroup(x)),
-            UnionCase.Of((AggregateTimeNullableGroup x) => new TimeNullableGroup(x))
+            UnionCase.Of((TimeGroup x) => new TimeNullableGroup(x)),
+            UnionCase.Of((ExactTimeNullableGroup x) => new TimeNullableGroup(x))
         );
         registry.Union(
             UnionCase.Of((KeyUuid x) => new UuidGroup(x)),
             UnionCase.Of((ParamUuid x) => new UuidGroup(x)),
             UnionCase.Of((LiteralUuid x) => new UuidGroup(x)),
-            UnionCase.Of((ConditionalUuidGroup x) => new UuidGroup(x))
+            UnionCase.Of((ConditionalUuidGroup x) => new UuidGroup(x)),
+            UnionCase.Of((AggregateUuidGroup x) => new UuidGroup(x))
         );
         registry.Union(
-            UnionCase.Of((KeyAsUuidNullable x) => new UuidNullableGroup(x)),
-            UnionCase.Of((ParamAsUuidNullable x) => new UuidNullableGroup(x)),
-            UnionCase.Of((LiteralAsUuidNullable x) => new UuidNullableGroup(x)),
-            UnionCase.Of((ConditionalUuidNullableGroup x) => new UuidNullableGroup(x))
-        );
-        registry.Probe(
-            null,
-            UnionCase.Of(
-                TypeFamily.Decimal,
-                (DecimalNullableGroup x) => new ValueGroup(x)
-            ),
-            UnionCase.Of(TypeFamily.String, (StringNullableGroup x) => new ValueGroup(x)),
-            UnionCase.Of(
-                TypeFamily.Boolean,
-                (BooleanNullableGroup x) => new ValueGroup(x)
-            ),
-            UnionCase.Of(TypeFamily.Date, (DateNullableGroup x) => new ValueGroup(x)),
-            UnionCase.Of(TypeFamily.Time, (TimeNullableGroup x) => new ValueGroup(x)),
-            UnionCase.Of(
-                TypeFamily.Datetime,
-                (DatetimeNullableGroup x) => new ValueGroup(x)
-            ),
-            UnionCase.Of(TypeFamily.Uuid, (UuidNullableGroup x) => new ValueGroup(x))
+            UnionCase.Of((UuidGroup x) => new UuidNullableGroup(x)),
+            UnionCase.Of((ExactUuidNullableGroup x) => new UuidNullableGroup(x))
         );
     }
 }

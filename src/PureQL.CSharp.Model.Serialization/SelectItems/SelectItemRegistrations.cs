@@ -1,6 +1,7 @@
 using PureQL.CSharp.Model.GroupExpressions;
 using PureQL.CSharp.Model.ProjectionExpressions;
 using PureQL.CSharp.Model.SelectItems;
+using PureQL.CSharp.Model.TotalExpressions;
 using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.SelectItems;
@@ -20,7 +21,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeBooleanNullable(),
-            (string a, BooleanNullableGroup e) =>
+            (string a, ExactBooleanNullableGroup e) =>
                 new SelectItemGroupBooleanNullable(a, e),
             x => x.Expression
         );
@@ -31,7 +32,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeDateNullable(),
-            (string a, DateNullableGroup e) => new SelectItemGroupDateNullable(a, e),
+            (string a, ExactDateNullableGroup e) => new SelectItemGroupDateNullable(a, e),
             x => x.Expression
         );
         registry.SelectItem(
@@ -41,18 +42,18 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeDatetimeNullable(),
-            (string a, DatetimeNullableGroup e) =>
+            (string a, ExactDatetimeNullableGroup e) =>
                 new SelectItemGroupDatetimeNullable(a, e),
             x => x.Expression
         );
         registry.SelectItem(
             new TypeDecimal(),
-            (string a, DecimalGroup e) => new SelectItemGroupDecimal(a, e),
+            (string a, ExactDecimalGroup e) => new SelectItemGroupDecimal(a, e),
             x => x.Expression
         );
         registry.SelectItem(
             new TypeDecimalNullable(),
-            (string a, DecimalNullableGroup e) =>
+            (string a, ExactDecimalNullableGroup e) =>
                 new SelectItemGroupDecimalNullable(a, e),
             x => x.Expression
         );
@@ -63,7 +64,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeIntegerNullable(),
-            (string a, IntegerNullableGroup e) =>
+            (string a, ExactIntegerNullableGroup e) =>
                 new SelectItemGroupIntegerNullable(a, e),
             x => x.Expression
         );
@@ -112,7 +113,8 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeStringNullable(),
-            (string a, StringNullableGroup e) => new SelectItemGroupStringNullable(a, e),
+            (string a, ExactStringNullableGroup e) =>
+                new SelectItemGroupStringNullable(a, e),
             x => x.Expression
         );
         registry.SelectItem(
@@ -122,7 +124,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeTimeNullable(),
-            (string a, TimeNullableGroup e) => new SelectItemGroupTimeNullable(a, e),
+            (string a, ExactTimeNullableGroup e) => new SelectItemGroupTimeNullable(a, e),
             x => x.Expression
         );
         registry.SelectItem(
@@ -132,7 +134,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeUuidNullable(),
-            (string a, UuidNullableGroup e) => new SelectItemGroupUuidNullable(a, e),
+            (string a, ExactUuidNullableGroup e) => new SelectItemGroupUuidNullable(a, e),
             x => x.Expression
         );
         registry.Union(
@@ -148,7 +150,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeBooleanNullable(),
-            (string a, BooleanNullableProjection e) =>
+            (string a, ExactBooleanNullableProjection e) =>
                 new SelectItemProjectionBooleanNullable(a, e),
             x => x.Expression
         );
@@ -159,7 +161,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeDateNullable(),
-            (string a, DateNullableProjection e) =>
+            (string a, ExactDateNullableProjection e) =>
                 new SelectItemProjectionDateNullable(a, e),
             x => x.Expression
         );
@@ -170,18 +172,18 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeDatetimeNullable(),
-            (string a, DatetimeNullableProjection e) =>
+            (string a, ExactDatetimeNullableProjection e) =>
                 new SelectItemProjectionDatetimeNullable(a, e),
             x => x.Expression
         );
         registry.SelectItem(
             new TypeDecimal(),
-            (string a, DecimalProjection e) => new SelectItemProjectionDecimal(a, e),
+            (string a, ExactDecimalProjection e) => new SelectItemProjectionDecimal(a, e),
             x => x.Expression
         );
         registry.SelectItem(
             new TypeDecimalNullable(),
-            (string a, DecimalNullableProjection e) =>
+            (string a, ExactDecimalNullableProjection e) =>
                 new SelectItemProjectionDecimalNullable(a, e),
             x => x.Expression
         );
@@ -192,7 +194,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeIntegerNullable(),
-            (string a, IntegerNullableProjection e) =>
+            (string a, ExactIntegerNullableProjection e) =>
                 new SelectItemProjectionIntegerNullable(a, e),
             x => x.Expression
         );
@@ -263,7 +265,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeStringNullable(),
-            (string a, StringNullableProjection e) =>
+            (string a, ExactStringNullableProjection e) =>
                 new SelectItemProjectionStringNullable(a, e),
             x => x.Expression
         );
@@ -274,7 +276,7 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeTimeNullable(),
-            (string a, TimeNullableProjection e) =>
+            (string a, ExactTimeNullableProjection e) =>
                 new SelectItemProjectionTimeNullable(a, e),
             x => x.Expression
         );
@@ -285,8 +287,135 @@ internal static class SelectItemRegistrations
         );
         registry.SelectItem(
             new TypeUuidNullable(),
-            (string a, UuidNullableProjection e) =>
+            (string a, ExactUuidNullableProjection e) =>
                 new SelectItemProjectionUuidNullable(a, e),
+            x => x.Expression
+        );
+        registry.Union(
+            UnionCase.Of((SelectItemTotalNonNullable x) => new SelectItemTotal(x)),
+            UnionCase.Of((SelectItemTotalNullable x) => new SelectItemTotal(x))
+        );
+        registry.SelectItem(
+            new TypeBoolean(),
+            (string a, BooleanTotal e) => new SelectItemTotalBoolean(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeBooleanNullable(),
+            (string a, ExactBooleanNullableTotal e) =>
+                new SelectItemTotalBooleanNullable(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeDate(),
+            (string a, DateTotal e) => new SelectItemTotalDate(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeDateNullable(),
+            (string a, ExactDateNullableTotal e) => new SelectItemTotalDateNullable(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeDatetime(),
+            (string a, DatetimeTotal e) => new SelectItemTotalDatetime(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeDatetimeNullable(),
+            (string a, ExactDatetimeNullableTotal e) =>
+                new SelectItemTotalDatetimeNullable(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeDecimal(),
+            (string a, ExactDecimalTotal e) => new SelectItemTotalDecimal(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeDecimalNullable(),
+            (string a, ExactDecimalNullableTotal e) =>
+                new SelectItemTotalDecimalNullable(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeInteger(),
+            (string a, IntegerTotal e) => new SelectItemTotalInteger(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeIntegerNullable(),
+            (string a, ExactIntegerNullableTotal e) =>
+                new SelectItemTotalIntegerNullable(a, e),
+            x => x.Expression
+        );
+        registry.Union(
+            UnionCase.Of((SelectItemTotalInteger x) => new SelectItemTotalNonNullable(x)),
+            UnionCase.Of((SelectItemTotalDecimal x) => new SelectItemTotalNonNullable(x)),
+            UnionCase.Of((SelectItemTotalString x) => new SelectItemTotalNonNullable(x)),
+            UnionCase.Of((SelectItemTotalBoolean x) => new SelectItemTotalNonNullable(x)),
+            UnionCase.Of((SelectItemTotalDate x) => new SelectItemTotalNonNullable(x)),
+            UnionCase.Of((SelectItemTotalTime x) => new SelectItemTotalNonNullable(x)),
+            UnionCase.Of(
+                (SelectItemTotalDatetime x) => new SelectItemTotalNonNullable(x)
+            ),
+            UnionCase.Of((SelectItemTotalUuid x) => new SelectItemTotalNonNullable(x))
+        );
+        registry.Union(
+            UnionCase.Of(
+                (SelectItemTotalIntegerNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalDecimalNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalStringNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalBooleanNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalDateNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalTimeNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalDatetimeNullable x) => new SelectItemTotalNullable(x)
+            ),
+            UnionCase.Of(
+                (SelectItemTotalUuidNullable x) => new SelectItemTotalNullable(x)
+            )
+        );
+        registry.SelectItem(
+            new TypeString(),
+            (string a, StringTotal e) => new SelectItemTotalString(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeStringNullable(),
+            (string a, ExactStringNullableTotal e) =>
+                new SelectItemTotalStringNullable(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeTime(),
+            (string a, TimeTotal e) => new SelectItemTotalTime(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeTimeNullable(),
+            (string a, ExactTimeNullableTotal e) => new SelectItemTotalTimeNullable(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeUuid(),
+            (string a, UuidTotal e) => new SelectItemTotalUuid(a, e),
+            x => x.Expression
+        );
+        registry.SelectItem(
+            new TypeUuidNullable(),
+            (string a, ExactUuidNullableTotal e) => new SelectItemTotalUuidNullable(a, e),
             x => x.Expression
         );
     }

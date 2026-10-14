@@ -7,44 +7,6 @@ internal static class FieldRegistrations
 {
     public static void Register(ModelRegistry registry)
     {
-        registry.Union(
-            UnionCase.Of((FieldBoolean x) => new FieldAsBooleanNullable(x)),
-            UnionCase.Of((FieldBooleanNullable x) => new FieldAsBooleanNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldDate x) => new FieldAsDateNullable(x)),
-            UnionCase.Of((FieldDateNullable x) => new FieldAsDateNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldDatetime x) => new FieldAsDatetimeNullable(x)),
-            UnionCase.Of((FieldDatetimeNullable x) => new FieldAsDatetimeNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldDecimal x) => new FieldAsDecimal(x)),
-            UnionCase.Of((FieldInteger x) => new FieldAsDecimal(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldDecimal x) => new FieldAsDecimalNullable(x)),
-            UnionCase.Of((FieldDecimalNullable x) => new FieldAsDecimalNullable(x)),
-            UnionCase.Of((FieldInteger x) => new FieldAsDecimalNullable(x)),
-            UnionCase.Of((FieldIntegerNullable x) => new FieldAsDecimalNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldInteger x) => new FieldAsIntegerNullable(x)),
-            UnionCase.Of((FieldIntegerNullable x) => new FieldAsIntegerNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldString x) => new FieldAsStringNullable(x)),
-            UnionCase.Of((FieldStringNullable x) => new FieldAsStringNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldTime x) => new FieldAsTimeNullable(x)),
-            UnionCase.Of((FieldTimeNullable x) => new FieldAsTimeNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((FieldUuid x) => new FieldAsUuidNullable(x)),
-            UnionCase.Of((FieldUuidNullable x) => new FieldAsUuidNullable(x))
-        );
         registry.Field(new TypeBoolean(), (s, f) => new FieldBoolean(s, f));
         registry.Field(
             new TypeBooleanNullable(),

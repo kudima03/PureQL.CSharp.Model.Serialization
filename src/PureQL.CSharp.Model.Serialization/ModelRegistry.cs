@@ -10,6 +10,8 @@ using PureQL.CSharp.Model.Serialization.Parameters;
 using PureQL.CSharp.Model.Serialization.ProjectionExpressions;
 using PureQL.CSharp.Model.Serialization.RowExpressions;
 using PureQL.CSharp.Model.Serialization.SelectItems;
+using PureQL.CSharp.Model.Serialization.TotalExpressions;
+using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization;
 
@@ -34,6 +36,7 @@ internal sealed partial class ModelRegistry
         RowExpressionRegistrations.Register(this);
         ProjectionExpressionRegistrations.Register(this);
         GroupExpressionRegistrations.Register(this);
+        TotalExpressionRegistrations.Register(this);
         GroupKeyRegistrations.Register(this);
         SelectItemRegistrations.Register(this);
         foreach (ModelDescriptor descriptor in _descriptors.Values)
@@ -83,31 +86,36 @@ internal sealed partial class ModelRegistry
         Add<T>(new ProbeUnionDescriptor<T>(this, operand, cases));
     }
 
-    public void ByPresence<T>(string property, UnionCase<T> present, UnionCase<T> absent)
+    public void ByPresence<T>(
+        UnionCase<T> fallback,
+        params (string Property, UnionCase<T> Case)[] present
+    )
         where T : class
     {
-        Add<T>(new PresenceUnionDescriptor<T>(this, property, present, absent));
+        Add<T>(new PresenceUnionDescriptor<T>(this, present, fallback));
     }
 
     public void Record<T>(Func<ObjectReader, T> read, Action<ObjectWriter, T> write)
         where T : class
     {
-        Add<T>(new RecordDescriptor<T>(this, [], null, read, write));
+        Add<T>(new RecordDescriptor<T>(this, [], null, null, read, write));
     }
 
+    /// <summary>An operator node, which declares the type it yields.</summary>
     public void Operator<T>(
         string name,
+        IType type,
         Func<ObjectReader, T> read,
-        Action<ObjectWriter, T> write,
-        bool digits = false
+        Action<ObjectWriter, T> write
     )
         where T : class
     {
         Add<T>(
             new RecordDescriptor<T>(
                 this,
-                [Discriminators.Operator(name, digits)],
+                [Discriminators.Operator(name, type.Name, type.Nullable)],
                 name,
+                type,
                 read,
                 write
             )
@@ -121,7 +129,7 @@ internal sealed partial class ModelRegistry
     )
         where T : class
     {
-        Add<T>(new RecordDescriptor<T>(this, signatures, null, read, write));
+        Add<T>(new RecordDescriptor<T>(this, signatures, null, null, read, write));
     }
 
     private void Add<T>(ModelDescriptor descriptor)

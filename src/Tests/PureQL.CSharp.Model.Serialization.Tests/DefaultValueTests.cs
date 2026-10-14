@@ -3,6 +3,7 @@ using PureQL.CSharp.Model.GroupExpressions;
 using PureQL.CSharp.Model.Keys;
 using PureQL.CSharp.Model.ProjectionExpressions;
 using PureQL.CSharp.Model.RowExpressions;
+using PureQL.CSharp.Model.TotalExpressions;
 
 namespace PureQL.CSharp.Model.Serialization.Tests;
 
@@ -11,26 +12,32 @@ public sealed record DefaultValueTests
     [Fact]
     public void NonNullTypeIsWrittenWithoutNullable()
     {
-        FieldDecimal field = PureQLJson.Deserialize<FieldDecimal>(
-            /*lang=json,strict*/
-            """{"source":"o","field":"f","type":{"name":"decimal","nullable":false}}"""
-        );
-
         Assert.Equal(
             /*lang=json,strict*/
             """{"source":"o","field":"f","type":{"name":"decimal"}}""",
-            PureQLJson.Serialize(field)
+            PureQLJson.Serialize(new FieldDecimal("o", "f"))
+        );
+    }
+
+    [Fact]
+    public void NullableFalseIsRejected()
+    {
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<FieldDecimal>(
+                /*lang=json,strict*/
+                """{"source":"o","field":"f","type":{"name":"decimal","nullable":false}}"""
+            )
         );
     }
 
     [Theory]
     [InlineData(
         AggregateOver.Group, /*lang=json,strict*/
-        """{"operator":"count"}"""
+        """{"operator":"count","type":{"name":"integer"}}"""
     )]
     [InlineData(
         AggregateOver.All, /*lang=json,strict*/
-        """{"operator":"count","over":"all"}"""
+        """{"operator":"count","type":{"name":"integer"},"over":"all"}"""
     )]
     public void GroupOverIsOmitted(AggregateOver over, string json)
     {
@@ -41,46 +48,41 @@ public sealed record DefaultValueTests
     }
 
     [Fact]
-    public void ExplicitDefaultOverIsRead()
+    public void ExplicitDefaultOverIsRejected()
     {
-        Assert.Equal(
-            AggregateOver.Group,
-            PureQLJson
-                .Deserialize<CountGroup>( /*lang=json,strict*/
-                    """{"operator":"count","over":"group"}"""
-                )
-                .Over
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<CountGroup>( /*lang=json,strict*/
+                """{"operator":"count","type":{"name":"integer"},"over":"group"}"""
+            )
         );
     }
 
     [Fact]
-    public void FixedOverIsAcceptedButNotWritten()
+    public void OverIsRejectedOutsideAGroup()
     {
-        CountProjection count = PureQLJson.Deserialize<CountProjection>(
-            /*lang=json,strict*/
-            """{"operator":"count","over":"all"}"""
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<CountProjection>( /*lang=json,strict*/
+                """{"operator":"count","type":{"name":"integer"},"over":"all"}"""
+            )
         );
-
-        Assert.Equal( /*lang=json,strict*/
-            """{"operator":"count"}""",
-            PureQLJson.Serialize(count)
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<CountTotal>( /*lang=json,strict*/
+                """{"operator":"count","type":{"name":"integer"},"over":"all"}"""
+            )
         );
     }
 
     [Theory]
     [InlineData( /*lang=json,strict*/
-        """{"operator":"count","over":"group"}"""
+        """{"operator":"count","type":{"name":"integer"},"over":"window"}"""
     )]
     [InlineData( /*lang=json,strict*/
-        """{"operator":"count","over":"window"}"""
-    )]
-    [InlineData( /*lang=json,strict*/
-        """{"operator":"count","over":1}"""
+        """{"operator":"count","type":{"name":"integer"},"over":1}"""
     )]
     public void OtherOverIsRejected(string json)
     {
         _ = Assert.Throws<System.Text.Json.JsonException>(() =>
-            PureQLJson.Deserialize<CountProjection>(json)
+            PureQLJson.Deserialize<CountGroup>(json)
         );
     }
 
@@ -90,10 +92,10 @@ public sealed record DefaultValueTests
     public void AscendingDirectionIsOmitted(SortDirection direction, string suffix)
     {
         string expression = /*lang=json,strict*/
-            """{"key":0,"type":{"name":"integer"}}""";
+            """{"key":"user_id","type":{"name":"integer"}}""";
         OrderItemGroup item = new OrderItemGroup(
-            new ValueGroup(
-                new DecimalNullableGroup(new KeyAsDecimalNullable(new KeyInteger(0)))
+            new ExprGroup(
+                new DecimalNullableGroup(new IntegerGroup(new KeyInteger("user_id")))
             ),
             direction
         );
@@ -105,7 +107,17 @@ public sealed record DefaultValueTests
     }
 
     [Fact]
-    public void FalseDistinctAndAbsentClausesAreOmitted()
+    public void AscendingDirectionIsRejected()
+    {
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<OrderItemGroup>( /*lang=json,strict*/
+                """{"expression":{"key":"user_id","type":{"name":"integer"}},"direction":"asc"}"""
+            )
+        );
+    }
+
+    [Fact]
+    public void AbsentClausesAreOmitted()
     {
         MainPlainQuery query = new MainPlainQuery(
             new From(new FromEntity("orders")),
@@ -123,27 +135,45 @@ public sealed record DefaultValueTests
 
         Assert.Equal(
             /*lang=json,strict*/
-            """{"from":{"entity":"orders"},"select":[{"alias":"flag","type":{"name":"boolean"},"expression":{"source":"orders","field":"flag","type":{"name":"boolean"}}}]}""",
+            """{"from":{"entity":"orders"},"select":[{"alias":"flag","expression":{"source":"orders","field":"flag","type":{"name":"boolean"}}}]}""",
             PureQLJson.Serialize(new PureQLQuery(query))
         );
     }
 
     [Fact]
-    public void RoundWithDigitsIsToldApartByDigits()
+    public void RoundIsToldApartByItsDeclaredType()
     {
-        string value = /*lang=json,strict*/
+        string operand = /*lang=json,strict*/
             """{"source":"o","field":"f","type":{"name":"decimal"}}""";
         string digits = /*lang=json,strict*/
             """{"type":{"name":"integer"},"value":2}""";
 
         DecimalRow withDigits = PureQLJson.Deserialize<DecimalRow>(
-            $$"""{"operator":"round","value":{{value}},"digits":{{digits}}}"""
+            $$"""{"operator":"round","type":{"name":"decimal"},"operand":{{operand}},"digits":{{digits}}}"""
         );
         DecimalRow withoutDigits = PureQLJson.Deserialize<DecimalRow>(
-            $$"""{"operator":"round","value":{{value}}}"""
+            $$"""{"operator":"round","type":{"name":"integer"},"operand":{{operand}}}"""
         );
 
-        _ = Assert.IsType<RoundDecimalDigitsRow>(withDigits.AsT4.Value);
-        _ = Assert.IsType<RoundIntegerRow>(withoutDigits.AsT4.Value);
+        _ = Assert.IsType<RoundDecimalRow>(withDigits.AsT0.AsT4);
+        _ = Assert.IsType<RoundIntegerRow>(withoutDigits.AsT1.AsT4.AsT2);
+    }
+
+    [Theory]
+    [InlineData("integer", true)]
+    [InlineData("decimal", false)]
+    public void DigitsBelongToADecimalRound(string type, bool withDigits)
+    {
+        string operand = /*lang=json,strict*/
+            """{"source":"o","field":"f","type":{"name":"decimal"}}""";
+        string count = /*lang=json,strict*/
+            """{"type":{"name":"integer"},"value":2}""";
+        string suffix = withDigits ? $",\"digits\":{count}" : "";
+
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<DecimalRow>(
+                $$"""{"operator":"round","type":{"name":"{{type}}"},"operand":{{operand}}{{suffix}}}"""
+            )
+        );
     }
 }

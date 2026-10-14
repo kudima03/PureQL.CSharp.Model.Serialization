@@ -7,44 +7,6 @@ internal static class LiteralRegistrations
 {
     public static void Register(ModelRegistry registry)
     {
-        registry.Union(
-            UnionCase.Of((LiteralBoolean x) => new LiteralAsBooleanNullable(x)),
-            UnionCase.Of((LiteralBooleanNullable x) => new LiteralAsBooleanNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralDate x) => new LiteralAsDateNullable(x)),
-            UnionCase.Of((LiteralDateNullable x) => new LiteralAsDateNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralDatetime x) => new LiteralAsDatetimeNullable(x)),
-            UnionCase.Of((LiteralDatetimeNullable x) => new LiteralAsDatetimeNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralDecimal x) => new LiteralAsDecimal(x)),
-            UnionCase.Of((LiteralInteger x) => new LiteralAsDecimal(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralDecimal x) => new LiteralAsDecimalNullable(x)),
-            UnionCase.Of((LiteralDecimalNullable x) => new LiteralAsDecimalNullable(x)),
-            UnionCase.Of((LiteralInteger x) => new LiteralAsDecimalNullable(x)),
-            UnionCase.Of((LiteralIntegerNullable x) => new LiteralAsDecimalNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralInteger x) => new LiteralAsIntegerNullable(x)),
-            UnionCase.Of((LiteralIntegerNullable x) => new LiteralAsIntegerNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralString x) => new LiteralAsStringNullable(x)),
-            UnionCase.Of((LiteralStringNullable x) => new LiteralAsStringNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralTime x) => new LiteralAsTimeNullable(x)),
-            UnionCase.Of((LiteralTimeNullable x) => new LiteralAsTimeNullable(x))
-        );
-        registry.Union(
-            UnionCase.Of((LiteralUuid x) => new LiteralAsUuidNullable(x)),
-            UnionCase.Of((LiteralUuidNullable x) => new LiteralAsUuidNullable(x))
-        );
         registry.Literal(
             new TypeBoolean(),
             LiteralValues.Boolean,
