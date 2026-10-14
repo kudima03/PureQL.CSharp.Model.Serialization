@@ -11,6 +11,31 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
+## [0.1.0-preview.5.0.0] - 2026-10-14
+
+Moves serialization to `PureQL.CSharp.Model 0.1.0-preview.13.0.0`, which mirrors
+PureQL specification `0.1.0-preview.2.0.1`. The JSON mapping changes, so documents
+written by the previous release may not be accepted.
+
+### Added
+
+- Total queries (`aggregate`) and the converters for their expressions.
+
+### Changed
+
+- Operator nodes are chosen by `operator` and the type they declare; select items and
+  group keys take the type of their `expression`.
+- Renamed properties: `param_name` is now `param`, a join's `type` is now `kind`, the
+  operand `value` of floor, ceiling, round and `in` is now `operand`, and `distinct`
+  is now `distinctBy`. Group keys are referenced by alias.
+- Every value has a single spelling on read and write: decimal literals as strings,
+  time and datetime to the microsecond, datetime in UTC, lower case uuid, no repeated
+  list literal value, and no `nullable: false`, `over: "group"` or `direction: "asc"`.
+- Row, projection and group expression converters follow the exact unions of the
+  specification, including `round` by declared type and ordered `uuid` and `boolean`.
+
+---
+
 ## [0.1.0-preview.4.0.0] - 2026-10-09
 
 Rewrites serialization for `PureQL.CSharp.Model 0.1.0-preview.12.0.0`, which mirrors
