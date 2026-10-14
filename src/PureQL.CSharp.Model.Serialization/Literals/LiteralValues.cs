@@ -4,15 +4,19 @@ using System.Text.Json;
 namespace PureQL.CSharp.Model.Serialization.Literals;
 
 /// <summary>
-/// Literal formats of the specification. Strings are checked against the schema
-/// patterns (ASCII digits only, no surrounding whitespace), and a value the model's CLR
-/// type cannot hold exactly is rejected rather than altered.
+/// Literal formats of the specification, each with one spelling. Strings are checked
+/// against the schema patterns (ASCII digits only, no surrounding whitespace), and a
+/// value that the schema or the model's CLR type cannot hold exactly is rejected rather
+/// than altered, on read and on write.
 /// </summary>
 internal static class LiteralValues
 {
     private const long TicksPerSecond = TimeSpan.TicksPerSecond;
 
-    private static readonly TimeSpan MaxClrOffset = TimeSpan.FromHours(14);
+    /// <summary>The schema holds times and datetimes to microseconds.</summary>
+    private const long TicksPerMicrosecond = TimeSpan.TicksPerMillisecond / 1000;
+
+    private const int MaxDecimalDigits = 28;
 
     public static LiteralValue<long> Integer { get; } =
         new LiteralValue<long>(
@@ -23,7 +27,7 @@ internal static class LiteralValues
     public static LiteralValue<decimal> Decimal { get; } =
         new LiteralValue<decimal>(
             ReadDecimal,
-            (writer, value) => writer.WriteNumberValue(value)
+            (writer, value) => writer.WriteStringValue(FormatDecimal(value))
         );
 
     public static LiteralValue<string> String { get; } =
@@ -89,11 +93,18 @@ internal static class LiteralValues
 
     private static decimal ReadDecimal(JsonElement element, string path)
     {
-        return
-            element.ValueKind == JsonValueKind.Number
-            && element.TryGetDecimal(out decimal value)
-            ? value
-            : throw JsonErrors.At(path, "Expected a number that fits System.Decimal");
+        string text = ReadString(element, path);
+        return IsDecimal(text)
+            ? decimal.Parse(
+                text,
+                NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture
+            )
+            : throw JsonErrors.At(
+                path,
+                $"'{text}' is not a decimal (no exponent, no leading or trailing zeros, "
+                    + $"at most {MaxDecimalDigits} digits)"
+            );
     }
 
     private static string ReadString(JsonElement element, string path)
@@ -125,39 +136,27 @@ internal static class LiteralValues
         return !TryParseTimeTicks(text, out long ticks)
             ? throw JsonErrors.At(
                 path,
-                $"'{text}' is not a time (HH:mm:ss[.f] to 100 ns)"
+                $"'{text}' is not a time (HH:mm:ss[.f], at most 6 fraction digits)"
             )
             : new TimeOnly(ticks);
     }
 
     private static DateTimeOffset ParseDatetime(string text, string path)
     {
-        if (
-            text.Length < 20
-            || (text[10] != 'T')
-            || !TryParseDate(text[..10], out DateOnly date)
-            || !TrySplitOffset(text[11..], out string time, out TimeSpan offset)
-            || !TryParseTimeTicks(time, out long ticks)
-        )
-        {
-            throw JsonErrors.At(
+        return
+            (text.Length >= 20)
+            && (text[10] == 'T')
+            && (text[^1] == 'Z')
+            && TryParseDate(text[..10], out DateOnly date)
+            && TryParseTimeTicks(text[11..^1], out long ticks)
+            ? new DateTimeOffset(
+                date.ToDateTime(TimeOnly.MinValue).Ticks + ticks,
+                TimeSpan.Zero
+            )
+            : throw JsonErrors.At(
                 path,
-                $"'{text}' is not a datetime (yyyy-MM-ddTHH:mm:ss[.f] with Z or ±hh:mm)"
+                $"'{text}' is not a datetime (yyyy-MM-ddTHH:mm:ss[.f]Z in UTC)"
             );
-        }
-
-        long localTicks = date.ToDateTime(TimeOnly.MinValue).Ticks + ticks;
-        long utcTicks = localTicks - offset.Ticks;
-        if ((utcTicks < 0) || (utcTicks > DateTime.MaxValue.Ticks))
-        {
-            throw JsonErrors.At(path, $"'{text}' is outside the range of DateTimeOffset");
-        }
-
-        // The offset is notation only: an offset beyond ±14:00, which DateTimeOffset
-        // cannot carry, keeps the instant and is written in UTC.
-        return offset.Duration() <= MaxClrOffset
-            ? new DateTimeOffset(localTicks, offset)
-            : new DateTimeOffset(utcTicks, TimeSpan.Zero);
     }
 
     private static Guid ParseUuid(string text, string path)
@@ -170,7 +169,7 @@ internal static class LiteralValues
         for (int i = 0; i < text.Length; i++)
         {
             bool hyphen = i is 8 or 13 or 18 or 23;
-            if (hyphen ? (text[i] != '-') : !char.IsAsciiHexDigit(text[i]))
+            if (hyphen ? (text[i] != '-') : !char.IsAsciiHexDigitLower(text[i]))
             {
                 throw JsonErrors.At(path, $"'{text}' is not a uuid");
             }
@@ -224,65 +223,28 @@ internal static class LiteralValues
         if (text.Length > 8)
         {
             int digits = text.Length - 9;
-            if ((text[8] != '.') || (digits < 1) || (digits > 9))
+            if (
+                (text[8] != '.')
+                || (digits < 1)
+                || (digits > 6)
+                || (text[^1] == '0')
+                || !TryDigits(text, 9, digits, out int microseconds)
+            )
             {
                 return false;
             }
 
-            for (int i = 0; i < digits; i++)
-            {
-                char digit = text[9 + i];
-                if (!char.IsAsciiDigit(digit) || ((i >= 7) && (digit != '0')))
-                {
-                    // Beyond 100 ns, the precision of TimeOnly and DateTimeOffset.
-                    return false;
-                }
-
-                if (i < 7)
-                {
-                    fraction = (fraction * 10) + (digit - '0');
-                }
-            }
-
-            for (int i = digits; i < 7; i++)
+            fraction = microseconds;
+            for (int i = digits; i < 6; i++)
             {
                 fraction *= 10;
             }
+
+            fraction *= TicksPerMicrosecond;
         }
 
         ticks =
             (((((hours * 60L) + minutes) * 60L) + seconds) * TicksPerSecond) + fraction;
-        return true;
-    }
-
-    private static bool TrySplitOffset(string text, out string time, out TimeSpan offset)
-    {
-        time = text;
-        offset = TimeSpan.Zero;
-        if (text.EndsWith('Z'))
-        {
-            time = text[..^1];
-            return true;
-        }
-
-        // The caller guarantees at least 9 characters.
-        string suffix = text[^6..];
-        if (
-            (suffix[0] is not ('+' or '-'))
-            || (suffix[3] != ':')
-            || !TryDigits(suffix, 1, 2, out int hours)
-            || !TryDigits(suffix, 4, 2, out int minutes)
-            || (hours > 23)
-            || (minutes > 59)
-            || ((suffix[0] == '-') && (hours == 0) && (minutes == 0))
-        )
-        {
-            return false;
-        }
-
-        time = text[..^6];
-        offset = new TimeSpan(hours, minutes, 0);
-        offset = suffix[0] == '-' ? offset.Negate() : offset;
         return true;
     }
 
@@ -309,31 +271,63 @@ internal static class LiteralValues
 
     private static string FormatTime(long ticks)
     {
+        long fraction = ticks % TicksPerSecond;
+        if ((fraction % TicksPerMicrosecond) != 0)
+        {
+            throw new JsonException(
+                "A time or datetime finer than a microsecond cannot be written"
+            );
+        }
+
         TimeOnly time = new TimeOnly(ticks);
         string text = time.ToString("HH':'mm':'ss", CultureInfo.InvariantCulture);
-        long fraction = ticks % TicksPerSecond;
-        string digits = fraction
-            .ToString("D7", CultureInfo.InvariantCulture)
+        string digits = (fraction / TicksPerMicrosecond)
+            .ToString("D6", CultureInfo.InvariantCulture)
             .TrimEnd('0');
         return fraction == 0 ? text : $"{text}.{digits}";
     }
 
     private static string FormatDatetime(DateTimeOffset value)
     {
-        string text =
-            $"{FormatDate(DateOnly.FromDateTime(value.DateTime))}T"
-            + FormatTime(value.DateTime.TimeOfDay.Ticks);
-        TimeSpan offset = value.Offset;
-        if (offset == TimeSpan.Zero)
+        DateTime utc = value.UtcDateTime;
+        return $"{FormatDate(DateOnly.FromDateTime(utc))}T"
+            + $"{FormatTime(utc.TimeOfDay.Ticks)}Z";
+    }
+
+    /// <summary>
+    /// The spelling of <c>value.decimal</c>: no exponent, no leading or trailing zeros,
+    /// no negative zero, and at most 28 digits.
+    /// </summary>
+    private static bool IsDecimal(string text)
+    {
+        int start = text.StartsWith('-') ? 1 : 0;
+        int dot = text.IndexOf('.', StringComparison.Ordinal);
+        string whole = dot < 0 ? text[start..] : text[start..dot];
+        string fraction = dot < 0 ? string.Empty : text[(dot + 1)..];
+        bool isZero = whole == "0";
+        bool valid =
+            (whole.Length > 0)
+            && whole.All(char.IsAsciiDigit)
+            && fraction.All(char.IsAsciiDigit)
+            && (isZero || (whole[0] != '0'))
+            && ((dot < 0) || ((fraction.Length > 0) && (fraction[^1] != '0')))
+            && !(isZero && (dot < 0) && (start == 1))
+            && !(isZero && (dot >= 0) && (fraction.Length == 0));
+        return valid
+            && ((isZero ? 0 : whole.Length) + fraction.Length <= MaxDecimalDigits);
+    }
+
+    private static string FormatDecimal(decimal value)
+    {
+        string text = value.ToString(CultureInfo.InvariantCulture);
+        if (text.Contains('.', StringComparison.Ordinal))
         {
-            return $"{text}Z";
+            text = text.TrimEnd('0').TrimEnd('.');
         }
 
-        char sign = offset < TimeSpan.Zero ? '-' : '+';
-        TimeSpan duration = offset.Duration();
-        return string.Create(
-            CultureInfo.InvariantCulture,
-            $"{text}{sign}{duration.Hours:D2}:{duration.Minutes:D2}"
-        );
+        text = text == "-0" ? "0" : text;
+        return IsDecimal(text)
+            ? text
+            : throw new JsonException($"The decimal {text} has more than 28 digits");
     }
 }

@@ -8,8 +8,8 @@ namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
 /// Writes the properties of one JSON object. Values equal to the schema default
-/// (<c>nullable: false</c>, the default <c>over</c> and <c>direction</c>,
-/// <c>distinct: false</c>) and absent optional properties are omitted.
+/// (<c>nullable: false</c>, the default <c>over</c> and <c>direction</c>) and absent
+/// optional properties are omitted.
 /// </summary>
 internal sealed class ObjectWriter(ModelRegistry registry, Utf8JsonWriter writer)
 {
@@ -67,17 +67,20 @@ internal sealed class ObjectWriter(ModelRegistry registry, Utf8JsonWriter writer
         }
     }
 
-    public void Index(string name, int value)
+    public void OptionalStrings(string name, IEnumerable<string>? values)
     {
-        _writer.WriteNumber(name, value);
-    }
-
-    public void Flag(string name, bool value)
-    {
-        if (value)
+        if (values is null)
         {
-            _writer.WriteBoolean(name, value);
+            return;
         }
+
+        _writer.WriteStartArray(name);
+        foreach (string value in values)
+        {
+            _writer.WriteStringValue(value);
+        }
+
+        _writer.WriteEndArray();
     }
 
     public void Type(IType type)
@@ -135,17 +138,17 @@ internal sealed class ObjectWriter(ModelRegistry registry, Utf8JsonWriter writer
         }
     }
 
-    public void JoinType(JoinType type)
+    public void Kind(JoinKind kind)
     {
         _writer.WriteString(
-            "type",
-            type switch
+            "kind",
+            kind switch
             {
-                Model.JoinType.Inner => "inner",
-                Model.JoinType.Left => "left",
-                Model.JoinType.Right => "right",
-                Model.JoinType.Full => "full",
-                _ => throw new JsonException($"Unknown join type {type}"),
+                JoinKind.Inner => "inner",
+                JoinKind.Left => "left",
+                JoinKind.Right => "right",
+                JoinKind.Full => "full",
+                _ => throw new JsonException($"Unknown join kind {kind}"),
             }
         );
     }

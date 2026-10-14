@@ -39,17 +39,17 @@ internal sealed partial class ModelRegistry
             r =>
             {
                 r.Skip("type");
-                return create(r.String("param_name"));
+                return create(r.String("param"));
             },
             (w, x) =>
             {
-                w.String("param_name", x.Name);
+                w.String("param", x.Name);
                 w.Type(type);
             }
         );
     }
 
-    public void Key<T>(IType type, Func<int, T> create)
+    public void Key<T>(IType type, Func<string, T> create)
         where T : class, IKey
     {
         Leaf(
@@ -57,11 +57,11 @@ internal sealed partial class ModelRegistry
             r =>
             {
                 r.Skip("type");
-                return create(r.Index("key"));
+                return create(r.String("key"));
             },
             (w, x) =>
             {
-                w.Index("key", x.Key);
+                w.String("key", x.Key);
                 w.Type(type);
             }
         );
@@ -162,6 +162,10 @@ internal sealed partial class ModelRegistry
         );
     }
 
+    /// <summary>
+    /// A column <c>{ alias, expression }</c>, which has the type its expression
+    /// declares.
+    /// </summary>
     public void SelectItem<T, TExpression>(
         IType type,
         Func<string, TExpression, T> create,
@@ -172,23 +176,22 @@ internal sealed partial class ModelRegistry
     {
         Leaf(
             [Discriminators.Leaf("item", type.Name, type.Nullable)],
-            r =>
-            {
-                r.Skip("type");
-                return create(r.String("alias"), r.One<TExpression>("expression"));
-            },
+            r => create(r.String("alias"), r.One<TExpression>("expression")),
             (w, x) =>
             {
                 w.String("alias", x.Alias);
-                w.Type(type);
                 w.One("expression", expression(x));
             }
         );
     }
 
+    /// <summary>
+    /// A group key <c>{ alias, expression }</c>, which has the type its expression
+    /// declares.
+    /// </summary>
     public void GroupKey<T, TExpression>(
         IType type,
-        Func<TExpression, string?, T> create,
+        Func<string, TExpression, T> create,
         Func<T, TExpression> expression
     )
         where T : class, IGroupKey
@@ -196,18 +199,10 @@ internal sealed partial class ModelRegistry
     {
         Leaf(
             [Discriminators.Leaf("item", type.Name, type.Nullable)],
-            r =>
-            {
-                r.Skip("type");
-                return create(
-                    r.One<TExpression>("expression"),
-                    r.OptionalString("alias")
-                );
-            },
+            r => create(r.String("alias"), r.One<TExpression>("expression")),
             (w, x) =>
             {
-                w.OptionalString("alias", x.Alias);
-                w.Type(type);
+                w.String("alias", x.Alias);
                 w.One("expression", expression(x));
             }
         );

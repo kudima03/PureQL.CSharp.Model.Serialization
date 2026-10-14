@@ -14,52 +14,52 @@ internal static class GroupKeyRegistrations
         );
         registry.GroupKey(
             new TypeBoolean(),
-            (BooleanRow e, string? a) => new GroupKeyBoolean(e, a),
+            (string a, BooleanRow e) => new GroupKeyBoolean(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeBooleanNullable(),
-            (BooleanNullableRow e, string? a) => new GroupKeyBooleanNullable(e, a),
+            (string a, ExactBooleanNullableRow e) => new GroupKeyBooleanNullable(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeDate(),
-            (DateRow e, string? a) => new GroupKeyDate(e, a),
+            (string a, DateRow e) => new GroupKeyDate(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeDateNullable(),
-            (DateNullableRow e, string? a) => new GroupKeyDateNullable(e, a),
+            (string a, ExactDateNullableRow e) => new GroupKeyDateNullable(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeDatetime(),
-            (DatetimeRow e, string? a) => new GroupKeyDatetime(e, a),
+            (string a, DatetimeRow e) => new GroupKeyDatetime(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeDatetimeNullable(),
-            (DatetimeNullableRow e, string? a) => new GroupKeyDatetimeNullable(e, a),
+            (string a, ExactDatetimeNullableRow e) => new GroupKeyDatetimeNullable(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeDecimal(),
-            (DecimalRow e, string? a) => new GroupKeyDecimal(e, a),
+            (string a, ExactDecimalRow e) => new GroupKeyDecimal(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeDecimalNullable(),
-            (DecimalNullableRow e, string? a) => new GroupKeyDecimalNullable(e, a),
+            (string a, ExactDecimalNullableRow e) => new GroupKeyDecimalNullable(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeInteger(),
-            (IntegerRow e, string? a) => new GroupKeyInteger(e, a),
+            (string a, IntegerRow e) => new GroupKeyInteger(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeIntegerNullable(),
-            (IntegerNullableRow e, string? a) => new GroupKeyIntegerNullable(e, a),
+            (string a, ExactIntegerNullableRow e) => new GroupKeyIntegerNullable(a, e),
             x => x.Expression
         );
         registry.Union(
@@ -84,32 +84,32 @@ internal static class GroupKeyRegistrations
         );
         registry.GroupKey(
             new TypeString(),
-            (StringRow e, string? a) => new GroupKeyString(e, a),
+            (string a, StringRow e) => new GroupKeyString(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeStringNullable(),
-            (StringNullableRow e, string? a) => new GroupKeyStringNullable(e, a),
+            (string a, ExactStringNullableRow e) => new GroupKeyStringNullable(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeTime(),
-            (TimeRow e, string? a) => new GroupKeyTime(e, a),
+            (string a, TimeRow e) => new GroupKeyTime(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeTimeNullable(),
-            (TimeNullableRow e, string? a) => new GroupKeyTimeNullable(e, a),
+            (string a, ExactTimeNullableRow e) => new GroupKeyTimeNullable(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeUuid(),
-            (UuidRow e, string? a) => new GroupKeyUuid(e, a),
+            (string a, UuidRow e) => new GroupKeyUuid(a, e),
             x => x.Expression
         );
         registry.GroupKey(
             new TypeUuidNullable(),
-            (UuidNullableRow e, string? a) => new GroupKeyUuidNullable(e, a),
+            (string a, ExactUuidNullableRow e) => new GroupKeyUuidNullable(a, e),
             x => x.Expression
         );
     }

@@ -52,7 +52,19 @@ public sealed record ErrorTests
     )]
     [InlineData( /*lang=json,strict*/
         """{"operator":"like"}""",
-        "DecimalRow does not accept 'like'"
+        "Missing property 'type'"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"like","type":{"name":"decimal"}}""",
+        "DecimalRow does not accept 'like decimal'"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"add","type":{"name":"string"},"values":[]}""",
+        "DecimalRow does not accept 'add string'"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"add","type":{"name":"decimal","nullable":false},"values":[]}""",
+        "A non-null type is written without 'nullable'"
     )]
     [InlineData( /*lang=json,strict*/
         """{"name":"x"}""",
@@ -60,11 +72,11 @@ public sealed record ErrorTests
     )]
     [InlineData("""[]""", "Expected an object, found Array")]
     [InlineData( /*lang=json,strict*/
-        """{"operator":"add","values":{}}""",
+        """{"operator":"add","type":{"name":"decimal"},"values":{}}""",
         "Expected an array, found Object"
     )]
     [InlineData( /*lang=json,strict*/
-        """{"operator":"add"}""",
+        """{"operator":"add","type":{"name":"decimal"}}""",
         "Missing property 'values'"
     )]
     public void MalformedNodeIsRejectedWithItsPath(string json, string message)
@@ -78,34 +90,29 @@ public sealed record ErrorTests
     }
 
     [Theory]
-    [InlineData("""{"operator":"equal","right":{{F}}}""", "Missing property 'left'")]
     [InlineData(
-        """{"operator":"equal","left":[],"right":{{F}}}""",
+        """{"operator":"equal","type":{"name":"boolean"},"right":{{F}}}""",
+        "Missing property 'left'"
+    )]
+    [InlineData(
+        """{"operator":"equal","type":{"name":"boolean"},"left":[],"right":{{F}}}""",
         "Cannot determine the type"
     )]
     [InlineData(
-        """{"operator":"equal","left":{"operator":1},"right":{{F}}}""",
+        """{"operator":"equal","type":{"name":"boolean"},"left":{"operator":1},"right":{{F}}}""",
         "Cannot determine the type"
     )]
     [InlineData(
-        """{"operator":"equal","left":{"operator":"if"},"right":{{F}}}""",
+        """{"operator":"equal","type":{"name":"boolean"},"left":{"operator":"if"},"right":{{F}}}""",
         "Cannot determine the type"
     )]
     [InlineData(
-        """{"operator":"equal","left":{"operator":"coalesce","values":[]},"right":{{F}}}""",
+        """{"operator":"equal","type":{"name":"boolean"},"left":{"operator":"like","type":{"name":"hyper"}},"right":{{F}}}""",
         "Cannot determine the type"
     )]
     [InlineData(
-        """{"operator":"equal","left":{"operator":"like"},"right":{{F}}}""",
+        """{"operator":"equal","type":{"name":"boolean"},"left":{"type":{"name":"stringList"}},"right":{{F}}}""",
         "Cannot determine the type"
-    )]
-    [InlineData(
-        """{"operator":"equal","left":{"type":{"name":"stringList"}},"right":{{F}}}""",
-        "Cannot determine the type"
-    )]
-    [InlineData(
-        """{"operator":"greaterThan","left":{"type":{"name":"uuid"}},"right":{{F}}}""",
-        "GreaterThanRow does not accept Uuid"
     )]
     public void OperandOfUnknownTypeIsRejected(string json, string message)
     {
@@ -120,59 +127,59 @@ public sealed record ErrorTests
 
     [Theory]
     [InlineData(
-        """{"operator":"if","condition":{{T}},"then":{{K}},"else":{{K}}}""",
+        """{"operator":"if","type":{"name":"decimal"},"condition":{{T}},"then":{{K}},"else":{{K}}}""",
         "decimal",
         typeof(EqualDecimalGroup)
     )]
     [InlineData(
-        """{"operator":"coalesce","values":[{{K}},{{K}}]}""",
+        """{"operator":"coalesce","type":{"name":"decimal"},"values":[{{K}},{{K}}]}""",
         "decimal",
         typeof(EqualDecimalGroup)
     )]
     [InlineData(
-        """{"operator":"min","selector":{{F}}}""",
+        """{"operator":"min","type":{"name":"decimal"},"selector":{{F}}}""",
         "decimal",
         typeof(EqualDecimalGroup)
     )]
     [InlineData( /*lang=json,strict*/
-        """{"operator":"count"}""",
+        """{"operator":"count","type":{"name":"integer"}}""",
         "integer",
         typeof(EqualDecimalGroup)
     )]
     [InlineData(
-        """{"operator":"concat","values":[{{S}},{{S}}]}""",
+        """{"operator":"concat","type":{"name":"string"},"values":[{{S}},{{S}}]}""",
         "string",
         typeof(EqualStringGroup)
     )]
     [InlineData(
-        """{"operator":"dateAddDays","left":{"type":{"name":"date"},"value":"2024-01-01"},"right":{{I}}}""",
+        """{"operator":"dateAddDays","type":{"name":"date"},"left":{"type":{"name":"date"},"value":"2024-01-01"},"right":{{I}}}""",
         "date",
         typeof(EqualDateGroup)
     )]
     [InlineData(
-        """{"operator":"timeAddSeconds","left":{"type":{"name":"time"},"value":"10:00:00"},"right":{{I}}}""",
+        """{"operator":"timeAddSeconds","type":{"name":"time"},"left":{"type":{"name":"time"},"value":"10:00:00"},"right":{{I}}}""",
         "time",
         typeof(EqualTimeGroup)
     )]
     [InlineData(
-        """{"operator":"datetimeAddSeconds","left":{"type":{"name":"datetime"},"value":"2024-01-01T10:00:00Z"},"right":{{I}}}""",
+        """{"operator":"datetimeAddSeconds","type":{"name":"datetime"},"left":{"type":{"name":"datetime"},"value":"2024-01-01T10:00:00Z"},"right":{{I}}}""",
         "datetime",
         typeof(EqualDatetimeGroup)
     )]
     [InlineData(
-        """{"operator":"any","predicate":{{T}}}""",
+        """{"operator":"any","type":{"name":"boolean"},"predicate":{{T}}}""",
         "boolean",
         typeof(EqualBooleanGroup)
     )]
     [InlineData( /*lang=json,strict*/
-        """{"key":0,"type":{"name":"uuid"}}""",
+        """{"key":"k","type":{"name":"uuid"}}""",
         "uuid",
         typeof(EqualUuidGroup)
     )]
     public void EqualVariantFollowsTheLeftOperand(string left, string type, Type variant)
     {
         string json =
-            """{"operator":"equal","left":"""
+            """{"operator":"equal","type":{"name":"boolean"},"left":"""
             + left.Replace(
                     "{{T}}",
                     /*lang=json,strict*/
@@ -182,7 +189,7 @@ public sealed record ErrorTests
                 .Replace(
                     "{{K}}",
                     /*lang=json,strict*/
-                    """{"key":0,"type":{"name":"decimal"}}""",
+                    """{"key":"k","type":{"name":"decimal"}}""",
                     StringComparison.Ordinal
                 )
                 .Replace(
@@ -214,10 +221,10 @@ public sealed record ErrorTests
     }
 
     [Fact]
-    public void UnknownJoinTypeIsRejectedOnWrite()
+    public void UnknownJoinKindIsRejectedOnWrite()
     {
         JoinEntity join = new JoinEntity(
-            (JoinType)42,
+            (JoinKind)42,
             "users",
             new BooleanRow(new FieldBoolean("users", "active"))
         );
@@ -228,23 +235,23 @@ public sealed record ErrorTests
     [Theory]
     [InlineData(
         /*lang=json,strict*/
-        """{"type":"cross","entity":"u","on":{"type":{"name":"boolean"},"value":true}}"""
+        """{"kind":"cross","entity":"u","on":{"type":{"name":"boolean"},"value":true}}"""
     )]
     [InlineData( /*lang=json,strict*/
         """{"entity":"u","on":{"type":{"name":"boolean"},"value":true}}"""
     )]
-    public void JoinWithoutAKnownTypeIsRejected(string json)
+    public void JoinWithoutAKnownKindIsRejected(string json)
     {
         _ = Assert.Throws<JsonException>(() => PureQLJson.Deserialize<Join>(json));
     }
 
     [Fact]
-    public void GroupKeyIndexMustBeAnInteger()
+    public void GroupKeyMustBeAString()
     {
         _ = Assert.Throws<JsonException>(() =>
             PureQLJson.Deserialize<DecimalGroup>(
                 /*lang=json,strict*/
-                """{"key":"0","type":{"name":"decimal"}}"""
+                """{"key":0,"type":{"name":"decimal"}}"""
             )
         );
     }

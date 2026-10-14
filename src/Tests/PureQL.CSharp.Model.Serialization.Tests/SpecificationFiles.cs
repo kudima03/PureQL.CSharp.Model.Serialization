@@ -1,7 +1,7 @@
 namespace PureQL.CSharp.Model.Serialization.Tests;
 
 /// <summary>
-/// The fixtures of PureQL specification 0.1.0-preview.1.0.0, from the
+/// The fixtures of PureQL specification 0.1.0-preview.2.0.1, from the
 /// <c>src/Tests/PureQL-Specification</c> submodule.
 /// </summary>
 internal static class SpecificationFiles

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization;
 
@@ -7,6 +8,7 @@ internal sealed class RecordDescriptor<T>(
     ModelRegistry registry,
     IEnumerable<string> signatures,
     string? operatorName,
+    IType? operatorType,
     Func<ObjectReader, T> read,
     Action<ObjectWriter, T> write
 ) : ModelDescriptor(registry, typeof(T))
@@ -34,6 +36,7 @@ internal sealed class RecordDescriptor<T>(
         if (operatorName is not null)
         {
             reader.Skip("operator");
+            reader.Skip("type");
         }
 
         T value = read(reader);
@@ -49,7 +52,13 @@ internal sealed class RecordDescriptor<T>(
             writer.WriteString("operator", operatorName);
         }
 
-        write(new ObjectWriter(Registry, writer), (T)value);
+        ObjectWriter objectWriter = new ObjectWriter(Registry, writer);
+        if (operatorType is not null)
+        {
+            objectWriter.Type(operatorType);
+        }
+
+        write(objectWriter, (T)value);
         writer.WriteEndObject();
     }
 }

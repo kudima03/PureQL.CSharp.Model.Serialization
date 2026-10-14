@@ -16,7 +16,6 @@ public sealed record InvalidQueryTests
     {
         // minItems: arrays are IEnumerable<T> of any length.
         ["003_empty_select.jsonc"] = "minItems",
-        ["013_empty_group_by.jsonc"] = "minItems",
         ["044_and_without_conditions.jsonc"] = "minItems",
         ["045_add_single_value.jsonc"] = "minItems",
         ["047_coalesce_single_value.jsonc"] = "minItems",
@@ -26,17 +25,39 @@ public sealed record InvalidQueryTests
         ["318_subquery_empty_select.jsonc"] = "minItems",
         ["334_empty_joins.jsonc"] = "minItems",
         ["335_empty_order_by.jsonc"] = "minItems",
+        ["370_or_with_one_condition.jsonc"] = "minItems",
 
         // contains: a non-null coalesce needs a non-null operand, but its operands are
-        // typed nullable.
-        ["080_coalesce_still_nullable.jsonc"] = "contains",
+        // typed nullable, and at most one of them may be non-null.
         ["261_coalesce_all_nullable_declared_non_null.jsonc"] = "contains",
-        ["265_coalesce_nullable_boolean_in_and.jsonc"] = "contains",
+        ["407_coalesce_two_non_null.jsonc"] = "contains",
 
-        // minimum: skip, take and key are plain long / int.
+        // declared type: an operator declares the exact type its operands give it, but
+        // its operands are typed by position, so a wider or narrower declaration of the
+        // same record is a valid model.
+        ["287_max_of_boolean_declared_nullable.jsonc"] = "declared type",
+        ["348_grouped_min_over_all_declared_nullable.jsonc"] = "declared type",
+        ["350_add_of_integers_declared_decimal.jsonc"] = "declared type",
+        ["351_add_of_non_null_declared_nullable.jsonc"] = "declared type",
+        ["353_if_of_non_null_branches_declared_nullable.jsonc"] = "declared type",
+        ["354_if_of_integers_declared_decimal.jsonc"] = "declared type",
+        ["355_coalesce_with_non_null_declared_nullable.jsonc"] = "declared type",
+        ["356_coalesce_of_nullables_declared_non_null.jsonc"] = "declared type",
+        ["357_coalesce_of_integers_declared_decimal.jsonc"] = "declared type",
+        ["361_sum_of_integers_declared_decimal.jsonc"] = "declared type",
+        ["362_min_of_integers_declared_decimal.jsonc"] = "declared type",
+        ["363_group_min_declared_nullable.jsonc"] = "declared type",
+        ["386_plain_min_declared_nullable.jsonc"] = "declared type",
+
+        // dependentRequired, dependentSchemas: a pagination needs an orderBy, and a
+        // subquery's orderBy needs a pagination or a distinctBy, but each is a property.
+        ["371_pagination_without_order_by.jsonc"] = "dependent",
+        ["372_subquery_pagination_without_order_by.jsonc"] = "dependent",
+        ["373_subquery_order_by_without_pagination.jsonc"] = "dependent",
+
+        // minimum: skip and take are plain long.
         ["005_pagination_take_zero.jsonc"] = "minimum",
         ["006_pagination_negative_skip.jsonc"] = "minimum",
-        ["116_negative_key_index.jsonc"] = "minimum",
 
         // NAME pattern: names, aliases and sources are plain strings.
         ["031_field_empty_name.jsonc"] = "name",
@@ -45,6 +66,7 @@ public sealed record InvalidQueryTests
         ["173_from_empty_subquery.jsonc"] = "name",
         ["178_join_empty_alias.jsonc"] = "name",
         ["201_param_empty_name.jsonc"] = "name",
+        ["206_key_empty_name.jsonc"] = "name",
         ["205_field_empty_source.jsonc"] = "name",
         ["309_group_key_empty_alias.jsonc"] = "name",
         ["313_subquery_empty_name.jsonc"] = "name",
@@ -53,6 +75,7 @@ public sealed record InvalidQueryTests
         ["338_source_leading_tab.jsonc"] = "name",
         ["339_param_name_with_line_break.jsonc"] = "name",
         ["340_subquery_name_whitespace.jsonc"] = "name",
+        ["396_distinct_by_empty_alias.jsonc"] = "name",
     };
 
     [Theory]

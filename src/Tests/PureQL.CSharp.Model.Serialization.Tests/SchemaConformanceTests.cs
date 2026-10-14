@@ -63,14 +63,16 @@ public sealed partial record SchemaConformanceTests
     }
 
     [Theory]
-    [InlineData("add.decimal@row", true, "values", "{{D}},{{D}}")]
-    [InlineData("add.decimal@row", false, "value", "{{D}},{{D}}")]
-    [InlineData("add.decimal@row", false, "values", "{{D}}")]
-    [InlineData("add.integer@row", false, "values", "{{D}},{{D}}")]
-    [InlineData("add.decimal@group", false, "values", "{{D}},{{D}}")]
+    [InlineData("add@row", true, "decimal", "values", "{{D}},{{D}}")]
+    [InlineData("add@row", false, "decimal", "value", "{{D}},{{D}}")]
+    [InlineData("add@row", false, "decimal", "values", "{{D}}")]
+    [InlineData("add@row", false, "integer", "values", "{{D}},{{D}}")]
+    [InlineData("add@row", false, "string", "values", "{{D}},{{D}}")]
+    [InlineData("add@group", false, "decimal", "values", "{{D}},{{D}}")]
     public void DefinitionCheckTellsValidFromInvalid(
         string definition,
         bool valid,
+        string type,
         string property,
         string operands
     )
@@ -78,7 +80,7 @@ public sealed partial record SchemaConformanceTests
         string field = /*lang=json,strict*/
             """{"source":"o","field":"f","type":{"name":"decimal"}}""";
         string json =
-            $$"""{"operator":"add","{{property}}":["""
+            $$$"""{"operator":"add","type":{"name":"{{{type}}}"},"{{{property}}}":["""
             + operands.Replace("{{D}}", field, StringComparison.Ordinal)
             + "]}";
 
@@ -166,6 +168,7 @@ public sealed partial record SchemaConformanceTests
             }
 
             Match list = ListPattern().Match(name);
+            Match leaf = LeafPattern().Match(name);
             string mapped = name switch
             {
                 _ when list.Success => $"List{list.Groups[1].Value}",
@@ -175,8 +178,11 @@ public sealed partial record SchemaConformanceTests
                         "SelectItemProjection",
                         StringComparison.Ordinal
                     ) => "SelectItemProjection",
+                _ when name.StartsWith("SelectItemTotal", StringComparison.Ordinal) =>
+                    "SelectItemTotal",
                 _ when name.StartsWith("GroupKey", StringComparison.Ordinal) =>
                     "GroupKey",
+                _ when leaf.Success => leaf.Groups[1].Value,
                 "FromEntity" or "FromSubquery" => "From",
                 "JoinEntity" or "JoinSubquery" => "Join",
                 _ => name,
@@ -209,6 +215,11 @@ public sealed partial record SchemaConformanceTests
 
         [GeneratedRegex("[.@]")]
         private static partial Regex Separator();
+
+        [GeneratedRegex(
+            "^(Field|Param|Key|Literal)(?:Boolean|Date|Datetime|Decimal|Integer|String|Time|Uuid)(?:Nullable)?$"
+        )]
+        private static partial Regex LeafPattern();
 
         [GeneratedRegex(
             "^List(?:Literal|Param|SubqueryColumn)?(Boolean|Date|Datetime|Decimal|Integer|String|Time|Uuid)$"

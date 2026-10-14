@@ -3,47 +3,13 @@ using System.Text.Json;
 namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
-/// Reads what the specification dispatches on. Operator nodes are told apart by
-/// <c>operator</c> (and <c>round</c> by the presence of <c>digits</c>), leaves by their
-/// shape and declared <c>type</c>, and operands by the family <c>probe.*</c> reports.
+/// Reads what the specification dispatches on. Every node declares its <c>type</c>, so
+/// operator nodes are told apart by <c>operator</c> and the declared type, leaves by
+/// their shape and declared type (select items and group keys by the type of their
+/// expression), and operands by the family of the type they declare.
 /// </summary>
 internal static class Discriminators
 {
-    private static readonly Dictionary<string, TypeFamily> OperatorFamilies =
-        new Dictionary<string, TypeFamily>(StringComparer.Ordinal)
-        {
-            ["add"] = TypeFamily.Decimal,
-            ["subtract"] = TypeFamily.Decimal,
-            ["multiply"] = TypeFamily.Decimal,
-            ["divide"] = TypeFamily.Decimal,
-            ["integerDivide"] = TypeFamily.Decimal,
-            ["modulo"] = TypeFamily.Decimal,
-            ["floor"] = TypeFamily.Decimal,
-            ["ceiling"] = TypeFamily.Decimal,
-            ["round"] = TypeFamily.Decimal,
-            ["dateDiffDays"] = TypeFamily.Decimal,
-            ["timeDiffSeconds"] = TypeFamily.Decimal,
-            ["datetimeDiffSeconds"] = TypeFamily.Decimal,
-            ["count"] = TypeFamily.Decimal,
-            ["sum"] = TypeFamily.Decimal,
-            ["and"] = TypeFamily.Boolean,
-            ["or"] = TypeFamily.Boolean,
-            ["not"] = TypeFamily.Boolean,
-            ["equal"] = TypeFamily.Boolean,
-            ["notEqual"] = TypeFamily.Boolean,
-            ["in"] = TypeFamily.Boolean,
-            ["greaterThan"] = TypeFamily.Boolean,
-            ["lessThan"] = TypeFamily.Boolean,
-            ["greaterThanOrEqual"] = TypeFamily.Boolean,
-            ["lessThanOrEqual"] = TypeFamily.Boolean,
-            ["any"] = TypeFamily.Boolean,
-            ["all"] = TypeFamily.Boolean,
-            ["concat"] = TypeFamily.String,
-            ["dateAddDays"] = TypeFamily.Date,
-            ["timeAddSeconds"] = TypeFamily.Time,
-            ["datetimeAddSeconds"] = TypeFamily.Datetime,
-        };
-
     private static readonly Dictionary<string, TypeFamily> TypeFamilies = new Dictionary<
         string,
         TypeFamily
@@ -63,16 +29,16 @@ internal static class Discriminators
     private static readonly (string Property, string Kind)[] LeafKinds =
     [
         ("source", "field"),
-        ("param_name", "param"),
+        ("param", "param"),
         ("key", "key"),
         ("subquery", "column"),
         ("expression", "item"),
         ("value", "literal"),
     ];
 
-    public static string Operator(string name, bool digits)
+    public static string Operator(string name, string typeName, bool nullable)
     {
-        return digits ? $"{name}(digits)" : name;
+        return nullable ? $"{name} {typeName}?" : $"{name} {typeName}";
     }
 
     public static string Leaf(string kind, string typeName, bool nullable)
@@ -89,22 +55,55 @@ internal static class Discriminators
 
         if (element.TryGetProperty("operator", out JsonElement name))
         {
-            return name.ValueKind != JsonValueKind.String
-                ? throw JsonErrors.At($"{path}.operator", "Expected a string")
-                : Operator(name.GetString()!, element.TryGetProperty("digits", out _));
+            if (name.ValueKind != JsonValueKind.String)
+            {
+                throw JsonErrors.At($"{path}.operator", "Expected a string");
+            }
+
+            (string operatorType, bool operatorNullable) = DeclaredType(element, path);
+            return Operator(name.GetString()!, operatorType, operatorNullable);
         }
 
         string kind =
             LeafKind(element)
             ?? throw JsonErrors.At(path, "Expected an operator node or a reference");
 
-        if (!element.TryGetProperty("type", out JsonElement type))
+        // A select item or group key has no type of its own: it has the type its
+        // expression declares.
+        if (kind == "item")
         {
-            throw JsonErrors.At(path, "Missing property 'type'");
+            if (
+                !element.TryGetProperty("expression", out JsonElement expression)
+                || (expression.ValueKind != JsonValueKind.Object)
+            )
+            {
+                throw JsonErrors.At(path, "Missing property 'expression'");
+            }
+
+            (string itemType, bool itemNullable) = DeclaredType(
+                expression,
+                $"{path}.expression"
+            );
+            return Leaf(kind, itemType, itemNullable);
         }
 
-        (string typeName, bool nullable) = Type(type, $"{path}.type");
+        (string typeName, bool nullable) = DeclaredType(element, path);
         return Leaf(kind, typeName, nullable);
+    }
+
+    private static (string Name, bool Nullable) DeclaredType(
+        JsonElement element,
+        string path
+    )
+    {
+        return element.ValueKind != JsonValueKind.Object
+                ? throw JsonErrors.At(
+                    path,
+                    $"Expected an object, found {element.ValueKind}"
+                )
+            : element.TryGetProperty("type", out JsonElement type)
+                ? Type(type, $"{path}.type")
+            : throw JsonErrors.At(path, "Missing property 'type'");
     }
 
     public static (string Name, bool Nullable) Type(JsonElement type, string path)
@@ -131,11 +130,16 @@ internal static class Discriminators
             if (isName)
             {
                 name = property.Value.GetString();
+                continue;
             }
-            else
-            {
-                nullable = property.Value.GetBoolean();
-            }
+
+            // A non-null type is written without 'nullable': one spelling per type.
+            nullable = property.Value.GetBoolean()
+                ? true
+                : throw JsonErrors.At(
+                    path,
+                    "A non-null type is written without 'nullable'"
+                );
         }
 
         return name is null
@@ -144,65 +148,19 @@ internal static class Discriminators
     }
 
     /// <summary>
-    /// The family of an operand as <c>probe.*</c> reads it, without validating it:
-    /// a leaf's <c>type.name</c>, a fixed-type operator, or the operand that carries the
-    /// type (<c>if.then</c>, <c>coalesce.values[0]</c>, an aggregate's <c>selector</c>).
+    /// The family of an operand: that of the type it declares. Nothing else is
+    /// validated, the case that is chosen reads the operand in full.
     /// </summary>
     public static TypeFamily? Probe(JsonElement element)
     {
-        if (element.ValueKind != JsonValueKind.Object)
-        {
-            return null;
-        }
-
-        if (!element.TryGetProperty("operator", out JsonElement name))
-        {
-            return
-                element.TryGetProperty("type", out JsonElement type)
-                && type.ValueKind == JsonValueKind.Object
-                && type.TryGetProperty("name", out JsonElement typeName)
-                && typeName.ValueKind == JsonValueKind.String
-                && TypeFamilies.TryGetValue(typeName.GetString()!, out TypeFamily family)
-                ? family
-                : null;
-        }
-
-        if (name.ValueKind != JsonValueKind.String)
-        {
-            return null;
-        }
-
-        string op = name.GetString()!;
-        return OperatorFamilies.TryGetValue(op, out TypeFamily fixedFamily)
-            ? fixedFamily
-            : SpineFamily(element, op);
-    }
-
-    private static TypeFamily? SpineFamily(JsonElement element, string op)
-    {
-        return op switch
-        {
-            "if" => ProbeProperty(element, "then"),
-            "coalesce" => ProbeFirst(element, "values"),
-            "min" or "max" or "average" => ProbeProperty(element, "selector"),
-            _ => null,
-        };
-    }
-
-    private static TypeFamily? ProbeProperty(JsonElement element, string name)
-    {
-        return element.TryGetProperty(name, out JsonElement operand)
-            ? Probe(operand)
-            : null;
-    }
-
-    private static TypeFamily? ProbeFirst(JsonElement element, string name)
-    {
         return
-            element.TryGetProperty(name, out JsonElement operands)
-            && operands.ValueKind == JsonValueKind.Array
-            && operands.GetArrayLength() > 0
-            ? Probe(operands[0])
+            element.ValueKind == JsonValueKind.Object
+            && element.TryGetProperty("type", out JsonElement type)
+            && type.ValueKind == JsonValueKind.Object
+            && type.TryGetProperty("name", out JsonElement typeName)
+            && typeName.ValueKind == JsonValueKind.String
+            && TypeFamilies.TryGetValue(typeName.GetString()!, out TypeFamily family)
+            ? family
             : null;
     }
 

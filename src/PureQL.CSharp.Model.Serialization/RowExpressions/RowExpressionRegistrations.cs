@@ -3,6 +3,7 @@ using PureQL.CSharp.Model.Lists;
 using PureQL.CSharp.Model.Literals;
 using PureQL.CSharp.Model.Parameters;
 using PureQL.CSharp.Model.RowExpressions;
+using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.RowExpressions;
 
@@ -12,26 +13,31 @@ internal static class RowExpressionRegistrations
     {
         registry.Operator(
             "add",
+            new TypeDecimalNullable(),
             r => new AddDecimalNullableRow(r.Many<DecimalNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
+            new TypeDecimal(),
             r => new AddDecimalRow(r.Many<DecimalRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
+            new TypeIntegerNullable(),
             r => new AddIntegerNullableRow(r.Many<IntegerNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
+            new TypeInteger(),
             r => new AddIntegerRow(r.Many<IntegerRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "and",
+            new TypeBoolean(),
             r => new AndRow(r.Many<BooleanRow>("conditions")),
             (w, x) => w.Many("conditions", x.Conditions)
         );
@@ -47,21 +53,13 @@ internal static class RowExpressionRegistrations
             ),
             UnionCase.Of(
                 (DivideDecimalNullableRow x) => new ArithmeticDecimalNullableRow(x)
-            ),
-            UnionCase.Of(
-                (IntegerDivideIntegerNullableRow x) => new ArithmeticDecimalNullableRow(x)
-            ),
-            UnionCase.Of(
-                (ModuloIntegerNullableRow x) => new ArithmeticDecimalNullableRow(x)
             )
         );
         registry.Union(
             UnionCase.Of((AddDecimalRow x) => new ArithmeticDecimalRow(x)),
             UnionCase.Of((SubtractDecimalRow x) => new ArithmeticDecimalRow(x)),
             UnionCase.Of((MultiplyDecimalRow x) => new ArithmeticDecimalRow(x)),
-            UnionCase.Of((DivideDecimalRow x) => new ArithmeticDecimalRow(x)),
-            UnionCase.Of((IntegerDivideIntegerRow x) => new ArithmeticDecimalRow(x)),
-            UnionCase.Of((ModuloIntegerRow x) => new ArithmeticDecimalRow(x))
+            UnionCase.Of((DivideDecimalRow x) => new ArithmeticDecimalRow(x))
         );
         registry.Union(
             UnionCase.Of(
@@ -88,12 +86,8 @@ internal static class RowExpressionRegistrations
             UnionCase.Of((ModuloIntegerRow x) => new ArithmeticIntegerRow(x))
         );
         registry.Union(
-            UnionCase.Of((FieldAsBooleanNullable x) => new BooleanNullableRow(x)),
-            UnionCase.Of((ParamAsBooleanNullable x) => new BooleanNullableRow(x)),
-            UnionCase.Of((LiteralAsBooleanNullable x) => new BooleanNullableRow(x)),
-            UnionCase.Of((LogicalRow x) => new BooleanNullableRow(x)),
-            UnionCase.Of((ComparisonRow x) => new BooleanNullableRow(x)),
-            UnionCase.Of((ConditionalBooleanNullableRow x) => new BooleanNullableRow(x))
+            UnionCase.Of((BooleanRow x) => new BooleanNullableRow(x)),
+            UnionCase.Of((ExactBooleanNullableRow x) => new BooleanNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldBoolean x) => new BooleanRow(x)),
@@ -105,91 +99,109 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "ceiling",
-            r => new CeilingIntegerNullableRow(r.One<DecimalNullableRow>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeIntegerNullable(),
+            r => new CeilingIntegerNullableRow(r.One<DecimalNullableRow>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "ceiling",
-            r => new CeilingIntegerRow(r.One<DecimalRow>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeInteger(),
+            r => new CeilingIntegerRow(r.One<DecimalRow>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "coalesce",
+            new TypeBooleanNullable(),
             r => new CoalesceBooleanNullableRow(r.Many<BooleanNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeBoolean(),
             r => new CoalesceBooleanRow(r.Many<BooleanNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDateNullable(),
             r => new CoalesceDateNullableRow(r.Many<DateNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDate(),
             r => new CoalesceDateRow(r.Many<DateNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDatetimeNullable(),
             r => new CoalesceDatetimeNullableRow(r.Many<DatetimeNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDatetime(),
             r => new CoalesceDatetimeRow(r.Many<DatetimeNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDecimalNullable(),
             r => new CoalesceDecimalNullableRow(r.Many<DecimalNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeDecimal(),
             r => new CoalesceDecimalRow(r.Many<DecimalNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeIntegerNullable(),
             r => new CoalesceIntegerNullableRow(r.Many<IntegerNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeInteger(),
             r => new CoalesceIntegerRow(r.Many<IntegerNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeStringNullable(),
             r => new CoalesceStringNullableRow(r.Many<StringNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeString(),
             r => new CoalesceStringRow(r.Many<StringNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeTimeNullable(),
             r => new CoalesceTimeNullableRow(r.Many<TimeNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeTime(),
             r => new CoalesceTimeRow(r.Many<TimeNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeUuidNullable(),
             r => new CoalesceUuidNullableRow(r.Many<UuidNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
+            new TypeUuid(),
             r => new CoalesceUuidRow(r.Many<UuidNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
@@ -204,11 +216,13 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "concat",
+            new TypeStringNullable(),
             r => new ConcatStringNullableRow(r.Many<StringNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "concat",
+            new TypeString(),
             r => new ConcatStringRow(r.Many<StringRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
@@ -296,6 +310,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "dateAddDays",
+            new TypeDateNullable(),
             r => new DateAddDaysDateNullableRow(
                 r.One<DateNullableRow>("left"),
                 r.One<IntegerNullableRow>("right")
@@ -308,6 +323,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "dateAddDays",
+            new TypeDate(),
             r => new DateAddDaysDateRow(
                 r.One<DateRow>("left"),
                 r.One<IntegerRow>("right")
@@ -320,6 +336,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "dateDiffDays",
+            new TypeIntegerNullable(),
             r => new DateDiffDaysIntegerNullableRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -332,6 +349,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "dateDiffDays",
+            new TypeInteger(),
             r => new DateDiffDaysIntegerRow(
                 r.One<DateRow>("left"),
                 r.One<DateRow>("right")
@@ -343,11 +361,8 @@ internal static class RowExpressionRegistrations
             }
         );
         registry.Union(
-            UnionCase.Of((FieldAsDateNullable x) => new DateNullableRow(x)),
-            UnionCase.Of((ParamAsDateNullable x) => new DateNullableRow(x)),
-            UnionCase.Of((LiteralAsDateNullable x) => new DateNullableRow(x)),
-            UnionCase.Of((DateAddDaysDateNullableRow x) => new DateNullableRow(x)),
-            UnionCase.Of((ConditionalDateNullableRow x) => new DateNullableRow(x))
+            UnionCase.Of((DateRow x) => new DateNullableRow(x)),
+            UnionCase.Of((ExactDateNullableRow x) => new DateNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldDate x) => new DateRow(x)),
@@ -358,6 +373,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "datetimeAddSeconds",
+            new TypeDatetimeNullable(),
             r => new DatetimeAddSecondsDatetimeNullableRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -370,6 +386,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "datetimeAddSeconds",
+            new TypeDatetime(),
             r => new DatetimeAddSecondsDatetimeRow(
                 r.One<DatetimeRow>("left"),
                 r.One<DecimalRow>("right")
@@ -382,6 +399,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "datetimeDiffSeconds",
+            new TypeDecimalNullable(),
             r => new DatetimeDiffSecondsDecimalNullableRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -394,6 +412,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "datetimeDiffSeconds",
+            new TypeDecimal(),
             r => new DatetimeDiffSecondsDecimalRow(
                 r.One<DatetimeRow>("left"),
                 r.One<DatetimeRow>("right")
@@ -405,13 +424,8 @@ internal static class RowExpressionRegistrations
             }
         );
         registry.Union(
-            UnionCase.Of((FieldAsDatetimeNullable x) => new DatetimeNullableRow(x)),
-            UnionCase.Of((ParamAsDatetimeNullable x) => new DatetimeNullableRow(x)),
-            UnionCase.Of((LiteralAsDatetimeNullable x) => new DatetimeNullableRow(x)),
-            UnionCase.Of(
-                (DatetimeAddSecondsDatetimeNullableRow x) => new DatetimeNullableRow(x)
-            ),
-            UnionCase.Of((ConditionalDatetimeNullableRow x) => new DatetimeNullableRow(x))
+            UnionCase.Of((DatetimeRow x) => new DatetimeNullableRow(x)),
+            UnionCase.Of((ExactDatetimeNullableRow x) => new DatetimeNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldDatetime x) => new DatetimeRow(x)),
@@ -421,27 +435,16 @@ internal static class RowExpressionRegistrations
             UnionCase.Of((ConditionalDatetimeRow x) => new DatetimeRow(x))
         );
         registry.Union(
-            UnionCase.Of((FieldAsDecimalNullable x) => new DecimalNullableRow(x)),
-            UnionCase.Of((ParamAsDecimalNullable x) => new DecimalNullableRow(x)),
-            UnionCase.Of((LiteralAsDecimalNullable x) => new DecimalNullableRow(x)),
-            UnionCase.Of((ArithmeticDecimalNullableRow x) => new DecimalNullableRow(x)),
-            UnionCase.Of((RoundingDecimalNullableRow x) => new DecimalNullableRow(x)),
-            UnionCase.Of((DifferenceDecimalNullableRow x) => new DecimalNullableRow(x)),
-            UnionCase.Of((ConditionalDecimalNullableRow x) => new DecimalNullableRow(x))
+            UnionCase.Of((ExactDecimalRow x) => new DecimalNullableRow(x)),
+            UnionCase.Of((ExactDecimalNullableRow x) => new DecimalNullableRow(x)),
+            UnionCase.Of((IntegerRow x) => new DecimalNullableRow(x)),
+            UnionCase.Of((ExactIntegerNullableRow x) => new DecimalNullableRow(x))
         );
         registry.Union(
-            UnionCase.Of((FieldAsDecimal x) => new DecimalRow(x)),
-            UnionCase.Of((ParamAsDecimal x) => new DecimalRow(x)),
-            UnionCase.Of((LiteralAsDecimal x) => new DecimalRow(x)),
-            UnionCase.Of((ArithmeticDecimalRow x) => new DecimalRow(x)),
-            UnionCase.Of((RoundingDecimalRow x) => new DecimalRow(x)),
-            UnionCase.Of((DifferenceDecimalRow x) => new DecimalRow(x)),
-            UnionCase.Of((ConditionalDecimalRow x) => new DecimalRow(x))
+            UnionCase.Of((ExactDecimalRow x) => new DecimalRow(x)),
+            UnionCase.Of((IntegerRow x) => new DecimalRow(x))
         );
         registry.Union(
-            UnionCase.Of(
-                (DateDiffDaysIntegerNullableRow x) => new DifferenceDecimalNullableRow(x)
-            ),
             UnionCase.Of(
                 (TimeDiffSecondsDecimalNullableRow x) =>
                     new DifferenceDecimalNullableRow(x)
@@ -452,22 +455,24 @@ internal static class RowExpressionRegistrations
             )
         );
         registry.Union(
-            UnionCase.Of((DateDiffDaysIntegerRow x) => new DifferenceDecimalRow(x)),
             UnionCase.Of((TimeDiffSecondsDecimalRow x) => new DifferenceDecimalRow(x)),
             UnionCase.Of((DatetimeDiffSecondsDecimalRow x) => new DifferenceDecimalRow(x))
         );
         registry.Operator(
             "divide",
+            new TypeDecimalNullable(),
             r => new DivideDecimalNullableRow(r.Many<DecimalNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "divide",
+            new TypeDecimal(),
             r => new DivideDecimalRow(r.Many<DecimalRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualBooleanRow(
                 r.One<BooleanNullableRow>("left"),
                 r.One<BooleanNullableRow>("right")
@@ -480,6 +485,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualDateRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -492,6 +498,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualDatetimeRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -504,6 +511,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualDecimalRow(
                 r.One<DecimalNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -526,6 +534,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualStringRow(
                 r.One<StringNullableRow>("left"),
                 r.One<StringNullableRow>("right")
@@ -538,6 +547,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualTimeRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
@@ -550,6 +560,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "equal",
+            new TypeBoolean(),
             r => new EqualUuidRow(
                 r.One<UuidNullableRow>("left"),
                 r.One<UuidNullableRow>("right")
@@ -560,18 +571,126 @@ internal static class RowExpressionRegistrations
                 w.One("right", x.Right);
             }
         );
-        registry.Operator(
-            "floor",
-            r => new FloorIntegerNullableRow(r.One<DecimalNullableRow>("value")),
-            (w, x) => w.One("value", x.Value)
+        registry.Union(
+            UnionCase.Of((FieldBooleanNullable x) => new ExactBooleanNullableRow(x)),
+            UnionCase.Of((ParamBooleanNullable x) => new ExactBooleanNullableRow(x)),
+            UnionCase.Of((LiteralBooleanNullable x) => new ExactBooleanNullableRow(x)),
+            UnionCase.Of(
+                (ConditionalBooleanNullableRow x) => new ExactBooleanNullableRow(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((FieldDateNullable x) => new ExactDateNullableRow(x)),
+            UnionCase.Of((ParamDateNullable x) => new ExactDateNullableRow(x)),
+            UnionCase.Of((LiteralDateNullable x) => new ExactDateNullableRow(x)),
+            UnionCase.Of((DateAddDaysDateNullableRow x) => new ExactDateNullableRow(x)),
+            UnionCase.Of((ConditionalDateNullableRow x) => new ExactDateNullableRow(x))
+        );
+        registry.Union(
+            UnionCase.Of((FieldDatetimeNullable x) => new ExactDatetimeNullableRow(x)),
+            UnionCase.Of((ParamDatetimeNullable x) => new ExactDatetimeNullableRow(x)),
+            UnionCase.Of((LiteralDatetimeNullable x) => new ExactDatetimeNullableRow(x)),
+            UnionCase.Of(
+                (DatetimeAddSecondsDatetimeNullableRow x) =>
+                    new ExactDatetimeNullableRow(x)
+            ),
+            UnionCase.Of(
+                (ConditionalDatetimeNullableRow x) => new ExactDatetimeNullableRow(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((FieldDecimalNullable x) => new ExactDecimalNullableRow(x)),
+            UnionCase.Of((ParamDecimalNullable x) => new ExactDecimalNullableRow(x)),
+            UnionCase.Of((LiteralDecimalNullable x) => new ExactDecimalNullableRow(x)),
+            UnionCase.Of(
+                (ArithmeticDecimalNullableRow x) => new ExactDecimalNullableRow(x)
+            ),
+            UnionCase.Of((RoundDecimalNullableRow x) => new ExactDecimalNullableRow(x)),
+            UnionCase.Of(
+                (DifferenceDecimalNullableRow x) => new ExactDecimalNullableRow(x)
+            ),
+            UnionCase.Of(
+                (ConditionalDecimalNullableRow x) => new ExactDecimalNullableRow(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((FieldDecimal x) => new ExactDecimalRow(x)),
+            UnionCase.Of((ParamDecimal x) => new ExactDecimalRow(x)),
+            UnionCase.Of((LiteralDecimal x) => new ExactDecimalRow(x)),
+            UnionCase.Of((ArithmeticDecimalRow x) => new ExactDecimalRow(x)),
+            UnionCase.Of((RoundDecimalRow x) => new ExactDecimalRow(x)),
+            UnionCase.Of((DifferenceDecimalRow x) => new ExactDecimalRow(x)),
+            UnionCase.Of((ConditionalDecimalRow x) => new ExactDecimalRow(x))
+        );
+        registry.Union(
+            UnionCase.Of((FieldIntegerNullable x) => new ExactIntegerNullableRow(x)),
+            UnionCase.Of((ParamIntegerNullable x) => new ExactIntegerNullableRow(x)),
+            UnionCase.Of((LiteralIntegerNullable x) => new ExactIntegerNullableRow(x)),
+            UnionCase.Of(
+                (ArithmeticIntegerNullableRow x) => new ExactIntegerNullableRow(x)
+            ),
+            UnionCase.Of(
+                (RoundingIntegerNullableRow x) => new ExactIntegerNullableRow(x)
+            ),
+            UnionCase.Of(
+                (DateDiffDaysIntegerNullableRow x) => new ExactIntegerNullableRow(x)
+            ),
+            UnionCase.Of(
+                (ConditionalIntegerNullableRow x) => new ExactIntegerNullableRow(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((FieldStringNullable x) => new ExactStringNullableRow(x)),
+            UnionCase.Of((ParamStringNullable x) => new ExactStringNullableRow(x)),
+            UnionCase.Of((LiteralStringNullable x) => new ExactStringNullableRow(x)),
+            UnionCase.Of((ConcatStringNullableRow x) => new ExactStringNullableRow(x)),
+            UnionCase.Of(
+                (ConditionalStringNullableRow x) => new ExactStringNullableRow(x)
+            )
+        );
+        registry.Union(
+            UnionCase.Of((FieldTimeNullable x) => new ExactTimeNullableRow(x)),
+            UnionCase.Of((ParamTimeNullable x) => new ExactTimeNullableRow(x)),
+            UnionCase.Of((LiteralTimeNullable x) => new ExactTimeNullableRow(x)),
+            UnionCase.Of(
+                (TimeAddSecondsTimeNullableRow x) => new ExactTimeNullableRow(x)
+            ),
+            UnionCase.Of((ConditionalTimeNullableRow x) => new ExactTimeNullableRow(x))
+        );
+        registry.Union(
+            UnionCase.Of((FieldUuidNullable x) => new ExactUuidNullableRow(x)),
+            UnionCase.Of((ParamUuidNullable x) => new ExactUuidNullableRow(x)),
+            UnionCase.Of((LiteralUuidNullable x) => new ExactUuidNullableRow(x)),
+            UnionCase.Of((ConditionalUuidNullableRow x) => new ExactUuidNullableRow(x))
         );
         registry.Operator(
             "floor",
-            r => new FloorIntegerRow(r.One<DecimalRow>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeIntegerNullable(),
+            r => new FloorIntegerNullableRow(r.One<DecimalNullableRow>("operand")),
+            (w, x) => w.One("operand", x.Operand)
+        );
+        registry.Operator(
+            "floor",
+            new TypeInteger(),
+            r => new FloorIntegerRow(r.One<DecimalRow>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
+            r => new GreaterThanBooleanRow(
+                r.One<BooleanNullableRow>("left"),
+                r.One<BooleanNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanDateRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -584,6 +703,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanDatetimeRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -596,6 +716,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanDecimalRow(
                 r.One<DecimalNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -608,6 +729,20 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
+            r => new GreaterThanOrEqualBooleanRow(
+                r.One<BooleanNullableRow>("left"),
+                r.One<BooleanNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualDateRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -620,6 +755,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualDatetimeRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -632,6 +768,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualDecimalRow(
                 r.One<DecimalNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -653,6 +790,10 @@ internal static class RowExpressionRegistrations
                 (GreaterThanOrEqualStringRow x) => new GreaterThanOrEqualRow(x)
             ),
             UnionCase.Of(
+                TypeFamily.Boolean,
+                (GreaterThanOrEqualBooleanRow x) => new GreaterThanOrEqualRow(x)
+            ),
+            UnionCase.Of(
                 TypeFamily.Date,
                 (GreaterThanOrEqualDateRow x) => new GreaterThanOrEqualRow(x)
             ),
@@ -663,10 +804,15 @@ internal static class RowExpressionRegistrations
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (GreaterThanOrEqualDatetimeRow x) => new GreaterThanOrEqualRow(x)
+            ),
+            UnionCase.Of(
+                TypeFamily.Uuid,
+                (GreaterThanOrEqualUuidRow x) => new GreaterThanOrEqualRow(x)
             )
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualStringRow(
                 r.One<StringNullableRow>("left"),
                 r.One<StringNullableRow>("right")
@@ -679,9 +825,23 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThanOrEqual",
+            new TypeBoolean(),
             r => new GreaterThanOrEqualTimeRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "greaterThanOrEqual",
+            new TypeBoolean(),
+            r => new GreaterThanOrEqualUuidRow(
+                r.One<UuidNullableRow>("left"),
+                r.One<UuidNullableRow>("right")
             ),
             (w, x) =>
             {
@@ -700,6 +860,10 @@ internal static class RowExpressionRegistrations
                 (GreaterThanStringRow x) => new GreaterThanRow(x)
             ),
             UnionCase.Of(
+                TypeFamily.Boolean,
+                (GreaterThanBooleanRow x) => new GreaterThanRow(x)
+            ),
+            UnionCase.Of(
                 TypeFamily.Date,
                 (GreaterThanDateRow x) => new GreaterThanRow(x)
             ),
@@ -710,10 +874,12 @@ internal static class RowExpressionRegistrations
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (GreaterThanDatetimeRow x) => new GreaterThanRow(x)
-            )
+            ),
+            UnionCase.Of(TypeFamily.Uuid, (GreaterThanUuidRow x) => new GreaterThanRow(x))
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanStringRow(
                 r.One<StringNullableRow>("left"),
                 r.One<StringNullableRow>("right")
@@ -726,6 +892,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "greaterThan",
+            new TypeBoolean(),
             r => new GreaterThanTimeRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
@@ -737,7 +904,21 @@ internal static class RowExpressionRegistrations
             }
         );
         registry.Operator(
+            "greaterThan",
+            new TypeBoolean(),
+            r => new GreaterThanUuidRow(
+                r.One<UuidNullableRow>("left"),
+                r.One<UuidNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
             "if",
+            new TypeBooleanNullable(),
             r => new IfBooleanNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<BooleanNullableRow>("then"),
@@ -752,6 +933,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeBoolean(),
             r => new IfBooleanRow(
                 r.One<BooleanRow>("condition"),
                 r.One<BooleanRow>("then"),
@@ -766,6 +948,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDateNullable(),
             r => new IfDateNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<DateNullableRow>("then"),
@@ -780,6 +963,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDate(),
             r => new IfDateRow(
                 r.One<BooleanRow>("condition"),
                 r.One<DateRow>("then"),
@@ -794,6 +978,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDatetimeNullable(),
             r => new IfDatetimeNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<DatetimeNullableRow>("then"),
@@ -808,6 +993,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDatetime(),
             r => new IfDatetimeRow(
                 r.One<BooleanRow>("condition"),
                 r.One<DatetimeRow>("then"),
@@ -822,6 +1008,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDecimalNullable(),
             r => new IfDecimalNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<DecimalNullableRow>("then"),
@@ -836,6 +1023,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeDecimal(),
             r => new IfDecimalRow(
                 r.One<BooleanRow>("condition"),
                 r.One<DecimalRow>("then"),
@@ -850,6 +1038,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeIntegerNullable(),
             r => new IfIntegerNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<IntegerNullableRow>("then"),
@@ -864,6 +1053,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeInteger(),
             r => new IfIntegerRow(
                 r.One<BooleanRow>("condition"),
                 r.One<IntegerRow>("then"),
@@ -878,6 +1068,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeStringNullable(),
             r => new IfStringNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<StringNullableRow>("then"),
@@ -892,6 +1083,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeString(),
             r => new IfStringRow(
                 r.One<BooleanRow>("condition"),
                 r.One<StringRow>("then"),
@@ -906,6 +1098,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeTimeNullable(),
             r => new IfTimeNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<TimeNullableRow>("then"),
@@ -920,6 +1113,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeTime(),
             r => new IfTimeRow(
                 r.One<BooleanRow>("condition"),
                 r.One<TimeRow>("then"),
@@ -934,6 +1128,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeUuidNullable(),
             r => new IfUuidNullableRow(
                 r.One<BooleanRow>("condition"),
                 r.One<UuidNullableRow>("then"),
@@ -948,6 +1143,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "if",
+            new TypeUuid(),
             r => new IfUuidRow(
                 r.One<BooleanRow>("condition"),
                 r.One<UuidRow>("then"),
@@ -962,51 +1158,58 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InBooleanRow(
-                r.One<BooleanNullableRow>("value"),
+                r.One<BooleanNullableRow>("operand"),
                 r.One<ListBoolean>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
-            r => new InDateRow(r.One<DateNullableRow>("value"), r.One<ListDate>("list")),
+            new TypeBoolean(),
+            r => new InDateRow(
+                r.One<DateNullableRow>("operand"),
+                r.One<ListDate>("list")
+            ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InDatetimeRow(
-                r.One<DatetimeNullableRow>("value"),
+                r.One<DatetimeNullableRow>("operand"),
                 r.One<ListDatetime>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InDecimalRow(
-                r.One<DecimalNullableRow>("value"),
+                r.One<DecimalNullableRow>("operand"),
                 r.One<ListDecimal>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Probe(
-            "value",
+            "operand",
             UnionCase.Of(TypeFamily.Decimal, (InDecimalRow x) => new InRow(x)),
             UnionCase.Of(TypeFamily.String, (InStringRow x) => new InRow(x)),
             UnionCase.Of(TypeFamily.Boolean, (InBooleanRow x) => new InRow(x)),
@@ -1017,36 +1220,46 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "in",
+            new TypeBoolean(),
             r => new InStringRow(
-                r.One<StringNullableRow>("value"),
+                r.One<StringNullableRow>("operand"),
                 r.One<ListString>("list")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
-            r => new InTimeRow(r.One<TimeNullableRow>("value"), r.One<ListTime>("list")),
+            new TypeBoolean(),
+            r => new InTimeRow(
+                r.One<TimeNullableRow>("operand"),
+                r.One<ListTime>("list")
+            ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "in",
-            r => new InUuidRow(r.One<UuidNullableRow>("value"), r.One<ListUuid>("list")),
+            new TypeBoolean(),
+            r => new InUuidRow(
+                r.One<UuidNullableRow>("operand"),
+                r.One<ListUuid>("list")
+            ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("list", x.List);
             }
         );
         registry.Operator(
             "integerDivide",
+            new TypeIntegerNullable(),
             r => new IntegerDivideIntegerNullableRow(
                 r.One<IntegerNullableRow>("left"),
                 r.One<IntegerNullableRow>("right")
@@ -1059,6 +1272,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "integerDivide",
+            new TypeInteger(),
             r => new IntegerDivideIntegerRow(
                 r.One<IntegerRow>("left"),
                 r.One<IntegerRow>("right")
@@ -1070,13 +1284,8 @@ internal static class RowExpressionRegistrations
             }
         );
         registry.Union(
-            UnionCase.Of((FieldAsIntegerNullable x) => new IntegerNullableRow(x)),
-            UnionCase.Of((ParamAsIntegerNullable x) => new IntegerNullableRow(x)),
-            UnionCase.Of((LiteralAsIntegerNullable x) => new IntegerNullableRow(x)),
-            UnionCase.Of((ArithmeticIntegerNullableRow x) => new IntegerNullableRow(x)),
-            UnionCase.Of((RoundingIntegerNullableRow x) => new IntegerNullableRow(x)),
-            UnionCase.Of((DateDiffDaysIntegerNullableRow x) => new IntegerNullableRow(x)),
-            UnionCase.Of((ConditionalIntegerNullableRow x) => new IntegerNullableRow(x))
+            UnionCase.Of((IntegerRow x) => new IntegerNullableRow(x)),
+            UnionCase.Of((ExactIntegerNullableRow x) => new IntegerNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldInteger x) => new IntegerRow(x)),
@@ -1089,6 +1298,20 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
+            r => new LessThanBooleanRow(
+                r.One<BooleanNullableRow>("left"),
+                r.One<BooleanNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThan",
+            new TypeBoolean(),
             r => new LessThanDateRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -1101,6 +1324,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanDatetimeRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -1113,6 +1337,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanDecimalRow(
                 r.One<DecimalNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -1125,6 +1350,20 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
+            r => new LessThanOrEqualBooleanRow(
+                r.One<BooleanNullableRow>("left"),
+                r.One<BooleanNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualDateRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -1137,6 +1376,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualDatetimeRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -1149,6 +1389,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualDecimalRow(
                 r.One<DecimalNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -1170,6 +1411,10 @@ internal static class RowExpressionRegistrations
                 (LessThanOrEqualStringRow x) => new LessThanOrEqualRow(x)
             ),
             UnionCase.Of(
+                TypeFamily.Boolean,
+                (LessThanOrEqualBooleanRow x) => new LessThanOrEqualRow(x)
+            ),
+            UnionCase.Of(
                 TypeFamily.Date,
                 (LessThanOrEqualDateRow x) => new LessThanOrEqualRow(x)
             ),
@@ -1180,10 +1425,15 @@ internal static class RowExpressionRegistrations
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (LessThanOrEqualDatetimeRow x) => new LessThanOrEqualRow(x)
+            ),
+            UnionCase.Of(
+                TypeFamily.Uuid,
+                (LessThanOrEqualUuidRow x) => new LessThanOrEqualRow(x)
             )
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualStringRow(
                 r.One<StringNullableRow>("left"),
                 r.One<StringNullableRow>("right")
@@ -1196,9 +1446,23 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThanOrEqual",
+            new TypeBoolean(),
             r => new LessThanOrEqualTimeRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThanOrEqual",
+            new TypeBoolean(),
+            r => new LessThanOrEqualUuidRow(
+                r.One<UuidNullableRow>("left"),
+                r.One<UuidNullableRow>("right")
             ),
             (w, x) =>
             {
@@ -1213,15 +1477,21 @@ internal static class RowExpressionRegistrations
                 (LessThanDecimalRow x) => new LessThanRow(x)
             ),
             UnionCase.Of(TypeFamily.String, (LessThanStringRow x) => new LessThanRow(x)),
+            UnionCase.Of(
+                TypeFamily.Boolean,
+                (LessThanBooleanRow x) => new LessThanRow(x)
+            ),
             UnionCase.Of(TypeFamily.Date, (LessThanDateRow x) => new LessThanRow(x)),
             UnionCase.Of(TypeFamily.Time, (LessThanTimeRow x) => new LessThanRow(x)),
             UnionCase.Of(
                 TypeFamily.Datetime,
                 (LessThanDatetimeRow x) => new LessThanRow(x)
-            )
+            ),
+            UnionCase.Of(TypeFamily.Uuid, (LessThanUuidRow x) => new LessThanRow(x))
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanStringRow(
                 r.One<StringNullableRow>("left"),
                 r.One<StringNullableRow>("right")
@@ -1234,9 +1504,23 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "lessThan",
+            new TypeBoolean(),
             r => new LessThanTimeRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
+            ),
+            (w, x) =>
+            {
+                w.One("left", x.Left);
+                w.One("right", x.Right);
+            }
+        );
+        registry.Operator(
+            "lessThan",
+            new TypeBoolean(),
+            r => new LessThanUuidRow(
+                r.One<UuidNullableRow>("left"),
+                r.One<UuidNullableRow>("right")
             ),
             (w, x) =>
             {
@@ -1251,6 +1535,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "modulo",
+            new TypeIntegerNullable(),
             r => new ModuloIntegerNullableRow(
                 r.One<IntegerNullableRow>("left"),
                 r.One<IntegerNullableRow>("right")
@@ -1263,6 +1548,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "modulo",
+            new TypeInteger(),
             r => new ModuloIntegerRow(
                 r.One<IntegerRow>("left"),
                 r.One<IntegerRow>("right")
@@ -1275,26 +1561,31 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "multiply",
+            new TypeDecimalNullable(),
             r => new MultiplyDecimalNullableRow(r.Many<DecimalNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
+            new TypeDecimal(),
             r => new MultiplyDecimalRow(r.Many<DecimalRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
+            new TypeIntegerNullable(),
             r => new MultiplyIntegerNullableRow(r.Many<IntegerNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
+            new TypeInteger(),
             r => new MultiplyIntegerRow(r.Many<IntegerRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualBooleanRow(
                 r.One<BooleanNullableRow>("left"),
                 r.One<BooleanNullableRow>("right")
@@ -1307,6 +1598,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualDateRow(
                 r.One<DateNullableRow>("left"),
                 r.One<DateNullableRow>("right")
@@ -1319,6 +1611,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualDatetimeRow(
                 r.One<DatetimeNullableRow>("left"),
                 r.One<DatetimeNullableRow>("right")
@@ -1331,6 +1624,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualDecimalRow(
                 r.One<DecimalNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -1362,6 +1656,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualStringRow(
                 r.One<StringNullableRow>("left"),
                 r.One<StringNullableRow>("right")
@@ -1374,6 +1669,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualTimeRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
@@ -1386,6 +1682,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "notEqual",
+            new TypeBoolean(),
             r => new NotEqualUuidRow(
                 r.One<UuidNullableRow>("left"),
                 r.One<UuidNullableRow>("right")
@@ -1398,67 +1695,53 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "not",
+            new TypeBoolean(),
             r => new NotRow(r.One<BooleanRow>("condition")),
             (w, x) => w.One("condition", x.Condition)
         );
         registry.Operator(
             "or",
+            new TypeBoolean(),
             r => new OrRow(r.Many<BooleanRow>("conditions")),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
             "round",
-            r => new RoundDecimalDigitsNullableRow(
-                r.One<DecimalNullableRow>("value"),
+            new TypeDecimalNullable(),
+            r => new RoundDecimalNullableRow(
+                r.One<DecimalNullableRow>("operand"),
                 r.One<IntegerRow>("digits")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("digits", x.Digits);
-            },
-            digits: true
+            }
         );
         registry.Operator(
             "round",
-            r => new RoundDecimalDigitsRow(
-                r.One<DecimalRow>("value"),
+            new TypeDecimal(),
+            r => new RoundDecimalRow(
+                r.One<DecimalRow>("operand"),
                 r.One<IntegerRow>("digits")
             ),
             (w, x) =>
             {
-                w.One("value", x.Value);
+                w.One("operand", x.Operand);
                 w.One("digits", x.Digits);
-            },
-            digits: true
+            }
         );
         registry.Operator(
             "round",
-            r => new RoundIntegerNullableRow(r.One<DecimalNullableRow>("value")),
-            (w, x) => w.One("value", x.Value)
+            new TypeIntegerNullable(),
+            r => new RoundIntegerNullableRow(r.One<DecimalNullableRow>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Operator(
             "round",
-            r => new RoundIntegerRow(r.One<DecimalRow>("value")),
-            (w, x) => w.One("value", x.Value)
-        );
-        registry.Union(
-            UnionCase.Of(
-                (FloorIntegerNullableRow x) => new RoundingDecimalNullableRow(x)
-            ),
-            UnionCase.Of(
-                (CeilingIntegerNullableRow x) => new RoundingDecimalNullableRow(x)
-            ),
-            UnionCase.Of(
-                (RoundDecimalDigitsNullableRow x) => new RoundingDecimalNullableRow(x)
-            ),
-            UnionCase.Of((RoundIntegerNullableRow x) => new RoundingDecimalNullableRow(x))
-        );
-        registry.Union(
-            UnionCase.Of((FloorIntegerRow x) => new RoundingDecimalRow(x)),
-            UnionCase.Of((CeilingIntegerRow x) => new RoundingDecimalRow(x)),
-            UnionCase.Of((RoundDecimalDigitsRow x) => new RoundingDecimalRow(x)),
-            UnionCase.Of((RoundIntegerRow x) => new RoundingDecimalRow(x))
+            new TypeInteger(),
+            r => new RoundIntegerRow(r.One<DecimalRow>("operand")),
+            (w, x) => w.One("operand", x.Operand)
         );
         registry.Union(
             UnionCase.Of(
@@ -1475,11 +1758,8 @@ internal static class RowExpressionRegistrations
             UnionCase.Of((RoundIntegerRow x) => new RoundingIntegerRow(x))
         );
         registry.Union(
-            UnionCase.Of((FieldAsStringNullable x) => new StringNullableRow(x)),
-            UnionCase.Of((ParamAsStringNullable x) => new StringNullableRow(x)),
-            UnionCase.Of((LiteralAsStringNullable x) => new StringNullableRow(x)),
-            UnionCase.Of((ConcatStringNullableRow x) => new StringNullableRow(x)),
-            UnionCase.Of((ConditionalStringNullableRow x) => new StringNullableRow(x))
+            UnionCase.Of((StringRow x) => new StringNullableRow(x)),
+            UnionCase.Of((ExactStringNullableRow x) => new StringNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldString x) => new StringRow(x)),
@@ -1490,26 +1770,31 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "subtract",
+            new TypeDecimalNullable(),
             r => new SubtractDecimalNullableRow(r.Many<DecimalNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
+            new TypeDecimal(),
             r => new SubtractDecimalRow(r.Many<DecimalRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
+            new TypeIntegerNullable(),
             r => new SubtractIntegerNullableRow(r.Many<IntegerNullableRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
+            new TypeInteger(),
             r => new SubtractIntegerRow(r.Many<IntegerRow>("values")),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "timeAddSeconds",
+            new TypeTimeNullable(),
             r => new TimeAddSecondsTimeNullableRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<DecimalNullableRow>("right")
@@ -1522,6 +1807,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "timeAddSeconds",
+            new TypeTime(),
             r => new TimeAddSecondsTimeRow(
                 r.One<TimeRow>("left"),
                 r.One<DecimalRow>("right")
@@ -1534,6 +1820,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "timeDiffSeconds",
+            new TypeDecimalNullable(),
             r => new TimeDiffSecondsDecimalNullableRow(
                 r.One<TimeNullableRow>("left"),
                 r.One<TimeNullableRow>("right")
@@ -1546,6 +1833,7 @@ internal static class RowExpressionRegistrations
         );
         registry.Operator(
             "timeDiffSeconds",
+            new TypeDecimal(),
             r => new TimeDiffSecondsDecimalRow(
                 r.One<TimeRow>("left"),
                 r.One<TimeRow>("right")
@@ -1557,11 +1845,8 @@ internal static class RowExpressionRegistrations
             }
         );
         registry.Union(
-            UnionCase.Of((FieldAsTimeNullable x) => new TimeNullableRow(x)),
-            UnionCase.Of((ParamAsTimeNullable x) => new TimeNullableRow(x)),
-            UnionCase.Of((LiteralAsTimeNullable x) => new TimeNullableRow(x)),
-            UnionCase.Of((TimeAddSecondsTimeNullableRow x) => new TimeNullableRow(x)),
-            UnionCase.Of((ConditionalTimeNullableRow x) => new TimeNullableRow(x))
+            UnionCase.Of((TimeRow x) => new TimeNullableRow(x)),
+            UnionCase.Of((ExactTimeNullableRow x) => new TimeNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldTime x) => new TimeRow(x)),
@@ -1571,10 +1856,8 @@ internal static class RowExpressionRegistrations
             UnionCase.Of((ConditionalTimeRow x) => new TimeRow(x))
         );
         registry.Union(
-            UnionCase.Of((FieldAsUuidNullable x) => new UuidNullableRow(x)),
-            UnionCase.Of((ParamAsUuidNullable x) => new UuidNullableRow(x)),
-            UnionCase.Of((LiteralAsUuidNullable x) => new UuidNullableRow(x)),
-            UnionCase.Of((ConditionalUuidNullableRow x) => new UuidNullableRow(x))
+            UnionCase.Of((UuidRow x) => new UuidNullableRow(x)),
+            UnionCase.Of((ExactUuidNullableRow x) => new UuidNullableRow(x))
         );
         registry.Union(
             UnionCase.Of((FieldUuid x) => new UuidRow(x)),
