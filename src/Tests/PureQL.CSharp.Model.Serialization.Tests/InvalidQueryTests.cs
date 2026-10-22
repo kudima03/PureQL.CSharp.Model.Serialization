@@ -14,19 +14,6 @@ public sealed record InvalidQueryTests
         string
     >
     {
-        // minItems: arrays are IEnumerable<T> of any length.
-        ["003_empty_select.jsonc"] = "minItems",
-        ["044_and_without_conditions.jsonc"] = "minItems",
-        ["045_add_single_value.jsonc"] = "minItems",
-        ["047_coalesce_single_value.jsonc"] = "minItems",
-        ["128_empty_subqueries.jsonc"] = "minItems",
-        ["228_divide_single_value.jsonc"] = "minItems",
-        ["236_concat_single_value.jsonc"] = "minItems",
-        ["318_subquery_empty_select.jsonc"] = "minItems",
-        ["334_empty_joins.jsonc"] = "minItems",
-        ["335_empty_order_by.jsonc"] = "minItems",
-        ["370_or_with_one_condition.jsonc"] = "minItems",
-
         // contains: a non-null coalesce needs a non-null operand, but its operands are
         // typed nullable, and at most one of them may be non-null.
         ["261_coalesce_all_nullable_declared_non_null.jsonc"] = "contains",

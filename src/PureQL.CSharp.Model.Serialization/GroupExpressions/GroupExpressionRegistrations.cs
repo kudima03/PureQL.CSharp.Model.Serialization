@@ -15,25 +15,25 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "add",
             new TypeDecimal(),
-            r => new AddDecimalGroup(r.Many<DecimalGroup>("values")),
+            r => new AddDecimalGroup(r.Many<DecimalGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeDecimalNullable(),
-            r => new AddDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
+            r => new AddDecimalNullableGroup(r.Many<DecimalNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeInteger(),
-            r => new AddIntegerGroup(r.Many<IntegerGroup>("values")),
+            r => new AddIntegerGroup(r.Many<IntegerGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeIntegerNullable(),
-            r => new AddIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
+            r => new AddIntegerNullableGroup(r.Many<IntegerNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -154,7 +154,7 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "and",
             new TypeBoolean(),
-            r => new AndGroup(r.Many<BooleanGroup>("conditions")),
+            r => new AndGroup(r.Many<BooleanGroup>("conditions", 2)),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
@@ -340,99 +340,107 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "coalesce",
             new TypeBoolean(),
-            r => new CoalesceBooleanGroup(r.Many<BooleanNullableGroup>("values")),
+            r => new CoalesceBooleanGroup(r.Many<BooleanNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeBooleanNullable(),
-            r => new CoalesceBooleanNullableGroup(r.Many<BooleanNullableGroup>("values")),
+            r => new CoalesceBooleanNullableGroup(
+                r.Many<BooleanNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDate(),
-            r => new CoalesceDateGroup(r.Many<DateNullableGroup>("values")),
+            r => new CoalesceDateGroup(r.Many<DateNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDateNullable(),
-            r => new CoalesceDateNullableGroup(r.Many<DateNullableGroup>("values")),
+            r => new CoalesceDateNullableGroup(r.Many<DateNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDatetime(),
-            r => new CoalesceDatetimeGroup(r.Many<DatetimeNullableGroup>("values")),
+            r => new CoalesceDatetimeGroup(r.Many<DatetimeNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDatetimeNullable(),
             r => new CoalesceDatetimeNullableGroup(
-                r.Many<DatetimeNullableGroup>("values")
+                r.Many<DatetimeNullableGroup>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDecimal(),
-            r => new CoalesceDecimalGroup(r.Many<DecimalNullableGroup>("values")),
+            r => new CoalesceDecimalGroup(r.Many<DecimalNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDecimalNullable(),
-            r => new CoalesceDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
+            r => new CoalesceDecimalNullableGroup(
+                r.Many<DecimalNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeInteger(),
-            r => new CoalesceIntegerGroup(r.Many<IntegerNullableGroup>("values")),
+            r => new CoalesceIntegerGroup(r.Many<IntegerNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeIntegerNullable(),
-            r => new CoalesceIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
+            r => new CoalesceIntegerNullableGroup(
+                r.Many<IntegerNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeString(),
-            r => new CoalesceStringGroup(r.Many<StringNullableGroup>("values")),
+            r => new CoalesceStringGroup(r.Many<StringNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeStringNullable(),
-            r => new CoalesceStringNullableGroup(r.Many<StringNullableGroup>("values")),
+            r => new CoalesceStringNullableGroup(
+                r.Many<StringNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeTime(),
-            r => new CoalesceTimeGroup(r.Many<TimeNullableGroup>("values")),
+            r => new CoalesceTimeGroup(r.Many<TimeNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeTimeNullable(),
-            r => new CoalesceTimeNullableGroup(r.Many<TimeNullableGroup>("values")),
+            r => new CoalesceTimeNullableGroup(r.Many<TimeNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeUuid(),
-            r => new CoalesceUuidGroup(r.Many<UuidNullableGroup>("values")),
+            r => new CoalesceUuidGroup(r.Many<UuidNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeUuidNullable(),
-            r => new CoalesceUuidNullableGroup(r.Many<UuidNullableGroup>("values")),
+            r => new CoalesceUuidNullableGroup(r.Many<UuidNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -447,13 +455,13 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "concat",
             new TypeString(),
-            r => new ConcatStringGroup(r.Many<StringGroup>("values")),
+            r => new ConcatStringGroup(r.Many<StringGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "concat",
             new TypeStringNullable(),
-            r => new ConcatStringNullableGroup(r.Many<StringNullableGroup>("values")),
+            r => new ConcatStringNullableGroup(r.Many<StringNullableGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -716,13 +724,15 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "divide",
             new TypeDecimal(),
-            r => new DivideDecimalGroup(r.Many<DecimalGroup>("values")),
+            r => new DivideDecimalGroup(r.Many<DecimalGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "divide",
             new TypeDecimalNullable(),
-            r => new DivideDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
+            r => new DivideDecimalNullableGroup(
+                r.Many<DecimalNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
@@ -2269,25 +2279,29 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "multiply",
             new TypeDecimal(),
-            r => new MultiplyDecimalGroup(r.Many<DecimalGroup>("values")),
+            r => new MultiplyDecimalGroup(r.Many<DecimalGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeDecimalNullable(),
-            r => new MultiplyDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
+            r => new MultiplyDecimalNullableGroup(
+                r.Many<DecimalNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeInteger(),
-            r => new MultiplyIntegerGroup(r.Many<IntegerGroup>("values")),
+            r => new MultiplyIntegerGroup(r.Many<IntegerGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeIntegerNullable(),
-            r => new MultiplyIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
+            r => new MultiplyIntegerNullableGroup(
+                r.Many<IntegerNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
@@ -2412,7 +2426,7 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "or",
             new TypeBoolean(),
-            r => new OrGroup(r.Many<BooleanGroup>("conditions")),
+            r => new OrGroup(r.Many<BooleanGroup>("conditions", 2)),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
@@ -2484,25 +2498,29 @@ internal static class GroupExpressionRegistrations
         registry.Operator(
             "subtract",
             new TypeDecimal(),
-            r => new SubtractDecimalGroup(r.Many<DecimalGroup>("values")),
+            r => new SubtractDecimalGroup(r.Many<DecimalGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeDecimalNullable(),
-            r => new SubtractDecimalNullableGroup(r.Many<DecimalNullableGroup>("values")),
+            r => new SubtractDecimalNullableGroup(
+                r.Many<DecimalNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeInteger(),
-            r => new SubtractIntegerGroup(r.Many<IntegerGroup>("values")),
+            r => new SubtractIntegerGroup(r.Many<IntegerGroup>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeIntegerNullable(),
-            r => new SubtractIntegerNullableGroup(r.Many<IntegerNullableGroup>("values")),
+            r => new SubtractIntegerNullableGroup(
+                r.Many<IntegerNullableGroup>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(

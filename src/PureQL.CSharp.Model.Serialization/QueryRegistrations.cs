@@ -23,13 +23,13 @@ internal static class QueryRegistrations
         registry.Record(
             r => new MainGroupedQuery(
                 r.One<From>("from"),
-                r.Many<GroupKey>("groupBy"),
-                r.Many<SelectItemGroup>("select"),
-                r.OptionalMany<Subquery>("subqueries"),
-                r.OptionalMany<Join>("joins"),
+                r.Many<GroupKey>("groupBy", 1),
+                r.Many<SelectItemGroup>("select", 1),
+                r.OptionalMany<Subquery>("subqueries", 1),
+                r.OptionalMany<Join>("joins", 1),
                 r.Optional<BooleanRow>("where"),
                 r.Optional<BooleanGroup>("having"),
-                r.OptionalMany<OrderItemGroup>("orderBy"),
+                r.OptionalMany<OrderItemGroup>("orderBy", 1),
                 r.Optional<Pagination>("pagination"),
                 r.OptionalStrings("distinctBy")
             ),
@@ -50,11 +50,11 @@ internal static class QueryRegistrations
         registry.Record(
             r => new MainPlainQuery(
                 r.One<From>("from"),
-                r.Many<SelectItemProjection>("select"),
-                r.OptionalMany<Subquery>("subqueries"),
-                r.OptionalMany<Join>("joins"),
+                r.Many<SelectItemProjection>("select", 1),
+                r.OptionalMany<Subquery>("subqueries", 1),
+                r.OptionalMany<Join>("joins", 1),
                 r.Optional<BooleanRow>("where"),
-                r.OptionalMany<OrderItemProjection>("orderBy"),
+                r.OptionalMany<OrderItemProjection>("orderBy", 1),
                 r.Optional<Pagination>("pagination"),
                 r.OptionalStrings("distinctBy")
             ),
@@ -73,9 +73,9 @@ internal static class QueryRegistrations
         registry.Record(
             r => new MainTotalQuery(
                 r.One<From>("from"),
-                r.Many<SelectItemTotal>("aggregate"),
-                r.OptionalMany<Subquery>("subqueries"),
-                r.OptionalMany<Join>("joins"),
+                r.Many<SelectItemTotal>("aggregate", 1),
+                r.OptionalMany<Subquery>("subqueries", 1),
+                r.OptionalMany<Join>("joins", 1),
                 r.Optional<BooleanRow>("where")
             ),
             (w, x) =>
@@ -90,12 +90,12 @@ internal static class QueryRegistrations
         registry.Record(
             r => new GroupedQuery(
                 r.One<From>("from"),
-                r.Many<GroupKey>("groupBy"),
-                r.Many<SelectItemGroup>("select"),
-                r.OptionalMany<Join>("joins"),
+                r.Many<GroupKey>("groupBy", 1),
+                r.Many<SelectItemGroup>("select", 1),
+                r.OptionalMany<Join>("joins", 1),
                 r.Optional<BooleanRow>("where"),
                 r.Optional<BooleanGroup>("having"),
-                r.OptionalMany<OrderItemGroup>("orderBy"),
+                r.OptionalMany<OrderItemGroup>("orderBy", 1),
                 r.Optional<Pagination>("pagination"),
                 r.OptionalStrings("distinctBy")
             ),
@@ -115,10 +115,10 @@ internal static class QueryRegistrations
         registry.Record(
             r => new PlainQuery(
                 r.One<From>("from"),
-                r.Many<SelectItemProjection>("select"),
-                r.OptionalMany<Join>("joins"),
+                r.Many<SelectItemProjection>("select", 1),
+                r.OptionalMany<Join>("joins", 1),
                 r.Optional<BooleanRow>("where"),
-                r.OptionalMany<OrderItemProjection>("orderBy"),
+                r.OptionalMany<OrderItemProjection>("orderBy", 1),
                 r.Optional<Pagination>("pagination"),
                 r.OptionalStrings("distinctBy")
             ),
@@ -136,8 +136,8 @@ internal static class QueryRegistrations
         registry.Record(
             r => new TotalQuery(
                 r.One<From>("from"),
-                r.Many<SelectItemTotal>("aggregate"),
-                r.OptionalMany<Join>("joins"),
+                r.Many<SelectItemTotal>("aggregate", 1),
+                r.OptionalMany<Join>("joins", 1),
                 r.Optional<BooleanRow>("where")
             ),
             (w, x) =>

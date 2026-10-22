@@ -59,21 +59,35 @@ internal sealed class ObjectReader
             : null;
     }
 
-    public IReadOnlyList<T> Many<T>(string name)
+    /// <summary>
+    /// A list of at least <paramref name="minItems"/> items, the <c>minItems</c> the
+    /// schema declares for it.
+    /// </summary>
+    public IReadOnlyList<T> Many<T>(string name, int minItems)
         where T : class
     {
         return Array(
             Required(name),
             Child(name),
+            minItems,
             (item, path) => _registry.Read<T>(item, path)
         );
     }
 
-    public IReadOnlyList<T>? OptionalMany<T>(string name)
+    /// <summary>
+    /// An optional list of at least <paramref name="minItems"/> items, the
+    /// <c>minItems</c> the schema declares for it.
+    /// </summary>
+    public IReadOnlyList<T>? OptionalMany<T>(string name, int minItems)
         where T : class
     {
         return TryGet(name, out JsonElement value)
-            ? Array(value, Child(name), (item, path) => _registry.Read<T>(item, path))
+            ? Array(
+                value,
+                Child(name),
+                minItems,
+                (item, path) => _registry.Read<T>(item, path)
+            )
             : null;
     }
 
@@ -103,13 +117,12 @@ internal sealed class ObjectReader
         IReadOnlyList<string> items = Array(
             value,
             Child(name),
+            1,
             LiteralValues.String.Read
         );
-        return items.Count == 0
-                ? throw JsonErrors.At(Child(name), "Expected at least one item")
-            : items.Distinct(StringComparer.Ordinal).Count() != items.Count
-                ? throw JsonErrors.At(Child(name), "Items must be unique")
-            : items;
+        return items.Distinct(StringComparer.Ordinal).Count() == items.Count
+            ? items
+            : throw JsonErrors.At(Child(name), "Items must be unique");
     }
 
     public TValue Value<TValue>(LiteralValue<TValue> literal)
@@ -122,6 +135,7 @@ internal sealed class ObjectReader
         IReadOnlyList<TValue> values = Array(
             Required("value"),
             Child("value"),
+            0,
             literal.Read
         );
         return values.Distinct().Count() == values.Count
@@ -236,6 +250,7 @@ internal sealed class ObjectReader
     private static IReadOnlyList<TItem> Array<TItem>(
         JsonElement array,
         string path,
+        int minItems,
         Func<JsonElement, string, TItem> read
     )
     {
@@ -244,7 +259,17 @@ internal sealed class ObjectReader
             throw JsonErrors.At(path, $"Expected an array, found {array.ValueKind}");
         }
 
-        TItem[] items = new TItem[array.GetArrayLength()];
+        int length = array.GetArrayLength();
+        if (length < minItems)
+        {
+            throw JsonErrors.At(
+                path,
+                $"Expected at least {minItems} {(minItems == 1 ? "item" : "items")}, "
+                    + $"found {length}"
+            );
+        }
+
+        TItem[] items = new TItem[length];
         int index = 0;
         foreach (JsonElement item in array.EnumerateArray())
         {
