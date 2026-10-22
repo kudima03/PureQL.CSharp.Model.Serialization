@@ -11,6 +11,16 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
+## [0.1.0-preview.5.0.1] - 2026-10-22
+
+### Fixed
+
+- Lists shorter than the specification's `minItems` are now rejected on read: operator
+  operands need at least two items and query lists at least one. Documents with such
+  lists were never valid under the specification, but were accepted before.
+
+---
+
 ## [0.1.0-preview.5.0.0] - 2026-10-14
 
 Moves serialization to `PureQL.CSharp.Model 0.1.0-preview.13.0.0`, which mirrors
