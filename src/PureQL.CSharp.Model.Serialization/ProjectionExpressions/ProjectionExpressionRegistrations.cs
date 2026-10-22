@@ -16,28 +16,28 @@ internal static class ProjectionExpressionRegistrations
             "add",
             new TypeDecimalNullable(),
             r => new AddDecimalNullableProjection(
-                r.Many<DecimalNullableProjection>("values")
+                r.Many<DecimalNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeDecimal(),
-            r => new AddDecimalProjection(r.Many<DecimalProjection>("values")),
+            r => new AddDecimalProjection(r.Many<DecimalProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeIntegerNullable(),
             r => new AddIntegerNullableProjection(
-                r.Many<IntegerNullableProjection>("values")
+                r.Many<IntegerNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeInteger(),
-            r => new AddIntegerProjection(r.Many<IntegerProjection>("values")),
+            r => new AddIntegerProjection(r.Many<IntegerProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -184,7 +184,7 @@ internal static class ProjectionExpressionRegistrations
         registry.Operator(
             "and",
             new TypeBoolean(),
-            r => new AndProjection(r.Many<BooleanProjection>("conditions")),
+            r => new AndProjection(r.Many<BooleanProjection>("conditions", 2)),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
@@ -369,7 +369,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeBooleanNullable(),
             r => new CoalesceBooleanNullableProjection(
-                r.Many<BooleanNullableProjection>("values")
+                r.Many<BooleanNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -377,7 +377,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeBoolean(),
             r => new CoalesceBooleanProjection(
-                r.Many<BooleanNullableProjection>("values")
+                r.Many<BooleanNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -385,21 +385,21 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeDateNullable(),
             r => new CoalesceDateNullableProjection(
-                r.Many<DateNullableProjection>("values")
+                r.Many<DateNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDate(),
-            r => new CoalesceDateProjection(r.Many<DateNullableProjection>("values")),
+            r => new CoalesceDateProjection(r.Many<DateNullableProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDatetimeNullable(),
             r => new CoalesceDatetimeNullableProjection(
-                r.Many<DatetimeNullableProjection>("values")
+                r.Many<DatetimeNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -407,7 +407,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeDatetime(),
             r => new CoalesceDatetimeProjection(
-                r.Many<DatetimeNullableProjection>("values")
+                r.Many<DatetimeNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -415,7 +415,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeDecimalNullable(),
             r => new CoalesceDecimalNullableProjection(
-                r.Many<DecimalNullableProjection>("values")
+                r.Many<DecimalNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -423,7 +423,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeDecimal(),
             r => new CoalesceDecimalProjection(
-                r.Many<DecimalNullableProjection>("values")
+                r.Many<DecimalNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -431,7 +431,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeIntegerNullable(),
             r => new CoalesceIntegerNullableProjection(
-                r.Many<IntegerNullableProjection>("values")
+                r.Many<IntegerNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -439,7 +439,7 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeInteger(),
             r => new CoalesceIntegerProjection(
-                r.Many<IntegerNullableProjection>("values")
+                r.Many<IntegerNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
@@ -447,42 +447,44 @@ internal static class ProjectionExpressionRegistrations
             "coalesce",
             new TypeStringNullable(),
             r => new CoalesceStringNullableProjection(
-                r.Many<StringNullableProjection>("values")
+                r.Many<StringNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeString(),
-            r => new CoalesceStringProjection(r.Many<StringNullableProjection>("values")),
+            r => new CoalesceStringProjection(
+                r.Many<StringNullableProjection>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeTimeNullable(),
             r => new CoalesceTimeNullableProjection(
-                r.Many<TimeNullableProjection>("values")
+                r.Many<TimeNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeTime(),
-            r => new CoalesceTimeProjection(r.Many<TimeNullableProjection>("values")),
+            r => new CoalesceTimeProjection(r.Many<TimeNullableProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeUuidNullable(),
             r => new CoalesceUuidNullableProjection(
-                r.Many<UuidNullableProjection>("values")
+                r.Many<UuidNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeUuid(),
-            r => new CoalesceUuidProjection(r.Many<UuidNullableProjection>("values")),
+            r => new CoalesceUuidProjection(r.Many<UuidNullableProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -498,14 +500,14 @@ internal static class ProjectionExpressionRegistrations
             "concat",
             new TypeStringNullable(),
             r => new ConcatStringNullableProjection(
-                r.Many<StringNullableProjection>("values")
+                r.Many<StringNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "concat",
             new TypeString(),
-            r => new ConcatStringProjection(r.Many<StringProjection>("values")),
+            r => new ConcatStringProjection(r.Many<StringProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -804,14 +806,14 @@ internal static class ProjectionExpressionRegistrations
             "divide",
             new TypeDecimalNullable(),
             r => new DivideDecimalNullableProjection(
-                r.Many<DecimalNullableProjection>("values")
+                r.Many<DecimalNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "divide",
             new TypeDecimal(),
-            r => new DivideDecimalProjection(r.Many<DecimalProjection>("values")),
+            r => new DivideDecimalProjection(r.Many<DecimalProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
@@ -2370,28 +2372,28 @@ internal static class ProjectionExpressionRegistrations
             "multiply",
             new TypeDecimalNullable(),
             r => new MultiplyDecimalNullableProjection(
-                r.Many<DecimalNullableProjection>("values")
+                r.Many<DecimalNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeDecimal(),
-            r => new MultiplyDecimalProjection(r.Many<DecimalProjection>("values")),
+            r => new MultiplyDecimalProjection(r.Many<DecimalProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeIntegerNullable(),
             r => new MultiplyIntegerNullableProjection(
-                r.Many<IntegerNullableProjection>("values")
+                r.Many<IntegerNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeInteger(),
-            r => new MultiplyIntegerProjection(r.Many<IntegerProjection>("values")),
+            r => new MultiplyIntegerProjection(r.Many<IntegerProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
@@ -2525,7 +2527,7 @@ internal static class ProjectionExpressionRegistrations
         registry.Operator(
             "or",
             new TypeBoolean(),
-            r => new OrProjection(r.Many<BooleanProjection>("conditions")),
+            r => new OrProjection(r.Many<BooleanProjection>("conditions", 2)),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
@@ -2607,28 +2609,28 @@ internal static class ProjectionExpressionRegistrations
             "subtract",
             new TypeDecimalNullable(),
             r => new SubtractDecimalNullableProjection(
-                r.Many<DecimalNullableProjection>("values")
+                r.Many<DecimalNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeDecimal(),
-            r => new SubtractDecimalProjection(r.Many<DecimalProjection>("values")),
+            r => new SubtractDecimalProjection(r.Many<DecimalProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeIntegerNullable(),
             r => new SubtractIntegerNullableProjection(
-                r.Many<IntegerNullableProjection>("values")
+                r.Many<IntegerNullableProjection>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeInteger(),
-            r => new SubtractIntegerProjection(r.Many<IntegerProjection>("values")),
+            r => new SubtractIntegerProjection(r.Many<IntegerProjection>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(

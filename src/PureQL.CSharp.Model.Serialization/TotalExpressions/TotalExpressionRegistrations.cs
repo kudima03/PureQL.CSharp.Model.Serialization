@@ -14,25 +14,25 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "add",
             new TypeDecimalNullable(),
-            r => new AddDecimalNullableTotal(r.Many<DecimalNullableTotal>("values")),
+            r => new AddDecimalNullableTotal(r.Many<DecimalNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeDecimal(),
-            r => new AddDecimalTotal(r.Many<DecimalTotal>("values")),
+            r => new AddDecimalTotal(r.Many<DecimalTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeIntegerNullable(),
-            r => new AddIntegerNullableTotal(r.Many<IntegerNullableTotal>("values")),
+            r => new AddIntegerNullableTotal(r.Many<IntegerNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "add",
             new TypeInteger(),
-            r => new AddIntegerTotal(r.Many<IntegerTotal>("values")),
+            r => new AddIntegerTotal(r.Many<IntegerTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -116,7 +116,7 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "and",
             new TypeBoolean(),
-            r => new AndTotal(r.Many<BooleanTotal>("conditions")),
+            r => new AndTotal(r.Many<BooleanTotal>("conditions", 2)),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
@@ -249,99 +249,107 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "coalesce",
             new TypeBooleanNullable(),
-            r => new CoalesceBooleanNullableTotal(r.Many<BooleanNullableTotal>("values")),
+            r => new CoalesceBooleanNullableTotal(
+                r.Many<BooleanNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeBoolean(),
-            r => new CoalesceBooleanTotal(r.Many<BooleanNullableTotal>("values")),
+            r => new CoalesceBooleanTotal(r.Many<BooleanNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDateNullable(),
-            r => new CoalesceDateNullableTotal(r.Many<DateNullableTotal>("values")),
+            r => new CoalesceDateNullableTotal(r.Many<DateNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDate(),
-            r => new CoalesceDateTotal(r.Many<DateNullableTotal>("values")),
+            r => new CoalesceDateTotal(r.Many<DateNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDatetimeNullable(),
             r => new CoalesceDatetimeNullableTotal(
-                r.Many<DatetimeNullableTotal>("values")
+                r.Many<DatetimeNullableTotal>("values", 2)
             ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDatetime(),
-            r => new CoalesceDatetimeTotal(r.Many<DatetimeNullableTotal>("values")),
+            r => new CoalesceDatetimeTotal(r.Many<DatetimeNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDecimalNullable(),
-            r => new CoalesceDecimalNullableTotal(r.Many<DecimalNullableTotal>("values")),
+            r => new CoalesceDecimalNullableTotal(
+                r.Many<DecimalNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeDecimal(),
-            r => new CoalesceDecimalTotal(r.Many<DecimalNullableTotal>("values")),
+            r => new CoalesceDecimalTotal(r.Many<DecimalNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeIntegerNullable(),
-            r => new CoalesceIntegerNullableTotal(r.Many<IntegerNullableTotal>("values")),
+            r => new CoalesceIntegerNullableTotal(
+                r.Many<IntegerNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeInteger(),
-            r => new CoalesceIntegerTotal(r.Many<IntegerNullableTotal>("values")),
+            r => new CoalesceIntegerTotal(r.Many<IntegerNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeStringNullable(),
-            r => new CoalesceStringNullableTotal(r.Many<StringNullableTotal>("values")),
+            r => new CoalesceStringNullableTotal(
+                r.Many<StringNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeString(),
-            r => new CoalesceStringTotal(r.Many<StringNullableTotal>("values")),
+            r => new CoalesceStringTotal(r.Many<StringNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeTimeNullable(),
-            r => new CoalesceTimeNullableTotal(r.Many<TimeNullableTotal>("values")),
+            r => new CoalesceTimeNullableTotal(r.Many<TimeNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeTime(),
-            r => new CoalesceTimeTotal(r.Many<TimeNullableTotal>("values")),
+            r => new CoalesceTimeTotal(r.Many<TimeNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeUuidNullable(),
-            r => new CoalesceUuidNullableTotal(r.Many<UuidNullableTotal>("values")),
+            r => new CoalesceUuidNullableTotal(r.Many<UuidNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "coalesce",
             new TypeUuid(),
-            r => new CoalesceUuidTotal(r.Many<UuidNullableTotal>("values")),
+            r => new CoalesceUuidTotal(r.Many<UuidNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -356,13 +364,13 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "concat",
             new TypeStringNullable(),
-            r => new ConcatStringNullableTotal(r.Many<StringNullableTotal>("values")),
+            r => new ConcatStringNullableTotal(r.Many<StringNullableTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "concat",
             new TypeString(),
-            r => new ConcatStringTotal(r.Many<StringTotal>("values")),
+            r => new ConcatStringTotal(r.Many<StringTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Union(
@@ -617,13 +625,15 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "divide",
             new TypeDecimalNullable(),
-            r => new DivideDecimalNullableTotal(r.Many<DecimalNullableTotal>("values")),
+            r => new DivideDecimalNullableTotal(
+                r.Many<DecimalNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "divide",
             new TypeDecimal(),
-            r => new DivideDecimalTotal(r.Many<DecimalTotal>("values")),
+            r => new DivideDecimalTotal(r.Many<DecimalTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
@@ -1959,25 +1969,29 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "multiply",
             new TypeDecimalNullable(),
-            r => new MultiplyDecimalNullableTotal(r.Many<DecimalNullableTotal>("values")),
+            r => new MultiplyDecimalNullableTotal(
+                r.Many<DecimalNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeDecimal(),
-            r => new MultiplyDecimalTotal(r.Many<DecimalTotal>("values")),
+            r => new MultiplyDecimalTotal(r.Many<DecimalTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeIntegerNullable(),
-            r => new MultiplyIntegerNullableTotal(r.Many<IntegerNullableTotal>("values")),
+            r => new MultiplyIntegerNullableTotal(
+                r.Many<IntegerNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "multiply",
             new TypeInteger(),
-            r => new MultiplyIntegerTotal(r.Many<IntegerTotal>("values")),
+            r => new MultiplyIntegerTotal(r.Many<IntegerTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
@@ -2102,7 +2116,7 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "or",
             new TypeBoolean(),
-            r => new OrTotal(r.Many<BooleanTotal>("conditions")),
+            r => new OrTotal(r.Many<BooleanTotal>("conditions", 2)),
             (w, x) => w.Many("conditions", x.Conditions)
         );
         registry.Operator(
@@ -2172,25 +2186,29 @@ internal static class TotalExpressionRegistrations
         registry.Operator(
             "subtract",
             new TypeDecimalNullable(),
-            r => new SubtractDecimalNullableTotal(r.Many<DecimalNullableTotal>("values")),
+            r => new SubtractDecimalNullableTotal(
+                r.Many<DecimalNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeDecimal(),
-            r => new SubtractDecimalTotal(r.Many<DecimalTotal>("values")),
+            r => new SubtractDecimalTotal(r.Many<DecimalTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeIntegerNullable(),
-            r => new SubtractIntegerNullableTotal(r.Many<IntegerNullableTotal>("values")),
+            r => new SubtractIntegerNullableTotal(
+                r.Many<IntegerNullableTotal>("values", 2)
+            ),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
             "subtract",
             new TypeInteger(),
-            r => new SubtractIntegerTotal(r.Many<IntegerTotal>("values")),
+            r => new SubtractIntegerTotal(r.Many<IntegerTotal>("values", 2)),
             (w, x) => w.Many("values", x.Values)
         );
         registry.Operator(
