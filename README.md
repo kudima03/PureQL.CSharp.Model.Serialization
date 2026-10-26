@@ -9,7 +9,7 @@
 
 ## Overview
 
-`PureQL.CSharp.Model.Serialization` provides `System.Text.Json` converters for every type of [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model), which mirrors PureQL specification [`0.1.0-preview.2.0.1`](https://github.com/kudima03/PureQL-Specification/releases/tag/0.1.0-preview.2.0.1). The single entry point is `PureQLConverters` — a record that implements `IEnumerable<JsonConverter>` and yields one converter per model type, so a whole `PureQLQuery` or any part of it (an expression, a select item, a literal) can be converted.
+`PureQL.CSharp.Model.Serialization` provides `System.Text.Json` converters for every type of [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model), which mirrors PureQL specification [`0.1.0-preview.2.0.1`](https://github.com/kudima03/PureQL-Specification/releases/tag/0.1.0-preview.2.0.1). There are two entry points: `PureQLConverters` — a record that implements `IEnumerable<JsonConverter>` and yields one converter per model type, so a whole `PureQLQuery` or any part of it (an expression, a select item, a literal) can be converted — and `PureQLTypeInfoResolver`, an `IJsonTypeInfoResolver` over the same converters for applications that serialize without reflection (Native AOT, trimming, source generation).
 
 ## How JSON maps to the model
 
@@ -30,7 +30,7 @@ Writing omits schema defaults — `nullable: false`, `over` when it is the defau
 
 Limits of the model's CLR types: `date` and `datetime` start at year 0001 (`DateOnly`, `DateTimeOffset`), and `time` / `datetime` have a precision of one microsecond, as the specification: a value finer than that, or a `decimal` of more than 28 digits, is a `JsonException` on write. A `DateTimeOffset` with an offset is written in UTC, keeping its instant.
 
-The converters use no reflection and the library is trim- and AOT-compatible (analyzers enabled for net8.0 and later).
+The converters use no reflection and the library is trim- and AOT-compatible (analyzers enabled for net8.0 and later). CI publishes a Native AOT application that round-trips every fixture of the specification through `PureQLTypeInfoResolver`, so the usage below is checked in a trimmed binary, not only by the analyzers.
 
 ## Dependencies
 
@@ -70,4 +70,44 @@ foreach (JsonConverter converter in new PureQLConverters())
 
 PureQLQuery query = JsonSerializer.Deserialize<PureQLQuery>(json, options)!;
 string written = JsonSerializer.Serialize(query, options);
+```
+
+### Native AOT and trimming
+
+The overloads above resolve type metadata by reflection, which a trimmed or Native AOT application does not have. Use `PureQLTypeInfoResolver` instead of the converters and the `JsonTypeInfo` overloads of `JsonSerializer`:
+
+```csharp
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using PureQL.CSharp.Model;
+using PureQL.CSharp.Model.Serialization;
+
+JsonSerializerOptions options = new JsonSerializerOptions
+{
+    MaxDepth = 256,
+    TypeInfoResolver = new PureQLTypeInfoResolver(),
+};
+JsonTypeInfo<PureQLQuery> queryInfo = (JsonTypeInfo<PureQLQuery>)
+    options.GetTypeInfo(typeof(PureQLQuery));
+
+PureQLQuery query = JsonSerializer.Deserialize(json, queryInfo)!;
+string written = JsonSerializer.Serialize(query, queryInfo);
+```
+
+The resolver answers for model types only and returns `null` for any other, so a query that is part of a larger document combines with the application's source-generated context. Put the resolver first, so that model types are not generated as plain objects:
+
+```csharp
+[JsonSerializable(typeof(Envelope))]
+internal sealed partial class DocumentContext : JsonSerializerContext;
+
+internal sealed record Envelope(string Name, PureQLQuery Query);
+
+JsonSerializerOptions options = new JsonSerializerOptions
+{
+    MaxDepth = 256,
+    TypeInfoResolver = JsonTypeInfoResolver.Combine(
+        new PureQLTypeInfoResolver(),
+        DocumentContext.Default
+    ),
+};
 ```

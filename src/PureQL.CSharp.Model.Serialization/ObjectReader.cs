@@ -70,7 +70,7 @@ internal sealed class ObjectReader
             Required(name),
             Child(name),
             minItems,
-            (item, path) => _registry.Read<T>(item, path)
+            _registry.Read<T>
         );
     }
 
@@ -86,7 +86,7 @@ internal sealed class ObjectReader
                 value,
                 Child(name),
                 minItems,
-                (item, path) => _registry.Read<T>(item, path)
+                _registry.Read<T>
             )
             : null;
     }

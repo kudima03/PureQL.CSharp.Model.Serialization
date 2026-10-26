@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using PureQL.CSharp.Model.Serialization.Fields;
 using PureQL.CSharp.Model.Serialization.GroupExpressions;
 using PureQL.CSharp.Model.Serialization.GroupKeys;
@@ -24,6 +25,11 @@ internal sealed partial class ModelRegistry
     private readonly Dictionary<Type, ModelDescriptor> _descriptors = [];
 
     private readonly List<JsonConverter> _converters = [];
+
+    private readonly Dictionary<
+        Type,
+        Func<JsonSerializerOptions, JsonTypeInfo>
+    > _typeInfos = [];
 
     private ModelRegistry()
     {
@@ -65,6 +71,20 @@ internal sealed partial class ModelRegistry
         }
 
         Find(value.GetType()).Write(writer, value);
+    }
+
+    /// <summary>
+    /// The <see cref="JsonTypeInfo"/> of a model type for one options instance, backed
+    /// by its converter, or <see langword="null"/> for any other type.
+    /// </summary>
+    public JsonTypeInfo? CreateTypeInfo(Type type, JsonSerializerOptions options)
+    {
+        return _typeInfos.TryGetValue(
+            type,
+            out Func<JsonSerializerOptions, JsonTypeInfo>? create
+        )
+            ? create(options)
+            : null;
     }
 
     public ModelDescriptor Find(Type type)
@@ -192,7 +212,12 @@ internal sealed partial class ModelRegistry
     private void Add<T>(ModelDescriptor descriptor)
         where T : class
     {
+        PureQLConverter<T> converter = new PureQLConverter<T>(this);
         _descriptors.Add(typeof(T), descriptor);
-        _converters.Add(new PureQLConverter<T>(this));
+        _converters.Add(converter);
+        _typeInfos.Add(
+            typeof(T),
+            options => JsonMetadataServices.CreateValueInfo<T>(options, converter)
+        );
     }
 }

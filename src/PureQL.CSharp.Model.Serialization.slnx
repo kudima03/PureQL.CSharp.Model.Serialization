@@ -3,6 +3,7 @@
     <File Path=".editorconfig" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="Tests/PureQL.CSharp.Model.Serialization.AotTests/PureQL.CSharp.Model.Serialization.AotTests.csproj" />
     <Project Path="Tests/PureQL.CSharp.Model.Serialization.Tests/PureQL.CSharp.Model.Serialization.Tests.csproj" />
   </Folder>
   <Project Path="PureQL.CSharp.Model.Serialization/PureQL.CSharp.Model.Serialization.csproj" />

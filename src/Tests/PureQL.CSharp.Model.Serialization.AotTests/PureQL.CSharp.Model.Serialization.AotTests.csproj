@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    A console application published with Native AOT, which proves that the library is
+    usable without reflection: CI publishes it and runs it against the specification
+    fixtures. Its code compiles under the trim and AOT analyzers with warnings as
+    errors, so it is also the documented usage checked by the compiler.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PureQL.CSharp.Model.Serialization\PureQL.CSharp.Model.Serialization.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile
+      Include="..\PureQL.CSharp.Model.Serialization.Tests\JsonSemantics.cs"
+      Link="JsonSemantics.cs"
+    />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The PureQL-Specification submodule, tracking its main branch. -->
+    <None
+      Include="..\PureQL-Specification\samples\valid\*.json;..\PureQL-Specification\samples\valid\*.jsonc"
+      LinkBase="Specification\samples\valid"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+  </ItemGroup>
+</Project>
