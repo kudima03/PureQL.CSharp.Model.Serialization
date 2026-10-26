@@ -36,6 +36,21 @@ internal static class Discriminators
         ("value", "literal"),
     ];
 
+    /// <summary>
+    /// The properties that hold the operands an operator takes its nullability from:
+    /// not a <c>condition</c>, <c>digits</c> or <c>predicate</c>.
+    /// </summary>
+    private static readonly string[] OperandProperties =
+    [
+        "values",
+        "operand",
+        "left",
+        "right",
+        "then",
+        "else",
+        "selector",
+    ];
+
     public static string Operator(string name, string typeName, bool nullable)
     {
         return nullable ? $"{name} {typeName}?" : $"{name} {typeName}";
@@ -145,6 +160,36 @@ internal static class Discriminators
         return name is null
             ? throw JsonErrors.At(path, "Missing type name")
             : (name, nullable);
+    }
+
+    /// <summary>The operands of an operator node that has been read.</summary>
+    public static IEnumerable<JsonElement> Operands(JsonElement element)
+    {
+        foreach (string name in OperandProperties)
+        {
+            if (!element.TryGetProperty(name, out JsonElement operand))
+            {
+                continue;
+            }
+
+            if (operand.ValueKind != JsonValueKind.Array)
+            {
+                yield return operand;
+                continue;
+            }
+
+            foreach (JsonElement item in operand.EnumerateArray())
+            {
+                yield return item;
+            }
+        }
+    }
+
+    /// <summary>Whether an operand that has been read declares a nullable type.</summary>
+    public static bool IsNullable(JsonElement operand)
+    {
+        return operand.TryGetProperty("type", out JsonElement type)
+            && type.TryGetProperty("nullable", out _);
     }
 
     /// <summary>

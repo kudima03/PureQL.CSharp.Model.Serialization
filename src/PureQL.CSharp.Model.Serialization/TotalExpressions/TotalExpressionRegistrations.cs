@@ -170,7 +170,7 @@ internal static class TotalExpressionRegistrations
             UnionCase.Of((IntegerDivideIntegerTotal x) => new ArithmeticIntegerTotal(x)),
             UnionCase.Of((ModuloIntegerTotal x) => new ArithmeticIntegerTotal(x))
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "average",
             new TypeDateNullable(),
             r => new AverageDateNullableTotal(
@@ -183,7 +183,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "average",
             new TypeDatetimeNullable(),
             r => new AverageDatetimeNullableTotal(
@@ -196,7 +196,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "average",
             new TypeDecimalNullable(),
             r => new AverageDecimalNullableTotal(
@@ -209,7 +209,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "average",
             new TypeTimeNullable(),
             r => new AverageTimeNullableTotal(
@@ -1732,7 +1732,7 @@ internal static class TotalExpressionRegistrations
             UnionCase.Of((OrTotal x) => new LogicalTotal(x)),
             UnionCase.Of((NotTotal x) => new LogicalTotal(x))
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeBooleanNullable(),
             r => new MaxBooleanNullableTotal(
@@ -1745,7 +1745,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeDateNullable(),
             r => new MaxDateNullableTotal(
@@ -1758,7 +1758,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeDatetimeNullable(),
             r => new MaxDatetimeNullableTotal(
@@ -1771,7 +1771,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeDecimalNullable(),
             r => new MaxDecimalNullableTotal(
@@ -1784,7 +1784,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeIntegerNullable(),
             r => new MaxIntegerNullableTotal(
@@ -1797,7 +1797,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeStringNullable(),
             r => new MaxStringNullableTotal(
@@ -1810,7 +1810,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeTimeNullable(),
             r => new MaxTimeNullableTotal(
@@ -1823,7 +1823,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "max",
             new TypeUuidNullable(),
             r => new MaxUuidNullableTotal(
@@ -1836,7 +1836,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeBooleanNullable(),
             r => new MinBooleanNullableTotal(
@@ -1849,7 +1849,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeDateNullable(),
             r => new MinDateNullableTotal(
@@ -1862,7 +1862,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeDatetimeNullable(),
             r => new MinDatetimeNullableTotal(
@@ -1875,7 +1875,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeDecimalNullable(),
             r => new MinDecimalNullableTotal(
@@ -1888,7 +1888,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeIntegerNullable(),
             r => new MinIntegerNullableTotal(
@@ -1901,7 +1901,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeStringNullable(),
             r => new MinStringNullableTotal(
@@ -1914,7 +1914,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeTimeNullable(),
             r => new MinTimeNullableTotal(
@@ -1927,7 +1927,7 @@ internal static class TotalExpressionRegistrations
                 w.Optional("predicate", x.Predicate);
             }
         );
-        registry.Operator(
+        registry.TotalAggregate(
             "min",
             new TypeUuidNullable(),
             r => new MinUuidNullableTotal(

@@ -212,6 +212,24 @@ public sealed record ErrorTests
         Assert.IsType(variant, equal.Value);
     }
 
+    [Theory]
+    [InlineData("""{"operator":"add","type":{"name":"decimal","nullable":true},"values":[{{F}},{{F}}]}""")]
+    [InlineData("""{"operator":"coalesce","type":{"name":"decimal","nullable":true},"values":[{"type":{"name":"decimal","nullable":true},"value":null},{{F}}]}""")]
+    public void NullableDeclarationOverNonNullOperandsIsRejectedWithItsPath(string json)
+    {
+        JsonException exception = Assert.Throws<JsonException>(() =>
+            PureQLJson.Deserialize<DecimalNullableRow>(
+                json.Replace("{{F}}", Field, StringComparison.Ordinal)
+            )
+        );
+
+        Assert.EndsWith(
+            "is declared nullable, but its operands make it non-null (at $)",
+            exception.Message,
+            StringComparison.Ordinal
+        );
+    }
+
     [Fact]
     public void NullValueIsRejectedOnWrite()
     {

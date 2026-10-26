@@ -9,6 +9,7 @@ internal sealed class RecordDescriptor<T>(
     IEnumerable<string> signatures,
     string? operatorName,
     IType? operatorType,
+    NullableCause nullableCause,
     Func<ObjectReader, T> read,
     Action<ObjectWriter, T> write
 ) : ModelDescriptor(registry, typeof(T))
@@ -41,6 +42,7 @@ internal sealed class RecordDescriptor<T>(
 
         T value = read(reader);
         reader.EnsureAllRead();
+        EnsureNullableCause(element, path);
         return value;
     }
 
@@ -60,5 +62,36 @@ internal sealed class RecordDescriptor<T>(
 
         write(objectWriter, (T)value);
         writer.WriteEndObject();
+    }
+
+    /// <summary>
+    /// Rejects a nullable declaration that the operands of the node do not give it: it
+    /// is wider than the exact type the schema requires.
+    /// </summary>
+    private void EnsureNullableCause(JsonElement element, string path)
+    {
+        if (
+            operatorType is not { Nullable: true }
+            || (nullableCause == NullableCause.Always)
+        )
+        {
+            return;
+        }
+
+        bool[] operands =
+        [
+            .. Discriminators.Operands(element).Select(Discriminators.IsNullable),
+        ];
+        bool nullable =
+            nullableCause == NullableCause.EveryOperand
+                ? operands.All(o => o)
+                : operands.Any(o => o) || element.TryGetProperty("predicate", out _);
+        if (!nullable)
+        {
+            throw JsonErrors.At(
+                path,
+                $"{Type.Name} is declared nullable, but its operands make it non-null"
+            );
+        }
     }
 }
