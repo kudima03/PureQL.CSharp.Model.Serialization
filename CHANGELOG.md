@@ -9,6 +9,14 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ## [Unreleased]
 
+### Added
+
+- `PureQLTypeInfoResolver`, an `IJsonTypeInfoResolver` that serves the `JsonTypeInfo` of
+  every model type from its converter and returns `null` for any other type, so a query
+  can be serialized in a Native AOT or trimmed application with the `JsonTypeInfo`
+  overloads of `JsonSerializer`, alone or combined with a source-generated context. CI
+  now publishes a Native AOT application and round-trips every valid fixture through it.
+
 ---
 
 ## [0.1.0-preview.5.0.1] - 2026-10-22
