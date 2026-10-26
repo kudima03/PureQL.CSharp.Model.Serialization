@@ -1,8 +1,8 @@
 namespace PureQL.CSharp.Model.Serialization.Tests;
 
 /// <summary>
-/// The fixtures of PureQL specification 0.1.0-preview.2.0.1, from the
-/// <c>src/Tests/PureQL-Specification</c> submodule.
+/// The fixtures of the PureQL specification, from the
+/// <c>src/Tests/PureQL-Specification</c> submodule, which tracks its main branch.
 /// </summary>
 internal static class SpecificationFiles
 {
@@ -13,12 +13,12 @@ internal static class SpecificationFiles
 
     public static IReadOnlyList<string> Valid()
     {
-        return Names("samples", "*.json", "tests/valid", "*.jsonc");
+        return Names("samples/valid", "*.json", "samples/valid", "*.jsonc");
     }
 
     public static IReadOnlyList<string> Invalid()
     {
-        return Names("tests/invalid", "*.jsonc");
+        return Names("samples/invalid", "*.jsonc");
     }
 
     public static TheoryData<string> Data(IEnumerable<string> names)
