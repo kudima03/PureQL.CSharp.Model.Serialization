@@ -1,3 +1,4 @@
 [submodule "src/Tests/PureQL-Specification"]
 	path = src/Tests/PureQL-Specification
 	url = https://github.com/kudima03/PureQL-Specification.git
+	branch = main
