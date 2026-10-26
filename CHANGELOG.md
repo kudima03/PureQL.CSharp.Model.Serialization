@@ -7,7 +7,7 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
-## [Unreleased]
+## [0.1.0-preview.5.1.0] - 2026-10-26
 
 ### Added
 
@@ -16,6 +16,13 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
   can be serialized in a Native AOT or trimmed application with the `JsonTypeInfo`
   overloads of `JsonSerializer`, alone or combined with a source-generated context. CI
   now publishes a Native AOT application and round-trips every valid fixture through it.
+
+### Fixed
+
+- An operator declared nullable is now rejected unless the node gives a cause for it:
+  a nullable operand or a `predicate`, and every operand nullable for `coalesce`. The
+  `average`, `min` and `max` of a total query stay nullable whatever their operands are.
+  Such documents were never valid under the specification, but were accepted before.
 
 ---
 
