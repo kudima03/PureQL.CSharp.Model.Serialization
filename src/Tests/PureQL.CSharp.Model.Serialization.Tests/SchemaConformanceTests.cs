@@ -62,6 +62,35 @@ public sealed partial record SchemaConformanceTests
         }
     }
 
+    /// <summary>
+    /// A record declared nullable over non-null operands only: the schema decides whether
+    /// that is its exact type (an aggregate over all rows of a total query) or a wider
+    /// one (#98), and the reader must agree.
+    /// </summary>
+    [SuppressMessage("Usage", "xUnit1004", Justification = Issue98.Skip)]
+    [Theory(Skip = Issue98.Skip)]
+    [MemberData(nameof(NullableOperatorTypes))]
+    public void NullableDeclarationOverNonNullOperandsFollowsTheSchema(string typeName)
+    {
+        Type type = ModelSamples.Types.Single(t => t.FullName == typeName);
+        object value = ModelSamples.OverNonNull(type);
+        string json = JsonSerializer.Serialize(value, type, PureQLJson.Options);
+
+        if (Specification.Value.IsValid(Definitions(type, type).Single(), json))
+        {
+            ModelAssert.Equivalent(
+                value,
+                JsonSerializer.Deserialize(json, type, PureQLJson.Options)
+            );
+        }
+        else
+        {
+            _ = Assert.Throws<JsonException>(() =>
+                JsonSerializer.Deserialize(json, type, PureQLJson.Options)
+            );
+        }
+    }
+
     [Theory]
     [InlineData("add@row", true, "decimal", "values", "{{D}},{{D}}")]
     [InlineData("add@row", false, "decimal", "value", "{{D}},{{D}}")]
@@ -100,6 +129,15 @@ public sealed partial record SchemaConformanceTests
     public static TheoryData<string> ModelTypes()
     {
         return SpecificationFiles.Data(ModelSamples.Types.Select(t => t.FullName!));
+    }
+
+    public static TheoryData<string> NullableOperatorTypes()
+    {
+        return SpecificationFiles.Data(
+            ModelSamples
+                .Types.Where(ModelSamples.IsNullableOperator)
+                .Select(t => t.FullName!)
+        );
     }
 
     /// <summary>

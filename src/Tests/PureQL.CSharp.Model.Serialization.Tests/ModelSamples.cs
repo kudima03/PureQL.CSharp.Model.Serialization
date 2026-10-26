@@ -50,9 +50,7 @@ internal static class ModelSamples
             return Wrap(type, pick, Create(pick, false));
         }
 
-        ConstructorInfo constructor = type.GetConstructors()
-            .OrderByDescending(c => c.GetParameters().Length)
-            .First();
+        ConstructorInfo constructor = Constructor(type);
         bool operands = IsNullable(type);
         bool coalesce =
             type.Name.StartsWith("Coalesce", StringComparison.Ordinal) && !operands;
@@ -61,6 +59,46 @@ internal static class ModelSamples
                 .GetParameters()
                 .Select(p => Value(p, full, operands, coalesce)),
         ]);
+    }
+
+    /// <summary>
+    /// Whether a type is a record declared nullable that takes an operand, so that its
+    /// exact type follows from its operands.
+    /// </summary>
+    public static bool IsNullableOperator(Type type)
+    {
+        return IsNullable(type)
+            && !IsUnion(type, out _)
+            && Constructor(type).GetParameters().Any(p => IsOperand(p.ParameterType));
+    }
+
+    /// <summary>
+    /// A record declared nullable built over non-null operands only and with no optional
+    /// value set, so that nothing but its declaration makes it nullable.
+    /// </summary>
+    public static object OverNonNull(Type type)
+    {
+        ConstructorInfo constructor = Constructor(type);
+        return constructor.Invoke([
+            .. constructor.GetParameters().Select(p => Value(p, false, false, false)),
+        ]);
+    }
+
+    private static ConstructorInfo Constructor(Type type)
+    {
+        return type.GetConstructors()
+            .OrderByDescending(c => c.GetParameters().Length)
+            .First();
+    }
+
+    private static bool IsOperand(Type type)
+    {
+        Type item =
+            type.IsGenericType
+            && (type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                ? type.GetGenericArguments()[0]
+                : type;
+        return IsUnion(item, out _);
     }
 
     private static bool IsNullable(Type type)

@@ -23,25 +23,20 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <!-- The PureQL-Specification submodule, pinned to tag 0.1.0-preview.1.0.0. -->
+    <!-- The PureQL-Specification submodule, tracking its main branch. -->
     <None
       Include="..\PureQL-Specification\PureQL-Specification.json"
       Link="Specification\PureQL-Specification.json"
       CopyToOutputDirectory="PreserveNewest"
     />
     <None
-      Include="..\PureQL-Specification\samples\*.json"
-      LinkBase="Specification\samples"
+      Include="..\PureQL-Specification\samples\valid\*.json;..\PureQL-Specification\samples\valid\*.jsonc"
+      LinkBase="Specification\samples\valid"
       CopyToOutputDirectory="PreserveNewest"
     />
     <None
-      Include="..\PureQL-Specification\tests\valid\*.jsonc"
-      LinkBase="Specification\tests\valid"
-      CopyToOutputDirectory="PreserveNewest"
-    />
-    <None
-      Include="..\PureQL-Specification\tests\invalid\*.jsonc"
-      LinkBase="Specification\tests\invalid"
+      Include="..\PureQL-Specification\samples\invalid\*.jsonc"
+      LinkBase="Specification\samples\invalid"
       CopyToOutputDirectory="PreserveNewest"
     />
   </ItemGroup>
