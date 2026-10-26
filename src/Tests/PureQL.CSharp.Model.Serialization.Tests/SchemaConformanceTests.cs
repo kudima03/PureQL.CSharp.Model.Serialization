@@ -65,10 +65,9 @@ public sealed partial record SchemaConformanceTests
     /// <summary>
     /// A record declared nullable over non-null operands only: the schema decides whether
     /// that is its exact type (an aggregate over all rows of a total query) or a wider
-    /// one (#98), and the reader must agree.
+    /// one, and the reader must agree.
     /// </summary>
-    [SuppressMessage("Usage", "xUnit1004", Justification = Issue98.Skip)]
-    [Theory(Skip = Issue98.Skip)]
+    [Theory]
     [MemberData(nameof(NullableOperatorTypes))]
     public void NullableDeclarationOverNonNullOperandsFollowsTheSchema(string typeName)
     {

@@ -98,13 +98,59 @@ internal sealed partial class ModelRegistry
     public void Record<T>(Func<ObjectReader, T> read, Action<ObjectWriter, T> write)
         where T : class
     {
-        Add<T>(new RecordDescriptor<T>(this, [], null, null, read, write));
+        Add<T>(
+            new RecordDescriptor<T>(
+                this,
+                [],
+                null,
+                null,
+                NullableCause.AnyOperand,
+                read,
+                write
+            )
+        );
     }
 
-    /// <summary>An operator node, which declares the type it yields.</summary>
+    /// <summary>
+    /// An operator node, which declares the type it yields: nullable only when an operand
+    /// is (each of them for <c>coalesce</c>) or a predicate filters its rows.
+    /// </summary>
     public void Operator<T>(
         string name,
         IType type,
+        Func<ObjectReader, T> read,
+        Action<ObjectWriter, T> write
+    )
+        where T : class
+    {
+        Operator(
+            name,
+            type,
+            name == "coalesce" ? NullableCause.EveryOperand : NullableCause.AnyOperand,
+            read,
+            write
+        );
+    }
+
+    /// <summary>
+    /// An aggregate over all rows of a total query, which yields one row even when none
+    /// is aggregated, so it is nullable whatever its operands are.
+    /// </summary>
+    public void TotalAggregate<T>(
+        string name,
+        IType type,
+        Func<ObjectReader, T> read,
+        Action<ObjectWriter, T> write
+    )
+        where T : class
+    {
+        Operator(name, type, NullableCause.Always, read, write);
+    }
+
+    private void Operator<T>(
+        string name,
+        IType type,
+        NullableCause nullableCause,
         Func<ObjectReader, T> read,
         Action<ObjectWriter, T> write
     )
@@ -116,6 +162,7 @@ internal sealed partial class ModelRegistry
                 [Discriminators.Operator(name, type.Name, type.Nullable)],
                 name,
                 type,
+                nullableCause,
                 read,
                 write
             )
@@ -129,7 +176,17 @@ internal sealed partial class ModelRegistry
     )
         where T : class
     {
-        Add<T>(new RecordDescriptor<T>(this, signatures, null, null, read, write));
+        Add<T>(
+            new RecordDescriptor<T>(
+                this,
+                signatures,
+                null,
+                null,
+                NullableCause.AnyOperand,
+                read,
+                write
+            )
+        );
     }
 
     private void Add<T>(ModelDescriptor descriptor)
