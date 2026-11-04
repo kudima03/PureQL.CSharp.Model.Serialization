@@ -41,7 +41,7 @@ jobs:
     - name: Run the Native AOT check
       run: ./aot/PureQL.CSharp.Model.Serialization.AotTests
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.12
       with:
         reports: "**/*.cobertura.xml"
         targetdir: "${{ github.workspace }}"
