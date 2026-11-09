@@ -40,7 +40,7 @@ This is a **JSON serialization library** for PureQL query models. It depends on 
 
 **Target framework:** net11.0 only, as the model. `IsAotCompatible` is `true`; no reflection or `JsonSerializer` calls inside converters.
 
-**Package validation:** enabled against `PackageValidationBaselineVersion` `0.1.0-preview.6.0.0`, the first union-based release; intentional breaks go to `CompatibilitySuppressions.xml` next to the csproj.
+**Package validation:** enabled against `PackageValidationBaselineVersion` `0.1.0-preview.6.0.1`, the latest release; intentional breaks go to `CompatibilitySuppressions.xml` next to the csproj.
 
 **Mutation testing:** `src/stryker-config.json` sets `language-version: Preview`, which Stryker 5.0.0 needs to parse C# 15. CI does not run it.
 
