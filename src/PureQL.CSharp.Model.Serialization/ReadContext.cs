@@ -12,6 +12,8 @@ namespace PureQL.CSharp.Model.Serialization;
 /// </summary>
 internal sealed partial class ReadContext
 {
+    private const string EndOfValue = "Unexpected end of the JSON value";
+
     private readonly List<(string? Name, int Index)> _path = [];
 
     /// <summary>The JSON path of the value being read, <c>$.select[0].expression</c>.</summary>
@@ -341,14 +343,28 @@ internal sealed partial class ReadContext
     }
 
     /// <summary>
-    /// The next token of the value being read: a converter is given its whole value, so
-    /// the reader never runs out of data inside it.
+    /// The next token of the value being read: the serializer gives a converter its
+    /// whole value, so the reader runs out of data inside it only when the value is cut
+    /// short, which is an error.
     /// </summary>
     private JsonTokenType Read(ref Utf8JsonReader reader)
     {
-        return reader.Read()
-            ? reader.TokenType
-            : throw Error("Unexpected end of the JSON value");
+        return reader.Read() ? reader.TokenType : throw Error(EndOfValue);
+    }
+
+    /// <summary>
+    /// Moves the reader to the last token of the value it is on, or of the value of the
+    /// property it is on. <see cref="Utf8JsonReader.Skip"/> cannot be used: it throws
+    /// on any reader whose block is not final, and the serializer gives a converter
+    /// such a reader when it reads a stream or a pipe, even though the block holds the
+    /// converter's whole value.
+    /// </summary>
+    private void Skip(ref Utf8JsonReader reader)
+    {
+        if (!reader.TrySkip())
+        {
+            throw Error(EndOfValue);
+        }
     }
 
     public static string Describe(JsonTokenType token)

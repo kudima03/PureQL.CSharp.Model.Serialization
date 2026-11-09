@@ -71,7 +71,7 @@ internal sealed partial class ReadContext
                     kind = LeafKind(ref probe);
                 }
 
-                probe.Skip();
+                Skip(ref probe);
             }
 
             if (IsComplete(isOperator, kind, type, kind == Kinds.In ? operand : left))
@@ -120,7 +120,7 @@ internal sealed partial class ReadContext
                 : probe.ValueTextEquals("pagination"u8) ? QueryClauses.Pagination
                 : probe.ValueTextEquals("orderBy"u8) ? QueryClauses.OrderBy
                 : QueryClauses.None;
-            probe.Skip();
+            Skip(ref probe);
         }
 
         return clauses;
@@ -142,7 +142,7 @@ internal sealed partial class ReadContext
                 return true;
             }
 
-            probe.Skip();
+            Skip(ref probe);
         }
 
         return false;
@@ -213,9 +213,9 @@ internal sealed partial class ReadContext
     /// is not known yet. Nothing else is validated: the case reads the operand in full.
     /// The reader is left on the operand's last token.
     /// </summary>
-    private static int Family(ref Utf8JsonReader probe, bool wanted)
+    private int Family(ref Utf8JsonReader probe, bool wanted)
     {
-        _ = probe.Read();
+        _ = Read(ref probe);
         int family = Families.None;
         if (wanted && (probe.TokenType == JsonTokenType.StartObject))
         {
@@ -223,17 +223,26 @@ internal sealed partial class ReadContext
             family = DeclaredFamily(ref operand);
         }
 
-        probe.Skip();
+        Skip(ref probe);
         return family;
     }
 
+    /// <summary>
+    /// The family of the type the operand declares, read on a copy of the reader. A
+    /// value cut short gives <see cref="Families.None"/>: the caller reports it when it
+    /// skips the operand.
+    /// </summary>
     private static int DeclaredFamily(ref Utf8JsonReader operand)
     {
         while (operand.Read() && (operand.TokenType == JsonTokenType.PropertyName))
         {
             if (!operand.ValueTextEquals("type"u8))
             {
-                operand.Skip();
+                if (!operand.TrySkip())
+                {
+                    return Families.None;
+                }
+
                 continue;
             }
 
@@ -246,7 +255,11 @@ internal sealed partial class ReadContext
             {
                 if (!operand.ValueTextEquals("name"u8))
                 {
-                    operand.Skip();
+                    if (!operand.TrySkip())
+                    {
+                        return Families.None;
+                    }
+
                     continue;
                 }
 
