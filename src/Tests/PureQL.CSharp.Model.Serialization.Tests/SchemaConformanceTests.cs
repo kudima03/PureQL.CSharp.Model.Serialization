@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Json.Schema;
-using OneOf;
 
 namespace PureQL.CSharp.Model.Serialization.Tests;
 
@@ -45,10 +45,11 @@ public sealed partial record SchemaConformanceTests
         foreach (object value in ModelSamples.Of(type))
         {
             string json = JsonSerializer.Serialize(value, type, PureQLJson.Options);
-            object leaf = value;
-            while (leaf is IOneOf union)
+            // Unions are flat: a union holds a record, or the number of a pagination.
+            object leaf = value is IUnion union ? union.Value! : value;
+            if (leaf.GetType().IsPrimitive)
             {
-                leaf = union.Value;
+                continue;
             }
 
             foreach (string? definition in Definitions(type, leaf.GetType()))
@@ -206,19 +207,11 @@ public sealed partial record SchemaConformanceTests
 
             Match list = ListPattern().Match(name);
             Match leaf = LeafPattern().Match(name);
+            Match query = QueryPattern().Match(name);
             string mapped = name switch
             {
                 _ when list.Success => $"List{list.Groups[1].Value}",
-                _ when name.StartsWith("SelectItemGroup", StringComparison.Ordinal) =>
-                    "SelectItemGroup",
-                _ when name.StartsWith(
-                        "SelectItemProjection",
-                        StringComparison.Ordinal
-                    ) => "SelectItemProjection",
-                _ when name.StartsWith("SelectItemTotal", StringComparison.Ordinal) =>
-                    "SelectItemTotal",
-                _ when name.StartsWith("GroupKey", StringComparison.Ordinal) =>
-                    "GroupKey",
+                _ when query.Success => query.Groups[1].Value,
                 _ when leaf.Success => leaf.Groups[1].Value,
                 "FromEntity" or "FromSubquery" => "From",
                 "JoinEntity" or "JoinSubquery" => "Join",
@@ -259,8 +252,12 @@ public sealed partial record SchemaConformanceTests
         private static partial Regex LeafPattern();
 
         [GeneratedRegex(
-            "^List(?:Literal|Param|SubqueryColumn)?(Boolean|Date|Datetime|Decimal|Integer|String|Time|Uuid)$"
+            "^List(?:Literal|Param|SubqueryColumn)?(Boolean|Date|Datetime|Decimal|Integer|String|Time|Uuid)(?:Nullable)?$"
         )]
         private static partial Regex ListPattern();
+
+        /// <summary>The variants the schema's dependencies split a query into.</summary>
+        [GeneratedRegex("^((?:Main)?(?:Grouped|Plain)Query)With")]
+        private static partial Regex QueryPattern();
     }
 }

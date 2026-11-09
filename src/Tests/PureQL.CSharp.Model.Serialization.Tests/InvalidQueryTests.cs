@@ -25,13 +25,13 @@ public sealed record InvalidQueryTests
 
         // declared type: an operator declares the exact number type its operands give it,
         // but an integer operand is a valid decimal operand, so a decimal declaration
-        // over integers only is a valid model. A nullable declaration over non-null
-        // operands only is not listed: the converters reject it.
+        // over integers only is a valid model where the operands are typed decimal (not
+        // where they are typed exactly decimal, as the selector of min and sum is). A
+        // nullable declaration over non-null operands only is not listed: the converters
+        // reject it.
         ["0350_add_of_integers_declared_decimal.jsonc"] = "declared type",
         ["0354_if_of_integers_declared_decimal.jsonc"] = "declared type",
         ["0357_coalesce_of_integers_declared_decimal.jsonc"] = "declared type",
-        ["0361_sum_of_integers_declared_decimal.jsonc"] = "declared type",
-        ["0362_min_of_integers_declared_decimal.jsonc"] = "declared type",
         ["0596_decimal_from_integers_add_decimal_group_by_key.jsonc"] = "declared type",
         ["0597_decimal_from_integers_add_decimal_grouped_select.jsonc"] = "declared type",
         ["0600_decimal_from_integers_add_decimal_total_query.jsonc"] = "declared type",
@@ -131,18 +131,6 @@ public sealed record InvalidQueryTests
         [
             "1280_decimal_from_integers_coalesce_decimal_nullable_total_query.jsonc"
         ] = "declared type",
-        [
-            "1451_declared_other_number_sum_integer_of_integer_total_query.jsonc"
-        ] = "declared type",
-
-        // dependentRequired, dependentSchemas: a pagination needs an orderBy, and a
-        // subquery's orderBy needs a pagination or a distinctBy, but each is a property.
-        ["0371_pagination_without_order_by.jsonc"] = "dependent",
-        ["0372_subquery_pagination_without_order_by.jsonc"] = "dependent",
-        ["0373_subquery_order_by_without_pagination.jsonc"] = "dependent",
-        ["0552_pagination_no_order_by_main_grouped_query.jsonc"] = "dependent",
-        ["0570_order_by_only_sub_grouped_query.jsonc"] = "dependent",
-        ["0571_pagination_no_order_by_sub_grouped_query.jsonc"] = "dependent",
 
         // minimum: skip and take are plain long.
         ["0005_pagination_take_zero.jsonc"] = "minimum",

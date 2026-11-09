@@ -18,10 +18,8 @@ JsonSerializerOptions options = new JsonSerializerOptions
         EnvelopeContext.Default
     ),
 };
-JsonTypeInfo<PureQLQuery> queryInfo = (JsonTypeInfo<PureQLQuery>)
-    options.GetTypeInfo(typeof(PureQLQuery));
-JsonTypeInfo<Envelope> envelopeInfo = (JsonTypeInfo<Envelope>)
-    options.GetTypeInfo(typeof(Envelope));
+JsonTypeInfo<PureQLQuery> queryInfo = options.GetTypeInfo<PureQLQuery>();
+JsonTypeInfo<Envelope> envelopeInfo = options.GetTypeInfo<Envelope>();
 
 int types = 0;
 foreach (JsonConverter converter in new PureQLConverters())
@@ -96,5 +94,9 @@ static int Fail(string message)
 /// <summary>A document of the application that carries a query.</summary>
 internal sealed record Envelope(string Name, PureQLQuery Query);
 
+// The source generator reports that it cannot tell the cases of the model's unions
+// apart (SYSLIB1227): it does not need to, PureQLTypeInfoResolver resolves them first.
+#pragma warning disable SYSLIB1227
 [JsonSerializable(typeof(Envelope))]
 internal sealed partial class EnvelopeContext : JsonSerializerContext;
+#pragma warning restore SYSLIB1227

@@ -1,7 +1,12 @@
 using System.Collections;
 using System.Reflection;
-using OneOf;
+using System.Runtime.CompilerServices;
+using PureQL.CSharp.Model.Fields;
+using PureQL.CSharp.Model.Keys;
+using PureQL.CSharp.Model.Lists;
+using PureQL.CSharp.Model.Literals;
 using PureQL.CSharp.Model.Parameters;
+using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization.Tests;
 
@@ -11,27 +16,49 @@ namespace PureQL.CSharp.Model.Serialization.Tests;
 /// <c>direction</c>) and one with none. The items of a list differ, as list literals
 /// and <c>distinctBy</c> repeat no value, and the operands of an operator give it the
 /// type it declares: a nullable operator gets nullable operands and a non-null one
-/// non-null operands (a non-null <c>coalesce</c> one of each).
+/// non-null operands (a non-null <c>coalesce</c> one of each), of the type it declares
+/// where the operand admits it. Operands are leaves, so that every record is built
+/// once, as a case of the unions that hold it.
 /// </summary>
 internal static class ModelSamples
 {
+    private static readonly string[] TypeNames =
+    [
+        "integer",
+        "decimal",
+        "string",
+        "boolean",
+        "date",
+        "time",
+        "datetime",
+        "uuid",
+    ];
+
+    private static readonly string[] Contexts = ["Row", "Projection", "Group", "Total"];
+
     public static IReadOnlyList<Type> Types { get; } =
     [
         .. typeof(PureQLQuery)
             .Assembly.GetExportedTypes()
             .Where(t =>
-                t.IsClass && !t.IsAbstract && (t.Namespace != "PureQL.CSharp.Model.Types")
+                ((t.IsClass && t.IsSealed) || IsUnion(t))
+                && (t.Namespace != typeof(IType).Namespace)
             )
             .OrderBy(t => t.FullName, StringComparer.Ordinal),
     ];
 
+    public static bool IsUnion(Type type)
+    {
+        return type.IsValueType && typeof(IUnion).IsAssignableFrom(type);
+    }
+
     public static IEnumerable<object> Of(Type type)
     {
-        if (IsUnion(type, out Type[] cases))
+        if (IsUnion(type))
         {
-            foreach (Type caseType in cases)
+            foreach (Type caseType in Cases(type))
             {
-                yield return Wrap(type, caseType, Create(caseType, false));
+                yield return Wrap(type, Create(caseType, false));
             }
 
             yield break;
@@ -41,34 +68,14 @@ internal static class ModelSamples
         yield return Create(type, false);
     }
 
-    private static object Create(Type type, bool full, bool? nullable = null)
-    {
-        if (IsUnion(type, out Type[] cases))
-        {
-            bool wanted = nullable ?? IsNullable(type);
-            Type pick = cases.FirstOrDefault(c => IsNullable(c) == wanted) ?? cases[0];
-            return Wrap(type, pick, Create(pick, false));
-        }
-
-        ConstructorInfo constructor = Constructor(type);
-        bool operands = IsNullable(type);
-        bool coalesce =
-            type.Name.StartsWith("Coalesce", StringComparison.Ordinal) && !operands;
-        return constructor.Invoke([
-            .. constructor
-                .GetParameters()
-                .Select(p => Value(p, full, operands, coalesce)),
-        ]);
-    }
-
     /// <summary>
     /// Whether a type is a record declared nullable that takes an operand, so that its
     /// exact type follows from its operands.
     /// </summary>
     public static bool IsNullableOperator(Type type)
     {
-        return IsNullable(type)
-            && !IsUnion(type, out _)
+        return !IsUnion(type)
+            && (DeclaredType(type)?.Nullable ?? false)
             && Constructor(type).GetParameters().Any(p => IsOperand(p.ParameterType));
     }
 
@@ -80,8 +87,121 @@ internal static class ModelSamples
     {
         ConstructorInfo constructor = Constructor(type);
         return constructor.Invoke([
-            .. constructor.GetParameters().Select(p => Value(p, false, false, false)),
+            .. constructor
+                .GetParameters()
+                .Select(p => Argument(p, false, false, false, DeclaredType(type))),
         ]);
+    }
+
+    /// <summary>The type a record declares, or <see langword="null"/>.</summary>
+    public static IType? DeclaredType(Type type)
+    {
+        PropertyInfo? property = type.IsClass ? type.GetProperty("Type") : null;
+        return property?.PropertyType == typeof(IType)
+            ? (IType?)property.GetValue(RuntimeHelpers.GetUninitializedObject(type))
+            : null;
+    }
+
+    public static Type[] Cases(Type union)
+    {
+        return
+        [
+            .. union
+                .GetConstructors()
+                .Select(c => c.GetParameters())
+                .Where(p => p.Length == 1)
+                .Select(p => p[0].ParameterType),
+        ];
+    }
+
+    private static object Create(Type type, bool full)
+    {
+        if (type == typeof(long))
+        {
+            return 20L;
+        }
+
+        ConstructorInfo constructor = Constructor(type);
+        IType? declared = DeclaredType(type);
+        bool nullable = declared?.Nullable ?? false;
+        bool coalesce =
+            type.Name.StartsWith("Coalesce", StringComparison.Ordinal) && !nullable;
+        return constructor.Invoke([
+            .. constructor
+                .GetParameters()
+                .Select(p => Argument(p, full, nullable, coalesce, declared)),
+        ]);
+    }
+
+    /// <summary>A leaf case of an operand union, as described above.</summary>
+    private static object Operand(Type union, bool nullable, IType? parent)
+    {
+        Type[] cases = Cases(union);
+        Type[] leaves = [.. cases.Where(IsLeaf).OrderBy(LeafOrder)];
+        Type[] candidates = leaves.Length > 0 ? leaves : cases;
+        Type[] wanted =
+        [
+            .. candidates.Where(c => DeclaredType(c)?.Nullable == nullable),
+        ];
+        wanted = wanted.Length > 0 ? wanted : candidates;
+        string?[] names = [parent?.Name, NaturalType(union)];
+        Type pick =
+            names
+                .Where(n => n is not null)
+                .Select(n => wanted.FirstOrDefault(c => DeclaredType(c)?.Name == n))
+                .FirstOrDefault(c => c is not null)
+            ?? wanted[0];
+        return Wrap(union, Create(pick, false));
+    }
+
+    private static bool IsLeaf(Type type)
+    {
+        return !typeof(IOperator).IsAssignableFrom(type);
+    }
+
+    private static int LeafOrder(Type type)
+    {
+        return type switch
+        {
+            _ when typeof(IField).IsAssignableFrom(type) => 0,
+            _ when typeof(IKey).IsAssignableFrom(type) => 0,
+            _ when typeof(IParameter).IsAssignableFrom(type) => 1,
+            _ when typeof(ILiteral).IsAssignableFrom(type) => 2,
+            _ when typeof(ISubqueryColumn).IsAssignableFrom(type) => 3,
+            _ => 4,
+        };
+    }
+
+    /// <summary>
+    /// The type a position is named after: <c>decimal</c> for
+    /// <c>DecimalNullableRow</c>, <c>DeclaresDecimalRow</c> and
+    /// <c>DecimalOrDecimalNullableRow</c>.
+    /// </summary>
+    private static string? NaturalType(Type union)
+    {
+        string name = union.Name;
+        string? context = Contexts.FirstOrDefault(c =>
+            name.EndsWith(c, StringComparison.Ordinal)
+        );
+        if (context is null)
+        {
+            return null;
+        }
+
+        name = name[..^context.Length];
+        name = name.StartsWith("Declares", StringComparison.Ordinal)
+            ? name["Declares".Length..]
+            : name;
+        int or = name.IndexOf("Or", StringComparison.Ordinal);
+        name =
+            (or > 0) && (name.Length > (or + 2)) && char.IsUpper(name[or + 2])
+                ? name[..or]
+                : name;
+        name = name.EndsWith("Nullable", StringComparison.Ordinal)
+            ? name[..^"Nullable".Length]
+            : name;
+        string type = char.ToLowerInvariant(name[0]) + name[1..];
+        return TypeNames.Contains(type) ? type : null;
     }
 
     private static ConstructorInfo Constructor(Type type)
@@ -98,48 +218,44 @@ internal static class ModelSamples
             && (type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 ? type.GetGenericArguments()[0]
                 : type;
-        return IsUnion(item, out _);
+        return IsUnion(item);
     }
 
-    private static bool IsNullable(Type type)
-    {
-        return type.Name.Contains("Nullable", StringComparison.Ordinal);
-    }
-
-    private static object? Value(
+    private static object? Argument(
         ParameterInfo parameter,
         bool full,
         bool nullable,
-        bool coalesce
+        bool coalesce,
+        IType? declared
     )
     {
         Type type = parameter.ParameterType;
-        return !type.IsValueType && parameter.HasDefaultValue && !full
+        return parameter.HasDefaultValue && !full && (type.IsClass || IsNullable(type))
             ? null
             : Value(
                 Nullable.GetUnderlyingType(type) ?? type,
                 full,
                 0,
                 nullable,
-                coalesce
+                coalesce,
+                declared
             );
+    }
+
+    private static bool IsNullable(Type type)
+    {
+        return Nullable.GetUnderlyingType(type) is not null;
     }
 
     private static object Value(
         Type type,
         bool full,
-        int variant = 0,
-        bool nullable = false,
-        bool coalesce = false
+        int variant,
+        bool nullable,
+        bool coalesce,
+        IType? declared
     )
     {
-        if (type == typeof(OneOf<long, ParamInteger>))
-        {
-            return full
-                ? (OneOf<long, ParamInteger>)new ParamInteger("page")
-                : (OneOf<long, ParamInteger>)20L;
-        }
-
         if (
             type.IsGenericType
             && (type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
@@ -151,7 +267,7 @@ internal static class ModelSamples
             {
                 // A non-null coalesce has exactly one non-null operand.
                 bool wanted = nullable || (coalesce && (i == 0));
-                items.SetValue(Value(item, false, i, wanted), i);
+                items.SetValue(Value(item, false, i, wanted, false, declared), i);
             }
 
             return items;
@@ -159,9 +275,11 @@ internal static class ModelSamples
 
         return type switch
         {
+            _ when type == typeof(PaginationSkip) || type == typeof(PaginationTake) =>
+                Wrap(type, full ? new ParamInteger("page") : 20L),
+            _ when IsUnion(type) => Operand(type, nullable, declared),
             _ when type == typeof(string) => $"name{variant}",
             _ when type == typeof(long) => -42L + variant,
-            _ when type == typeof(int) => 3,
             _ when type == typeof(decimal) => 12.50m + variant,
             _ when type == typeof(bool) => full ^ (variant == 1),
             _ when type == typeof(DateOnly) => new DateOnly(2024, 2, 29).AddDays(variant),
@@ -187,25 +305,13 @@ internal static class ModelSamples
                 ? SortDirection.Desc
                 : SortDirection.Asc,
             _ when type == typeof(JoinKind) => JoinKind.Right,
-            _ => Create(type, full, nullable),
+            _ => Create(type, full),
         };
     }
 
-    private static object Wrap(Type union, Type caseType, object value)
+    private static object Wrap(Type union, object value)
     {
-        return union.GetConstructor([caseType])!.Invoke([value]);
-    }
-
-    private static bool IsUnion(Type type, out Type[] cases)
-    {
-        Type? baseType = type.BaseType;
-        bool isUnion =
-            baseType is { IsGenericType: true }
-            && baseType
-                .GetGenericTypeDefinition()
-                .Name.StartsWith("OneOfBase", StringComparison.Ordinal);
-        cases = isUnion ? baseType!.GetGenericArguments() : [];
-        return isUnion;
+        return union.GetConstructor([value.GetType()])!.Invoke([value]);
     }
 }
 
@@ -227,9 +333,9 @@ internal static class ModelAssert
             $"{path}: expected {expected.GetType().Name}, got {actual.GetType().Name}"
         );
         Type type = expected.GetType();
-        if (expected is IOneOf union)
+        if (expected is IUnion union)
         {
-            Equivalent(union.Value, ((IOneOf)actual).Value, $"{path}<{type.Name}>");
+            Equivalent(union.Value, ((IUnion)actual).Value, $"{path}<{type.Name}>");
         }
         else if (
             type.IsPrimitive

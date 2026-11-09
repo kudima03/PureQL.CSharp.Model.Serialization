@@ -93,12 +93,7 @@ public sealed record DefaultValueTests
     {
         string expression = /*lang=json,strict*/
             """{"key":"user_id","type":{"name":"integer"}}""";
-        OrderItemGroup item = new OrderItemGroup(
-            new ExprGroup(
-                new DecimalNullableGroup(new IntegerGroup(new KeyInteger("user_id")))
-            ),
-            direction
-        );
+        OrderItemGroup item = new OrderItemGroup(new KeyInteger("user_id"), direction);
 
         string json = PureQLJson.Serialize(item);
 
@@ -119,24 +114,15 @@ public sealed record DefaultValueTests
     [Fact]
     public void AbsentClausesAreOmitted()
     {
-        MainPlainQuery query = new MainPlainQuery(
-            new From(new FromEntity("orders")),
-            [
-                new Model.SelectItems.SelectItemProjection(
-                    new Model.SelectItems.SelectItemProjectionNonNullable(
-                        new Model.SelectItems.SelectItemProjectionBoolean(
-                            "flag",
-                            new BooleanProjection(new FieldBoolean("orders", "flag"))
-                        )
-                    )
-                ),
-            ]
+        PureQLQuery query = new MainPlainQueryWithoutPagination(
+            new FromEntity("orders"),
+            [new SelectItemProjection("flag", new FieldBoolean("orders", "flag"))]
         );
 
         Assert.Equal(
             /*lang=json,strict*/
             """{"from":{"entity":"orders"},"select":[{"alias":"flag","expression":{"source":"orders","field":"flag","type":{"name":"boolean"}}}]}""",
-            PureQLJson.Serialize(new PureQLQuery(query))
+            PureQLJson.Serialize(query)
         );
     }
 
@@ -155,8 +141,8 @@ public sealed record DefaultValueTests
             $$"""{"operator":"round","type":{"name":"integer"},"operand":{{operand}}}"""
         );
 
-        _ = Assert.IsType<RoundDecimalRow>(withDigits.AsT0.AsT4);
-        _ = Assert.IsType<RoundIntegerRow>(withoutDigits.AsT1.AsT4.AsT2);
+        _ = Assert.IsType<RoundDecimalRow>(withDigits.Value);
+        _ = Assert.IsType<RoundIntegerRow>(withoutDigits.Value);
     }
 
     [Theory]
