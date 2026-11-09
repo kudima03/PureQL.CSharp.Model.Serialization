@@ -7,7 +7,7 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
-## [Unreleased]
+## [0.1.0-preview.6.0.0] - 2026-11-09
 
 Moves serialization to `PureQL.CSharp.Model 0.1.0-preview.14.0.0`, the model rewritten
 with C# 15 unions on .NET 11. The JSON is unchanged: every document accepted before is
