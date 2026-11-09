@@ -6,7 +6,9 @@ namespace PureQL.CSharp.Model.Serialization;
 /// <summary>
 /// Converts one model type with its generated reader and writer. The value is read in
 /// one pass of the <see cref="Utf8JsonReader"/>, which the serializer gives the whole
-/// value: a union reads ahead on a copy of the reader to choose its case.
+/// value: a union reads ahead on a copy of the reader to choose its case. The block need
+/// not be final, as when the serializer reads a stream or a pipe; a value cut short is
+/// a <see cref="JsonException"/>.
 /// </summary>
 internal sealed class PureQLConverter<T>(ReadValue<T> read, Action<Utf8JsonWriter, T> write)
     : JsonConverter<T>
