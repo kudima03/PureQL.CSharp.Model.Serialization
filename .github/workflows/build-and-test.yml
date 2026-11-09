@@ -28,6 +28,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore -warnaserror
+    - name: Check the serializers are generated from the referenced model
+      run: |
+        dotnet run --no-build --project PureQL.CSharp.Model.Serialization.Generator
+        git add --intent-to-add PureQL.CSharp.Model.Serialization/Generated
+        git diff --exit-code -- PureQL.CSharp.Model.Serialization/Generated
     - name: Code style check by dotnet format
       run: dotnet format --verify-no-changes
     # - name: Install csharpier

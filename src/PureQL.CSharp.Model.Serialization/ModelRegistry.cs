@@ -1,29 +1,18 @@
+using System.Collections.Frozen;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using PureQL.CSharp.Model.Serialization.Fields;
-using PureQL.CSharp.Model.Serialization.GroupExpressions;
-using PureQL.CSharp.Model.Serialization.GroupKeys;
-using PureQL.CSharp.Model.Serialization.Keys;
-using PureQL.CSharp.Model.Serialization.Lists;
-using PureQL.CSharp.Model.Serialization.Literals;
-using PureQL.CSharp.Model.Serialization.Parameters;
-using PureQL.CSharp.Model.Serialization.ProjectionExpressions;
-using PureQL.CSharp.Model.Serialization.RowExpressions;
-using PureQL.CSharp.Model.Serialization.SelectItems;
-using PureQL.CSharp.Model.Serialization.TotalExpressions;
-using PureQL.CSharp.Model.Types;
 
 namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
-/// The descriptors of all model types, keyed by CLR type. Built once; every union's
-/// dispatch table is computed and checked for ambiguity when it is built.
+/// The converter of every model type, built once from the generated readers and
+/// writers (<c>ModelSerializers.Register</c>), and the writer of every record by its
+/// runtime type, which writes the value a union holds.
 /// </summary>
-internal sealed partial class ModelRegistry
+internal sealed class ModelRegistry
 {
-    private readonly Dictionary<Type, ModelDescriptor> _descriptors = [];
-
     private readonly List<JsonConverter> _converters = [];
 
     private readonly Dictionary<
@@ -31,47 +20,24 @@ internal sealed partial class ModelRegistry
         Func<JsonSerializerOptions, JsonTypeInfo>
     > _typeInfos = [];
 
+    private readonly Dictionary<Type, Action<Utf8JsonWriter, object>> _writers = [];
+
+    private readonly HashSet<Type> _nullable = [];
+
+    private readonly FrozenDictionary<Type, Action<Utf8JsonWriter, object>> _records;
+
+    private readonly FrozenSet<Type> _nullableRecords;
+
     private ModelRegistry()
     {
-        QueryRegistrations.Register(this);
-        FieldRegistrations.Register(this);
-        ParameterRegistrations.Register(this);
-        LiteralRegistrations.Register(this);
-        KeyRegistrations.Register(this);
-        ListRegistrations.Register(this);
-        RowExpressionRegistrations.Register(this);
-        ProjectionExpressionRegistrations.Register(this);
-        GroupExpressionRegistrations.Register(this);
-        TotalExpressionRegistrations.Register(this);
-        GroupKeyRegistrations.Register(this);
-        SelectItemRegistrations.Register(this);
-        foreach (ModelDescriptor descriptor in _descriptors.Values)
-        {
-            descriptor.Seal();
-        }
+        ModelSerializers.Register(this);
+        _records = _writers.ToFrozenDictionary();
+        _nullableRecords = _nullable.ToFrozenSet();
     }
 
     public static ModelRegistry Instance { get; } = new ModelRegistry();
 
     public IReadOnlyList<JsonConverter> Converters => _converters;
-
-    public T Read<T>(JsonElement element, string path)
-        where T : class
-    {
-        return (T)Find(typeof(T)).Read(element, path);
-    }
-
-    public void Write(Utf8JsonWriter writer, object? value)
-    {
-        if (value is null)
-        {
-            throw new JsonException(
-                "A PureQL model value is null where JSON requires one"
-            );
-        }
-
-        Find(value.GetType()).Write(writer, value);
-    }
 
     /// <summary>
     /// The <see cref="JsonTypeInfo"/> of a model type for one options instance, backed
@@ -87,133 +53,48 @@ internal sealed partial class ModelRegistry
             : null;
     }
 
-    public ModelDescriptor Find(Type type)
+    /// <summary>Writes a record of any model type.</summary>
+    public void Write(Utf8JsonWriter writer, object? value)
     {
-        return _descriptors.TryGetValue(type, out ModelDescriptor? descriptor)
-            ? descriptor
-            : throw new InvalidOperationException($"{type.Name} is not registered");
+        if (value is null)
+        {
+            throw Writes.Missing();
+        }
+
+        _records[value.GetType()](writer, value);
     }
 
-    public void Union<T>(params UnionCase<T>[] cases)
-        where T : class
+    /// <summary>Whether a record declares a nullable type.</summary>
+    public bool IsNullable(object? value)
     {
-        Add<T>(new UnionDescriptor<T>(this, cases));
+        return value is not null && _nullableRecords.Contains(value.GetType());
     }
 
-    public void Probe<T>(string? operand, params UnionCase<T>[] cases)
-        where T : class
-    {
-        Add<T>(new ProbeUnionDescriptor<T>(this, operand, cases));
-    }
-
-    public void ByPresence<T>(
-        UnionCase<T> fallback,
-        params (string Property, UnionCase<T> Case)[] present
+    /// <param name="nullable">Whether the record declares a nullable type.</param>
+    public void Record<T>(
+        ReadValue<T> read,
+        Action<Utf8JsonWriter, T> write,
+        bool nullable = false
     )
         where T : class
     {
-        Add<T>(new PresenceUnionDescriptor<T>(this, present, fallback));
+        Add(read, write);
+        _writers.Add(typeof(T), (writer, value) => write(writer, (T)value));
+        if (nullable)
+        {
+            _ = _nullable.Add(typeof(T));
+        }
     }
 
-    public void Record<T>(Func<ObjectReader, T> read, Action<ObjectWriter, T> write)
-        where T : class
+    public void Union<T>(ReadValue<T> read, Action<Utf8JsonWriter, T> write)
+        where T : struct, IUnion
     {
-        Add<T>(
-            new RecordDescriptor<T>(
-                this,
-                [],
-                null,
-                null,
-                NullableCause.AnyOperand,
-                read,
-                write
-            )
-        );
+        Add(read, write);
     }
 
-    /// <summary>
-    /// An operator node, which declares the type it yields: nullable only when an operand
-    /// is (each of them for <c>coalesce</c>) or a predicate filters its rows.
-    /// </summary>
-    public void Operator<T>(
-        string name,
-        IType type,
-        Func<ObjectReader, T> read,
-        Action<ObjectWriter, T> write
-    )
-        where T : class
+    private void Add<T>(ReadValue<T> read, Action<Utf8JsonWriter, T> write)
     {
-        Operator(
-            name,
-            type,
-            name == "coalesce" ? NullableCause.EveryOperand : NullableCause.AnyOperand,
-            read,
-            write
-        );
-    }
-
-    /// <summary>
-    /// An aggregate over all rows of a total query, which yields one row even when none
-    /// is aggregated, so it is nullable whatever its operands are.
-    /// </summary>
-    public void TotalAggregate<T>(
-        string name,
-        IType type,
-        Func<ObjectReader, T> read,
-        Action<ObjectWriter, T> write
-    )
-        where T : class
-    {
-        Operator(name, type, NullableCause.Always, read, write);
-    }
-
-    private void Operator<T>(
-        string name,
-        IType type,
-        NullableCause nullableCause,
-        Func<ObjectReader, T> read,
-        Action<ObjectWriter, T> write
-    )
-        where T : class
-    {
-        Add<T>(
-            new RecordDescriptor<T>(
-                this,
-                [Discriminators.Operator(name, type.Name, type.Nullable)],
-                name,
-                type,
-                nullableCause,
-                read,
-                write
-            )
-        );
-    }
-
-    private void Leaf<T>(
-        IEnumerable<string> signatures,
-        Func<ObjectReader, T> read,
-        Action<ObjectWriter, T> write
-    )
-        where T : class
-    {
-        Add<T>(
-            new RecordDescriptor<T>(
-                this,
-                signatures,
-                null,
-                null,
-                NullableCause.AnyOperand,
-                read,
-                write
-            )
-        );
-    }
-
-    private void Add<T>(ModelDescriptor descriptor)
-        where T : class
-    {
-        PureQLConverter<T> converter = new PureQLConverter<T>(this);
-        _descriptors.Add(typeof(T), descriptor);
+        PureQLConverter<T> converter = new PureQLConverter<T>(read, write);
         _converters.Add(converter);
         _typeInfos.Add(
             typeof(T),

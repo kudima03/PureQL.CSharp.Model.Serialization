@@ -33,10 +33,7 @@ public sealed record MinItemsTests
         using JsonDocument schema = JsonDocument.Parse(
             SpecificationFiles.Read("PureQL-Specification.json")
         );
-        Dictionary<string, HashSet<int>> declared = new Dictionary<
-            string,
-            HashSet<int>
-        >(StringComparer.Ordinal);
+        Dictionary<string, HashSet<int>> declared = [with(StringComparer.Ordinal)];
         Collect(schema.RootElement, declared);
 
         Assert.Equal(

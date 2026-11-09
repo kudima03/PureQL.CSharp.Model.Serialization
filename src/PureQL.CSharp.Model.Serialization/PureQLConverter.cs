@@ -4,13 +4,16 @@ using System.Text.Json.Serialization;
 namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
-/// Converts one model type. The value is buffered as a <see cref="JsonDocument"/>,
-/// because choosing a variant may need to look ahead into operands.
+/// Converts one model type with its generated reader and writer. The value is read in
+/// one pass of the <see cref="Utf8JsonReader"/>, which the serializer gives the whole
+/// value: a union reads ahead on a copy of the reader to choose its case.
 /// </summary>
-internal sealed class PureQLConverter<T>(ModelRegistry registry) : JsonConverter<T>
-    where T : class
+internal sealed class PureQLConverter<T>(ReadValue<T> read, Action<Utf8JsonWriter, T> write)
+    : JsonConverter<T>
 {
-    private readonly ModelRegistry _registry = registry;
+    private readonly ReadValue<T> _read = read;
+
+    private readonly Action<Utf8JsonWriter, T> _write = write;
 
     public override T Read(
         ref Utf8JsonReader reader,
@@ -18,8 +21,7 @@ internal sealed class PureQLConverter<T>(ModelRegistry registry) : JsonConverter
         JsonSerializerOptions options
     )
     {
-        using JsonDocument document = JsonDocument.ParseValue(ref reader);
-        return _registry.Read<T>(document.RootElement, "$");
+        return _read(ref reader, new ReadContext());
     }
 
     public override void Write(
@@ -28,6 +30,6 @@ internal sealed class PureQLConverter<T>(ModelRegistry registry) : JsonConverter
         JsonSerializerOptions options
     )
     {
-        _registry.Write(writer, value);
+        _write(writer, value);
     }
 }

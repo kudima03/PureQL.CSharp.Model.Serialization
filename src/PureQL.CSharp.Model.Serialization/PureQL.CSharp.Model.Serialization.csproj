@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFramework>net11.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- The trim and AOT analyzers support net8.0 and later only. -->
-    <IsAotCompatible
-      Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))"
-      >true</IsAotCompatible>
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>0.1.0-preview.5.1.0</PackageValidationBaselineVersion>
+    <IsAotCompatible>true</IsAotCompatible>
+    <!-- Re-enable with the first union-based release as the baseline. -->
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>PureQL.CSharp.Model.Serialization</PackageId>
@@ -23,6 +20,6 @@
     <InternalsVisibleTo Include="PureQL.CSharp.Model.Serialization.Tests" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.13.0.0" />
+    <PackageReference Include="PureQL.CSharp.Model" Version="0.1.0-preview.14.0.0" />
   </ItemGroup>
 </Project>

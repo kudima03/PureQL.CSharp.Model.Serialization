@@ -1,6 +1,7 @@
 using System.Text.Json;
 using PureQL.CSharp.Model.Fields;
 using PureQL.CSharp.Model.GroupExpressions;
+using PureQL.CSharp.Model.Literals;
 using PureQL.CSharp.Model.RowExpressions;
 
 namespace PureQL.CSharp.Model.Serialization.Tests;
@@ -69,6 +70,14 @@ public sealed record ErrorTests
     [InlineData( /*lang=json,strict*/
         """{"name":"x"}""",
         "Expected an operator node or a reference"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"source":"o","field":"f","type":{"name":1}}""",
+        "Unexpected type property 'name'"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"source":"o","field":"f","type":{"name":"decimal","nullable":1}}""",
+        "Unexpected type property 'nullable'"
     )]
     [InlineData("""[]""", "Expected an object, found Array")]
     [InlineData( /*lang=json,strict*/
@@ -207,14 +216,14 @@ public sealed record ErrorTests
                 .Replace("{{F}}", Field, StringComparison.Ordinal)
             + $$$""","right":{"type":{"name":"{{{type}}}","nullable":true},"value":null}}""";
 
-        EqualGroup equal = PureQLJson.Deserialize<EqualGroup>(json);
+        BooleanGroup equal = PureQLJson.Deserialize<BooleanGroup>(json);
 
         Assert.IsType(variant, equal.Value);
     }
 
     [Theory]
     [InlineData("""{"operator":"add","type":{"name":"decimal","nullable":true},"values":[{{F}},{{F}}]}""")]
-    [InlineData("""{"operator":"coalesce","type":{"name":"decimal","nullable":true},"values":[{"type":{"name":"decimal","nullable":true},"value":null},{{F}}]}""")]
+    [InlineData("""{"operator":"if","type":{"name":"decimal","nullable":true},"condition":{"type":{"name":"boolean"},"value":true},"then":{{F}},"else":{{F}}}""")]
     public void NullableDeclarationOverNonNullOperandsIsRejectedWithItsPath(string json)
     {
         JsonException exception = Assert.Throws<JsonException>(() =>
@@ -231,9 +240,92 @@ public sealed record ErrorTests
     }
 
     [Fact]
+    public void NonNullOperandOfANullableCoalesceIsRejectedByItsType()
+    {
+        string json =
+            """{"operator":"coalesce","type":{"name":"decimal","nullable":true},"values":["""
+            + """{"type":{"name":"decimal","nullable":true},"value":null},"""
+            + Field
+            + "]}";
+
+        JsonException exception = Assert.Throws<JsonException>(() =>
+            PureQLJson.Deserialize<DecimalNullableRow>(json)
+        );
+
+        Assert.Equal(
+            "IntegerNullableOrDecimalNullableRow does not accept 'field decimal' "
+                + "(at $.values[1])",
+            exception.Message
+        );
+    }
+
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"subtract","type":{"name":"decimal"},"values":[]}""",
+        "AddDecimalRow does not accept 'subtract' (at $.operator)"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":1,"type":{"name":"decimal"},"values":[]}""",
+        "Expected a string (at $.operator)"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"add","type":{"name":"hyper","nullable":true},"values":[]}""",
+        "AddDecimalRow does not accept 'add hyper?' (at $.type)"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"add","values":[{"source":"o","field":"f","type":{"name":"decimal"}}]}""",
+        "Expected at least 2 items, found 1 (at $.values)"
+    )]
+    [InlineData(
+        """{"operator":"add","values":[{{F}},{{F}}]}""",
+        "Missing property 'type' (at $)"
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"add","type":{"name":"decimal"}}""",
+        "Missing property 'values' (at $)"
+    )]
+    public void RecordReadDirectlyChecksItsOperatorAndType(string json, string message)
+    {
+        JsonException exception = Assert.Throws<JsonException>(() =>
+            PureQLJson.Deserialize<AddDecimalRow>(
+                json.Replace("{{F}}", Field, StringComparison.Ordinal)
+            )
+        );
+
+        Assert.Equal(message, exception.Message);
+    }
+
+    [Fact]
+    public void LongOperatorIsUnknown()
+    {
+        string name = new string('a', 200);
+
+        JsonException exception = Assert.Throws<JsonException>(() =>
+            PureQLJson.Deserialize<DecimalRow>(
+                $$"""{"operator":"{{name}}","type":{"name":"decimal"},"values":[]}"""
+            )
+        );
+
+        Assert.Equal($"DecimalRow does not accept '{name} decimal' (at $)", exception.Message);
+    }
+
+    [Fact]
+    public void EveryOperandOfALiteralNullIsNullable()
+    {
+        DecimalNullableRow nullable = new LiteralDecimalNullable();
+        DecimalNullableRow nonNull = new FieldDecimal("o", "f");
+
+        Assert.True(Nullability.All([nullable, nullable]));
+        Assert.False(Nullability.All([nullable, nonNull]));
+        Assert.True(Nullability.Any([nonNull, nullable]));
+        Assert.False(Nullability.Any([nonNull, nonNull]));
+        Assert.False(Nullability.Of(default(DecimalNullableRow)));
+    }
+
+    [Fact]
     public void NullValueIsRejectedOnWrite()
     {
-        AddDecimalRow add = new AddDecimalRow([null!]);
+        AddDecimalRow add = new AddDecimalRow([default, new FieldDecimal("o", "f")]);
 
         _ = Assert.Throws<JsonException>(() => PureQLJson.Serialize(add));
     }
@@ -244,7 +336,7 @@ public sealed record ErrorTests
         JoinEntity join = new JoinEntity(
             (JoinKind)42,
             "users",
-            new BooleanRow(new FieldBoolean("users", "active"))
+            new FieldBoolean("users", "active")
         );
 
         _ = Assert.Throws<JsonException>(() => PureQLJson.Serialize(join));

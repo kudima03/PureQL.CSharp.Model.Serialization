@@ -66,10 +66,9 @@ public sealed record PureQLTypeInfoResolverTests
     public void WritesTheSameJsonAsTheConverters(string name)
     {
         string input = SpecificationFiles.Read(name);
-        JsonTypeInfo<PureQLQuery> info = (JsonTypeInfo<PureQLQuery>)
-            Options.GetTypeInfo(typeof(PureQLQuery));
+        JsonTypeInfo<PureQLQuery> info = Options.GetTypeInfo<PureQLQuery>();
 
-        PureQLQuery query = JsonSerializer.Deserialize(input, info)!;
+        PureQLQuery query = JsonSerializer.Deserialize(input, info);
         string output = JsonSerializer.Serialize(query, info);
 
         Assert.Equal(JsonSemantics.Canonical(input), JsonSemantics.Canonical(output));
@@ -90,8 +89,7 @@ public sealed record PureQLTypeInfoResolverTests
                 EnvelopeContext.Default
             ),
         };
-        JsonTypeInfo<Envelope> info = (JsonTypeInfo<Envelope>)
-            options.GetTypeInfo(typeof(Envelope));
+        JsonTypeInfo<Envelope> info = options.GetTypeInfo<Envelope>();
         string json = SpecificationFiles.Read(SpecificationFiles.Valid()[0]);
         Envelope envelope = new Envelope(
             "first",
@@ -115,8 +113,7 @@ public sealed record PureQLTypeInfoResolverTests
     [Fact]
     public void RejectsInvalidJsonThroughTypeInfo()
     {
-        JsonTypeInfo<PureQLQuery> info = (JsonTypeInfo<PureQLQuery>)
-            Options.GetTypeInfo(typeof(PureQLQuery));
+        JsonTypeInfo<PureQLQuery> info = Options.GetTypeInfo<PureQLQuery>();
 
         JsonException error = Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize("""{"from":{"entity":"a"}}""", info)
@@ -139,5 +136,9 @@ public sealed record PureQLTypeInfoResolverTests
 /// <summary>A document of the application that carries a query.</summary>
 internal sealed record Envelope(string Name, PureQLQuery Query);
 
+// The source generator reports that it cannot tell the cases of the model's unions
+// apart (SYSLIB1227): it does not need to, PureQLTypeInfoResolver resolves them first.
+#pragma warning disable SYSLIB1227
 [JsonSerializable(typeof(Envelope))]
 internal sealed partial class EnvelopeContext : JsonSerializerContext;
+#pragma warning restore SYSLIB1227
