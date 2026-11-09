@@ -7,6 +7,16 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
+## [0.1.0-preview.6.0.1] - 2026-11-09
+
+### Fixed
+
+- Queries are now read from a stream or a pipe, as `JsonSerializer.DeserializeAsync`
+  and ASP.NET Core model binding read them. The converters looked ahead with
+  `Utf8JsonReader.Skip`, which throws on a reader whose block is not final, so such
+  reads failed with "could not be converted to PureQLQuery" even for valid queries. A
+  value cut short is now a `JsonException`. No public API change.
+
 ## [0.1.0-preview.6.0.0] - 2026-11-09
 
 Moves serialization to `PureQL.CSharp.Model 0.1.0-preview.14.0.0`, the model rewritten
