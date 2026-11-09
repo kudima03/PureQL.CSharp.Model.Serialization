@@ -3,6 +3,7 @@ updates:
 - package-ecosystem: nuget
   directories:
     - "src/PureQL.CSharp.Model.Serialization"
+    - "src/PureQL.CSharp.Model.Serialization.Generator"
     - "src/Tests/PureQL.CSharp.Model.Serialization.Tests"
   schedule:
     interval: daily
