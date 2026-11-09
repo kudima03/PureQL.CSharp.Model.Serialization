@@ -7,6 +7,45 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
+## [Unreleased]
+
+Moves serialization to `PureQL.CSharp.Model 0.1.0-preview.14.0.0`, the model rewritten
+with C# 15 unions on .NET 11. The JSON is unchanged: every document accepted before is
+accepted now, except those the new model's types reject (see Changed).
+
+### Changed
+
+- **Targets .NET 11 only**, as the model does; the SDK is pinned by `global.json`.
+- **One pass over the JSON** — values are read straight from the `Utf8JsonReader`
+  instead of a buffered `JsonDocument`. A union looks ahead on a copy of the reader for
+  what chooses its case and stops as soon as it is known; the node is then read once.
+  Over the specification's valid fixtures, reading is about twice as fast and allocates
+  about twenty times less, and writing is about twice as fast.
+- **Generated readers and writers** — `PureQL.CSharp.Model.Serialization.Generator`
+  generates them from the model by reflection (CI fails if they are out of date),
+  replacing the registrations of a one-off script and the descriptor engine.
+- **Flat dispatch** — a union reads its case through one `switch` over the node's
+  signature: the operator or leaf kind, the declared type and, for `equal`, `notEqual`,
+  `in` and the comparisons, the family of the operand's type. The probe unions, the
+  operator families and the exact unions are gone with the model's.
+- **Query variants** follow the schema's dependencies: a query with `pagination` is the
+  variant that requires `orderBy`, and a subquery with `orderBy` but no `pagination` the
+  one that requires `distinctBy`. Such documents without the required clause, which the
+  specification never accepted, are now rejected. So are `min` / `max` / `sum` selectors
+  of another type than the one the operator declares, which the model now types
+  exactly.
+- Properties are written in the order of the specification (the model's).
+- A missing required value of the model (a `null` string or list, a default union) is
+  a `JsonException` on write.
+- In a source-generated context that holds a model type, the .NET 11 source generator
+  reports SYSLIB1227 for each of the model's unions, whose cases it cannot tell apart;
+  `PureQLTypeInfoResolver`, placed first, resolves them, so the warning can be
+  suppressed on the context (see the README).
+
+### Removed
+
+- Package validation, until the first union-based release becomes the baseline.
+
 ## [0.1.0-preview.5.1.0] - 2026-10-26
 
 ### Added

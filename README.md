@@ -13,35 +13,34 @@
 
 ## How JSON maps to the model
 
-Variants are chosen the way the schema chooses them:
+The model's unions are flat C# unions of records, and each record has one JSON shape, so variants are chosen the way the schema chooses them:
 
 | JSON | Chosen by |
 |---|---|
-| Root query, subquery (`PureQLQuery`, `Query`) | presence of `groupBy`, then of `aggregate` (a total query) |
+| Root query (`PureQLQuery`) | presence of `groupBy` (grouped), else of `aggregate` (total), else plain; then of `pagination` (`…WithPagination`, which requires `orderBy`) |
+| Subquery (`Query`) | as a root query, then of `orderBy` without `pagination` (`…WithoutPaginationWithOrderBy`, which requires `distinctBy`) |
 | `from`, `join` | presence of `subquery` (otherwise `entity`) |
-| Operator nodes | `operator` and the declared `type`, which name exactly one record per value union (`add` declared `decimal?` in `DecimalNullableRow` is `AddDecimalNullableRow`; `round` declared `decimal` is the one with `digits`) |
+| Operator nodes | `operator` and the declared `type`, which name exactly one record per union (`add` declared `decimal?` in `DecimalNullableRow` is `AddDecimalNullableRow`; `round` declared `decimal` is the one with `digits`) |
+| `equal`, `notEqual`, `in`, comparisons | also the type family of the left operand (`operand` for `in`): the `type.name` it declares, `integer` being of the decimal family |
 | Leaves | shape — `source` + `field` (field), `param` (parameter), `key` (group key), `subquery` (list column), `value` (literal) — then `type.name` and `nullable` |
-| Select items, group keys | `{ alias, expression }` has no `type` of its own: the type its `expression` declares |
-| `equal`, `notEqual`, `in`, comparisons | the type family of the left operand (`operand` for `in`): the `type.name` it declares |
 
-Reading is strict: an unknown or duplicate property, a missing required one, a `nullable: false`, a default that the schema never writes (`over: "group"`, `direction: "asc"`), a value that is not in the one spelling of its type, or a value the model's CLR type cannot hold exactly is a `JsonException` whose message carries the JSON path. Constraints that no model type expresses are not checked: empty arrays and too few operands (`minItems`), the `NAME` pattern of names and aliases, `skip` / `take` minimums, `pagination` without `orderBy`, and the exact declared type of an operator (a wider or narrower declaration of the same record, and the non-null operand that a non-null `coalesce` requires).
+Select items, group keys and order items are single records over `Expr{Ctx}`, whose case is chosen by the `expression` itself. A union reads ahead on a copy of the `Utf8JsonReader` only until its case is known, and the node is then read once, so documents are read in a single pass without buffering a `JsonDocument`.
 
-Writing omits schema defaults — `nullable: false`, `over` when it is the default (`group`; aggregates outside a group never write it), `direction: "asc"` — and absent optional clauses. A nullable literal is written as `"value": null`, a `decimal` as a string without exponent or trailing zeros, a `datetime` always in UTC with `Z` and a `uuid` in lower case.
+Reading is strict: an unknown or duplicate property, a missing required one, a `nullable: false`, a default that the schema never writes (`over: "group"`, `direction: "asc"`), a value that is not in the one spelling of its type, a list shorter than the schema's `minItems`, an operator declared nullable that none of its operands (nor a `predicate`) makes nullable, or a value the model's CLR type cannot hold exactly is a `JsonException` whose message carries the JSON path. A query whose clauses the schema's dependencies reject (`pagination` without `orderBy`, a subquery's `orderBy` without `pagination` or `distinctBy`) has no model variant and is rejected too. Constraints that no model type expresses are not checked: the `NAME` pattern of names and aliases, `skip` / `take` minimums, and the exact declared type of an operator where its operands are typed wider (a `decimal` declaration over `integer` operands where a `decimal` operand is accepted, and the non-null operand that a non-null `coalesce` requires).
+
+Writing omits schema defaults — `nullable: false`, `over` when it is the default (`group`; aggregates outside a group never write it), `direction: "asc"` — and absent optional clauses, and writes properties in the specification's order. A value the model leaves missing (a `null` string or list, a `default` union) is a `JsonException`. A nullable literal is written as `"value": null`, a `decimal` as a string without exponent or trailing zeros, a `datetime` always in UTC with `Z` and a `uuid` in lower case.
 
 Limits of the model's CLR types: `date` and `datetime` start at year 0001 (`DateOnly`, `DateTimeOffset`), and `time` / `datetime` have a precision of one microsecond, as the specification: a value finer than that, or a `decimal` of more than 28 digits, is a `JsonException` on write. A `DateTimeOffset` with an offset is written in UTC, keeping its instant.
 
-The converters use no reflection and the library is trim- and AOT-compatible (analyzers enabled for net8.0 and later). CI publishes a Native AOT application that round-trips every fixture of the specification through `PureQLTypeInfoResolver`, so the usage below is checked in a trimmed binary, not only by the analyzers.
+The readers and writers are generated from the model ahead of time, use no reflection, and the library is trim- and AOT-compatible. CI publishes a Native AOT application that round-trips every fixture of the specification through `PureQLTypeInfoResolver`, so the usage below is checked in a trimmed binary, not only by the analyzers.
 
 ## Dependencies
 
-- [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model) `0.1.0-preview.13.0.0`
+- [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model) `0.1.0-preview.14.0.0`
 
 ## Target Frameworks
 
-- .NET 7
-- .NET 8
-- .NET 9
-- .NET 10
+- .NET 11
 
 ## Installation
 
@@ -87,8 +86,7 @@ JsonSerializerOptions options = new JsonSerializerOptions
     MaxDepth = 256,
     TypeInfoResolver = new PureQLTypeInfoResolver(),
 };
-JsonTypeInfo<PureQLQuery> queryInfo = (JsonTypeInfo<PureQLQuery>)
-    options.GetTypeInfo(typeof(PureQLQuery));
+JsonTypeInfo<PureQLQuery> queryInfo = options.GetTypeInfo<PureQLQuery>();
 
 PureQLQuery query = JsonSerializer.Deserialize(json, queryInfo)!;
 string written = JsonSerializer.Serialize(query, queryInfo);
@@ -97,8 +95,13 @@ string written = JsonSerializer.Serialize(query, queryInfo);
 The resolver answers for model types only and returns `null` for any other, so a query that is part of a larger document combines with the application's source-generated context. Put the resolver first, so that model types are not generated as plain objects:
 
 ```csharp
+// The source generator cannot tell the cases of the model's unions apart and reports
+// SYSLIB1227 for each of them; it does not need to, as PureQLTypeInfoResolver resolves
+// them first.
+#pragma warning disable SYSLIB1227
 [JsonSerializable(typeof(Envelope))]
 internal sealed partial class DocumentContext : JsonSerializerContext;
+#pragma warning restore SYSLIB1227
 
 internal sealed record Envelope(string Name, PureQLQuery Query);
 
@@ -111,3 +114,13 @@ JsonSerializerOptions options = new JsonSerializerOptions
     ),
 };
 ```
+
+## Generating the serializers
+
+The readers and writers in `src/PureQL.CSharp.Model.Serialization/Generated` are generated from the referenced model. After a model bump, from `./src`:
+
+```bash
+dotnet run --project PureQL.CSharp.Model.Serialization.Generator
+```
+
+CI fails if the committed files differ from the generated ones.
