@@ -36,7 +36,7 @@ The readers and writers are generated from the model ahead of time, use no refle
 
 ## Dependencies
 
-- [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model) `0.1.0-preview.14.0.0`
+- [`PureQL.CSharp.Model`](https://github.com/kudima03/PureQL.CSharp.Model) `0.1.0-preview.14.1.0`
 
 ## Target Frameworks
 
