@@ -20,7 +20,7 @@ CI additionally passes `-p:AssemblyVersion` (pinned to the major) and `-p:FileVe
 
 ## Architecture
 
-This is a **JSON serialization library** for PureQL query models. It depends on `PureQL.CSharp.Model` `0.1.0-preview.14.0.0` (generated from PureQL specification `0.1.0-preview.2.0.1`; see its CLAUDE.md for the naming rules): sealed records, one per schema node, and flat C# 15 `union`s of them (structs implementing `IUnion`, one constructor per case, `Value` the record held). It adds `System.Text.Json` support on top.
+This is a **JSON serialization library** for PureQL query models. It depends on `PureQL.CSharp.Model` `0.1.0-preview.14.1.0` (generated from PureQL specification `0.1.0-preview.2.0.1`; see its CLAUDE.md for the naming rules): sealed records, one per schema node, and flat C# 15 `union`s of them (structs implementing `IUnion`, one constructor per case, `Value` the record held). It adds `System.Text.Json` support on top.
 
 **Entry points:** `PureQLConverters` — a `sealed record` that implements `IEnumerable<JsonConverter>` and yields one `PureQLConverter<T>` per model type (records and unions). Consumers register all converters into a `JsonSerializerOptions` instance in a single loop. `PureQLTypeInfoResolver` — an `IJsonTypeInfoResolver` that answers for the same types with a `JsonTypeInfo` built by `JsonMetadataServices.CreateValueInfo` over the type's converter and `null` for any other type, so it chains with a source-generated context through `JsonTypeInfoResolver.Combine` (the .NET 11 source generator reports SYSLIB1227 for the model's unions in such a context; suppress it there). It is the entry point for Native AOT and trimmed applications.
 
