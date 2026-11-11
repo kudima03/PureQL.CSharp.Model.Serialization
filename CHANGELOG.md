@@ -7,6 +7,15 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
+## [0.1.0-preview.6.1.0] - 2026-11-11
+
+Updates the dependency on `PureQL.CSharp.Model` to `0.1.0-preview.14.1.0`. No public API change.
+
+### Changed
+
+- The SDK is no longer pinned by `global.json`; CI installs the .NET 11 SDK by version.
+- Serializers regenerated from `PureQL.CSharp.Model 0.1.0-preview.14.1.0`.
+
 ## [0.1.0-preview.6.0.1] - 2026-11-09
 
 ### Fixed
