@@ -13,7 +13,8 @@ internal sealed class RecordShape(
     int kind,
     int type,
     string[] properties,
-    ulong required
+    ulong required,
+    bool atLeastOne = false
 )
 {
     /// <summary>The index <see cref="Match"/> gives the implied <c>operator</c>.</summary>
@@ -42,6 +43,12 @@ internal sealed class RecordShape(
     public int Type { get; } = type;
 
     public IReadOnlyList<string> Properties { get; } = properties;
+
+    /// <summary>
+    /// Whether one of the properties, all of them optional, is required
+    /// (<c>minProperties: 1</c>).
+    /// </summary>
+    public bool AtLeastOne { get; } = atLeastOne;
 
     /// <summary>The bits (see <see cref="Bit"/>) of the required properties.</summary>
     public ulong Required { get; } =

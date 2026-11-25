@@ -110,6 +110,73 @@ public sealed record SignatureTests
         );
     }
 
+    [Theory]
+    [InlineData("date", Families.Date)]
+    [InlineData("datetime", Families.Datetime)]
+    [InlineData("time", Families.Time)]
+    public void DatePartsCarryTheFamilyOfTheirOperand(string typeName, int family)
+    {
+        string operand = $$$"""{"source":"o","field":"f","type":{"name":"{{{typeName}}}"}}""";
+        int year = Signature.Of(Kinds.Year, TypeIds.Integer, family);
+
+        Assert.Equal(
+            year,
+            Scan($$"""{"operator":"year","type":{"name":"integer"},"operand":{{operand}}}""")
+        );
+        Assert.Equal(
+            year,
+            Scan($$"""{"operand":{{operand}},"type":{"name":"integer"},"operator":"year"}""")
+        );
+    }
+
+    [Theory]
+    [InlineData("integer", Families.Integer)]
+    [InlineData("string", Families.String)]
+    [InlineData("decimal", Families.Decimal)]
+    public void AnIntegerIsAFamilyOfItsOwnForAsDecimal(string typeName, int family)
+    {
+        string operand = $$$"""{"type":{"name":"{{{typeName}}}","nullable":true},"value":null}""";
+
+        Assert.Equal(
+            Signature.Of(Kinds.AsDecimal, TypeIds.DecimalNullable, family),
+            Scan($$"""{"operator":"asDecimal","type":{"name":"decimal","nullable":true},"operand":{{operand}}}""")
+        );
+        Assert.Equal(
+            Signature.Of(Kinds.AsString, TypeIds.String, Families.Decimal),
+            Scan($$$"""{"operator":"asString","type":{"name":"string"},"operand":{"type":{"name":"integer"},"value":1}}""")
+        );
+    }
+
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"round","type":{"name":"integer"},"operand":{},"digits":{}}""",
+        Families.WithDigits
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"digits":{},"operator":"truncate","type":{"name":"integer"}}""",
+        Families.WithDigits
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"round","type":{"name":"integer"},"operand":{},"mode":"halfEven"}""",
+        Families.WithoutDigits
+    )]
+    public void RoundingCarriesWhetherItHasDigits(string json, int family)
+    {
+        int kind = json.Contains("truncate", StringComparison.Ordinal)
+            ? Kinds.Truncate
+            : Kinds.Round;
+
+        Assert.Equal(Signature.Of(kind, TypeIds.Integer, family), Scan(json));
+    }
+
+    [Fact]
+    public void AFamilyThatNoCaseHasIsDescribed()
+    {
+        Assert.Equal("with digits", Families.Describe(Families.WithDigits));
+        Assert.Equal("without digits", Families.Describe(Families.WithoutDigits));
+        Assert.Equal("of date", Families.Describe(Families.Date));
+    }
+
     private static int Scan(string json)
     {
         Utf8JsonReader reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(json));

@@ -23,7 +23,7 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <!-- The PureQL-Specification submodule, tracking its main branch. -->
+    <!-- The PureQL-Specification submodule, pinned to the tag 0.1.0-preview.3.0.0. -->
     <None
       Include="..\PureQL-Specification\PureQL-Specification.json"
       Link="Specification\PureQL-Specification.json"

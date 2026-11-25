@@ -99,11 +99,20 @@ internal sealed partial class ReadContext
         return false;
     }
 
-    /// <summary>Checks that every required property of the record was read.</summary>
+    /// <summary>
+    /// Checks that every required property of the record was read, and one at least of
+    /// a record whose properties are all optional where the schema requires one
+    /// (<c>minProperties: 1</c>).
+    /// </summary>
     public void End(ref ObjectScope scope)
     {
         RecordShape shape = scope.Shape;
         ulong missing = shape.Required & ~scope.Seen;
+        if (shape.AtLeastOne && (scope.Seen == 0))
+        {
+            throw Error($"Expected at least one of {string.Join(", ", shape.Properties)}");
+        }
+
         if (missing == 0)
         {
             return;
@@ -130,10 +139,43 @@ internal sealed partial class ReadContext
     }
 
     /// <summary>
+    /// A non-null <c>coalesce</c> without exactly one non-null operand: none leaves it
+    /// nullable, and one after the first would never be reached.
+    /// </summary>
+    public JsonException NotOneNonNull(RecordShape shape)
+    {
+        return Error($"{shape.Name} is declared non-null, so exactly one operand is non-null");
+    }
+
+    /// <summary>
+    /// A record declared <c>decimal</c> whose number operands are all integers, which
+    /// make it an <c>integer</c>: the declaration is then wider than the exact type the
+    /// schema requires.
+    /// </summary>
+    public JsonException NotDecimal(RecordShape shape)
+    {
+        return Error($"{shape.Name} is declared decimal, but its operands make it an integer");
+    }
+
+    /// <summary>
     /// A list of at least <paramref name="minItems"/> items, the <c>minItems</c> the
     /// schema declares for it.
     /// </summary>
     public T[] Many<T>(ref Utf8JsonReader reader, int minItems, ReadValue<T> read)
+    {
+        return Many(ref reader, minItems, int.MaxValue, read);
+    }
+
+    /// <summary>
+    /// A list of <paramref name="minItems"/> to <paramref name="maxItems"/> items, the
+    /// <c>minItems</c> and <c>maxItems</c> the schema declares for it.
+    /// </summary>
+    public T[] Many<T>(
+        ref Utf8JsonReader reader,
+        int minItems,
+        int maxItems,
+        ReadValue<T> read
+    )
     {
         if (reader.TokenType != JsonTokenType.StartArray)
         {
@@ -164,6 +206,14 @@ internal sealed partial class ReadContext
             );
         }
 
+        if (count > maxItems)
+        {
+            throw Error(
+                $"Expected at most {maxItems} {(maxItems == 1 ? "item" : "items")}, "
+                    + $"found {count}"
+            );
+        }
+
         if (count != items.Length)
         {
             Array.Resize(ref items, count);
@@ -172,24 +222,62 @@ internal sealed partial class ReadContext
         return items;
     }
 
+    /// <summary>
+    /// A name of an entity, a field, an alias, a parameter or a subquery: not empty, no
+    /// leading or trailing space or tab, no line break (the schema's <c>NAME</c>).
+    /// </summary>
     public string String(ref Utf8JsonReader reader)
     {
-        return LiteralValues.String.Read(ref reader, this);
+        string name = LiteralValues.String.Read(ref reader, this);
+        return Checks.Name(name) is string error ? throw Error(error) : name;
     }
 
     /// <summary>A list of names, such as <c>distinctBy</c>: at least one, each once.</summary>
     public string[] Strings(ref Utf8JsonReader reader)
     {
-        string[] items = Many(ref reader, 1, LiteralValues.String.Read);
+        string[] items = Many(ref reader, 1, ReadName);
         return items.Distinct(StringComparer.Ordinal).Count() == items.Length
             ? items
             : throw Error("Items must be unique");
     }
 
-    /// <summary>The values of a list literal, each of them once.</summary>
+    /// <summary>
+    /// A bare number of rows, levels or units, as <c>skip</c>, <c>take</c>,
+    /// <c>maxDepth</c> and the sides of a window are written: from 1, as the absence of
+    /// the property is none of them.
+    /// </summary>
+    public long Count(ref Utf8JsonReader reader)
+    {
+        long count = LiteralValues.ReadInteger(ref reader, this);
+        return Checks.Count(count) is string error ? throw Error(error) : count;
+    }
+
+    /// <summary>The constant <c>"all"</c>, every row on one side of a window.</summary>
+    public All All(ref Utf8JsonReader reader)
+    {
+        return Enum(ref reader, "all"u8, new All());
+    }
+
+    /// <summary>Fails the read with the message of a check that failed.</summary>
+    public void Check(string? error)
+    {
+        if (error is not null)
+        {
+            throw Error(error);
+        }
+    }
+
+    /// <summary>The value, if the check of it found no error.</summary>
+    public T Check<T>(string? error, T value)
+    {
+        Check(error);
+        return value;
+    }
+
+    /// <summary>The values of a list literal: at least one, each of them once.</summary>
     public TValue[] Values<TValue>(ref Utf8JsonReader reader, LiteralValue<TValue> literal)
     {
-        TValue[] values = Many(ref reader, 0, literal.Read);
+        TValue[] values = Many(ref reader, 1, literal.Read);
         return values.Distinct().Count() == values.Length
             ? values
             : throw Error("A list literal repeats no value");
@@ -222,9 +310,47 @@ internal sealed partial class ReadContext
         return Enum(ref reader, "desc"u8, SortDirection.Desc);
     }
 
+    /// <summary>
+    /// Reads <c>mode</c>, which the schema allows only as <c>halfEven</c>: half away from
+    /// zero, the default, is never written.
+    /// </summary>
+    public RoundingMode Mode(ref Utf8JsonReader reader)
+    {
+        return Enum(ref reader, "halfEven"u8, RoundingMode.HalfEven);
+    }
+
+    /// <summary>
+    /// Reads a flag such as <c>distinct</c>, which the schema allows only as
+    /// <c>true</c>: <c>false</c>, the default, is never written.
+    /// </summary>
+    public bool Flag(ref Utf8JsonReader reader)
+    {
+        return reader.TokenType == JsonTokenType.True
+            ? true
+            : throw Error(
+                reader.TokenType == JsonTokenType.False
+                    ? "A flag is written only when true"
+                    : $"Expected true, found {Describe(reader.TokenType)}"
+            );
+    }
+
+    /// <summary>Reads <c>form</c>, the name of a Unicode normalization form.</summary>
+    public NormalizationForm Form(ref Utf8JsonReader reader)
+    {
+        string text = LiteralValues.String.Read(ref reader, this);
+        return text switch
+        {
+            "NFC" => NormalizationForm.NFC,
+            "NFD" => NormalizationForm.NFD,
+            "NFKC" => NormalizationForm.NFKC,
+            "NFKD" => NormalizationForm.NFKD,
+            _ => throw Error($"Unexpected value '{text}'"),
+        };
+    }
+
     public JoinKind Kind(ref Utf8JsonReader reader)
     {
-        string text = String(ref reader);
+        string text = LiteralValues.String.Read(ref reader, this);
         return text switch
         {
             "inner" => JoinKind.Inner,
@@ -323,8 +449,13 @@ internal sealed partial class ReadContext
             return value;
         }
 
-        string text = String(ref reader);
+        string text = LiteralValues.String.Read(ref reader, this);
         throw Error($"Unexpected value '{text}'");
+    }
+
+    private static string ReadName(ref Utf8JsonReader reader, ReadContext context)
+    {
+        return context.String(ref reader);
     }
 
     private void Push(string name)

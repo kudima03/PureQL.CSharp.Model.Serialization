@@ -15,6 +15,13 @@ internal static class Nullability
         return ModelRegistry.Instance.IsNullable(operand.Value);
     }
 
+    /// <summary>Whether an optional operand is present and declares a nullable type.</summary>
+    public static bool Of<TUnion>(TUnion? operand)
+        where TUnion : struct, IUnion
+    {
+        return operand.HasValue && Of(operand.GetValueOrDefault());
+    }
+
     public static bool Any<TUnion>(TUnion[] operands)
         where TUnion : struct, IUnion
     {
@@ -27,6 +34,19 @@ internal static class Nullability
         }
 
         return false;
+    }
+
+    /// <summary>Whether exactly one of the operands declares a non-null type.</summary>
+    public static bool OneNonNull<TUnion>(TUnion[] operands)
+        where TUnion : struct, IUnion
+    {
+        int count = 0;
+        foreach (TUnion operand in operands)
+        {
+            count += Of(operand) ? 0 : 1;
+        }
+
+        return count == 1;
     }
 
     public static bool All<TUnion>(TUnion[] operands)

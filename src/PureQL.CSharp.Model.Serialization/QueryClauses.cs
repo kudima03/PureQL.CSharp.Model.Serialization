@@ -9,4 +9,8 @@ internal enum QueryClauses
     Aggregate = 2,
     Pagination = 4,
     OrderBy = 8,
+    UnionAll = 16,
+    Union = 32,
+    Intersect = 64,
+    Except = 128,
 }

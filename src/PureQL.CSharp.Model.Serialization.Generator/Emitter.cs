@@ -10,27 +10,22 @@ namespace PureQL.CSharp.Model.Serialization.Generator;
 /// </summary>
 internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
 {
-    /// <summary>The unions read by hand, by which properties are present.</summary>
+    /// <summary>
+    /// The unions read by hand: the queries, chosen by their clauses as the schema's
+    /// conditions choose them, and windows, chosen by the type of their sort key too.
+    /// </summary>
     private static readonly string[] HandReadUnions =
     [
         nameof(PureQLQuery),
         nameof(Query),
-        nameof(From),
-        nameof(Join),
-        nameof(PaginationSkip),
-        nameof(PaginationTake),
-    ];
-
-    /// <summary>The unions written by hand: a number or a parameter.</summary>
-    private static readonly string[] HandWrittenUnions =
-    [
-        nameof(PaginationSkip),
-        nameof(PaginationTake),
+        nameof(Window),
     ];
 
     /// <summary>Names that C# reads as a keyword where a local is declared or used.</summary>
     private static readonly string[] Keywords =
     [
+        "base",
+        "default",
         "else",
         "from",
         "group",
@@ -40,6 +35,7 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         "on",
         "operator",
         "select",
+        "union",
         "where",
     ];
 
@@ -72,6 +68,7 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         }
 
         files["ModelSerializers.Registrations.g.cs"] = Registrations();
+        files["Kinds.g.cs"] = KindsFile();
         files["Signatures.g.cs"] = Signatures();
         files["Names.g.cs"] = Names();
         return files;
@@ -138,6 +135,17 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             RecordWriter(code, record);
         }
 
+        foreach (
+            PropertyModel nested in _catalog
+                .Records.SelectMany(r => r.Properties)
+                .Where(p => (p.Kind == ValueKind.ManyOfMany) && (Namespace(p.Type) == ns))
+                .DistinctBy(p => p.Type)
+        )
+        {
+            Separate(code, ref first);
+            NestedLists(code, nested.Type, nested.MinItems);
+        }
+
         foreach (UnionModel union in _catalog.Unions.Where(u => Namespace(u.Type) == ns))
         {
             if (!HandReadUnions.Contains(union.Type.Name))
@@ -146,11 +154,8 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
                 UnionReader(code, union);
             }
 
-            if (!HandWrittenUnions.Contains(union.Type.Name))
-            {
-                Separate(code, ref first);
-                UnionWriter(code, union);
-            }
+            Separate(code, ref first);
+            UnionWriter(code, union);
         }
 
         code.Close();
@@ -185,6 +190,7 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
                 record.DeclaredType is null ? "TypeIds.None" : $"TypeIds.{record.DeclaredType}",
                 properties == "[]" ? "[]" : properties,
                 $"0b{Convert.ToString((long)required, 2)}",
+                .. record.AtLeastOne ? (string[])["atLeastOne: true"] : [],
             ],
             ";"
         );
@@ -230,6 +236,28 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
 
         code.Line();
         code.Line("context.End(ref scope);");
+        if (record.NonNullCause is not null)
+        {
+            code.Wrap("if (!(", record.NonNullCause, "))");
+            code.Line("{");
+            code.Indent();
+            code.Line($"throw context.NotOneNonNull({name}Shape);");
+            code.Outdent();
+            code.Line("}");
+            code.Line();
+        }
+
+        if (record.DecimalCause is not null)
+        {
+            code.Wrap("if (!(", record.DecimalCause, "))");
+            code.Line("{");
+            code.Indent();
+            code.Line($"throw context.NotDecimal({name}Shape);");
+            code.Outdent();
+            code.Line("}");
+            code.Line();
+        }
+
         if (record.NullableCause is not null)
         {
             code.Wrap("if (!(", record.NullableCause, "))");
@@ -245,11 +273,24 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             p => p.Json,
             StringComparer.Ordinal
         );
-        code.Call(
-            $"return new {name}",
-            [.. record.Arguments.Select(a => Argument(byJson[a]))],
-            ";"
-        );
+        if (record.Check is null)
+        {
+            code.Call(
+                $"return new {name}",
+                [.. record.Arguments.Select(a => Argument(byJson[a]))],
+                ";"
+            );
+        }
+        else
+        {
+            code.Call(
+                $"{name} value = new {name}",
+                [.. record.Arguments.Select(a => Argument(byJson[a]))],
+                ";"
+            );
+            code.Call("return context.Check", [RecordCheck(record), "value"], ";");
+        }
+
         code.Outdent();
         code.Line("}");
     }
@@ -268,11 +309,15 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             ValueKind.Union => $"{type} {local} = default;",
             ValueKind.OptionalUnion or ValueKind.Record => $"{type}? {local} = null;",
             ValueKind.Many or ValueKind.OptionalMany or ValueKind.LiteralList => $"{type}[]? {local} = null;",
+            ValueKind.ManyOfMany => $"{type}[][]? {local} = null;",
             ValueKind.Strings or ValueKind.OptionalStrings => $"string[]? {local} = null;",
             ValueKind.String or ValueKind.OptionalString => $"string? {local} = null;",
             ValueKind.Over => $"AggregateOver {local} = AggregateOver.Group;",
             ValueKind.Direction => $"SortDirection {local} = SortDirection.Asc;",
             ValueKind.JoinKind => $"JoinKind {local} = default;",
+            ValueKind.Form => $"NormalizationForm {local} = default;",
+            ValueKind.Mode => $"RoundingMode {local} = RoundingMode.HalfAwayFromZero;",
+            ValueKind.Flag => $"bool {local} = false;",
             ValueKind.Literal when property.Type == typeof(string) => $"string? {local} = null;",
             ValueKind.Literal => $"{type} {local} = default;",
             ValueKind.NullLiteral => null,
@@ -293,18 +338,33 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         string value = property.Kind switch
         {
             ValueKind.Union or ValueKind.OptionalUnion or ValueKind.Record => $"Read{type}(ref reader, context)",
+            ValueKind.Many or ValueKind.OptionalMany when property.MaxItems > 0 => $"context.Many(ref reader, {property.MinItems}, {property.MaxItems}, Read{type})",
             ValueKind.Many or ValueKind.OptionalMany => $"context.Many(ref reader, {property.MinItems}, Read{type})",
+            ValueKind.ManyOfMany => $"context.Many(ref reader, {property.MinItems}, ReadMany{type})",
             ValueKind.Strings or ValueKind.OptionalStrings => "context.Strings(ref reader)",
             ValueKind.String or ValueKind.OptionalString => "context.String(ref reader)",
             ValueKind.Over => "context.Over(ref reader)",
             ValueKind.Direction => "context.Direction(ref reader)",
             ValueKind.JoinKind => "context.Kind(ref reader)",
+            ValueKind.Form => "context.Form(ref reader)",
+            ValueKind.Mode => "context.Mode(ref reader)",
+            ValueKind.Flag => "context.Flag(ref reader)",
             ValueKind.Literal => $"LiteralValues.{property.Literal}.Read(ref reader, context)",
             ValueKind.LiteralList => $"context.Values(ref reader, LiteralValues.{property.Literal})",
             ValueKind.NullLiteral => throw new InvalidOperationException("A null has no value."),
             _ => throw new InvalidOperationException($"{property.Kind} cannot be read."),
         };
         code.Wrap($"{local} = ", value, ";");
+        if (property.Check is not null)
+        {
+            code.Line($"context.Check(Checks.{property.Check}({local}));");
+        }
+    }
+
+    /// <summary>The call of a record's <c>Checks</c> member on its properties.</summary>
+    private static string RecordCheck(RecordModel record)
+    {
+        return $"Checks.{record.Check}({string.Join(", ", record.Properties.Select(p => "value." + p.Name))})";
     }
 
     private static string Argument(PropertyModel property)
@@ -312,11 +372,12 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         string local = Local(property.Json);
         return property.Kind switch
         {
-            ValueKind.Record or ValueKind.Many or ValueKind.Strings or ValueKind.String or ValueKind.LiteralList => local + "!",
+            ValueKind.Record or ValueKind.Many or ValueKind.ManyOfMany or ValueKind.Strings or ValueKind.String or ValueKind.LiteralList => local + "!",
             ValueKind.Literal when property.Type == typeof(string) => local + "!",
             ValueKind.Union or ValueKind.OptionalUnion or ValueKind.OptionalMany
             or ValueKind.OptionalStrings or ValueKind.OptionalString or ValueKind.Over
-            or ValueKind.Direction or ValueKind.JoinKind or ValueKind.Literal
+            or ValueKind.Direction or ValueKind.JoinKind or ValueKind.Form
+            or ValueKind.Mode or ValueKind.Flag or ValueKind.Literal
             or ValueKind.NullLiteral => local,
             _ => local,
         };
@@ -328,6 +389,20 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         Signature(code, $"internal static void Write{name}", "Utf8JsonWriter writer", $"{name} value");
         code.Line("{");
         code.Indent();
+        if (record.Check is not null)
+        {
+            code.Wrap("Writes.Check(", RecordCheck(record) + ")", ";");
+        }
+
+        if (record.AtLeastOne)
+        {
+            code.Wrap(
+                "Writes.AtLeastOne(",
+                string.Join(" || ", record.Properties.Select(p => $"value.{p.Name}.HasValue")) + ")",
+                ";"
+            );
+        }
+
         code.Line("writer.WriteStartObject();");
         bool typeFirst = record.IsOperator || (record.Kind == "Literal");
         if (record.IsOperator)
@@ -367,6 +442,11 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
                 code.Line($"Write{type}(writer, {value});");
                 break;
             case ValueKind.OptionalUnion:
+                if (property.Check is not null)
+                {
+                    code.Line($"Writes.Check(Checks.{property.Check}({value}));");
+                }
+
                 code.Call("Writes.Optional", ["writer", name, value, $"Write{type}"], ";");
                 break;
             case ValueKind.Record:
@@ -378,6 +458,9 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
                 break;
             case ValueKind.OptionalMany:
                 code.Call("Writes.OptionalMany", ["writer", name, value, $"Write{type}"], ";");
+                break;
+            case ValueKind.ManyOfMany:
+                code.Call("Writes.Many", ["writer", name, value, $"WriteMany{type}"], ";");
                 break;
             case ValueKind.Strings:
                 code.Call("Writes.Strings", ["writer", name, value], ";");
@@ -400,6 +483,15 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             case ValueKind.JoinKind:
                 code.Line($"Writes.Kind(writer, {value});");
                 break;
+            case ValueKind.Form:
+                code.Line($"Writes.Form(writer, {name}, {value});");
+                break;
+            case ValueKind.Mode:
+                code.Line($"Writes.Mode(writer, {name}, {value});");
+                break;
+            case ValueKind.Flag:
+                code.Line($"Writes.Flag(writer, {name}, {value});");
+                break;
             case ValueKind.Literal:
                 code.Call("Writes.Value", ["writer", $"LiteralValues.{property.Literal}", value], ";");
                 break;
@@ -417,33 +509,85 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
     private void UnionReader(CodeWriter code, UnionModel union)
     {
         string name = union.Type.Name;
-        Dictionary<(string, string, string?), string> signatures = [];
-        Signature(code, $"internal static {name} Read{name}", "ref Utf8JsonReader reader", "ReadContext context");
+        RecordModel[] cases =
+        [
+            .. union.Records.Select(c =>
+                _records.TryGetValue(c.Name, out RecordModel? found)
+                    ? found
+                    : throw new InvalidOperationException($"{name} holds {c.Name}, which is not a record.")
+            ),
+        ];
+        bool bySignature = cases.All(r => (r.Kind != "Unknown") && (r.DeclaredType is not null));
+        if (!bySignature && cases.Any(r => r.Kind != "Unknown"))
+        {
+            throw new InvalidOperationException($"{name} holds records with and without a signature.");
+        }
+
+        string reader = union.Check is null ? $"Read{name}" : $"Read{name}Case";
+        if (union.Check is not null)
+        {
+            Signature(code, $"internal static {name} Read{name}", "ref Utf8JsonReader reader", "ReadContext context");
+            code.Line("{");
+            code.Indent();
+            code.Wrap($"{name} value = ", $"{reader}(ref reader, context);", "");
+            code.Line($"return context.Check(Checks.{union.Check}(value), value);");
+            code.Outdent();
+            code.Line("}");
+            code.Line();
+        }
+
+        Signature(code, $"{(union.Check is null ? "internal" : "private")} static {name} {reader}", "ref Utf8JsonReader reader", "ReadContext context");
         code.Line("{");
         code.Indent();
+        if (union.Count)
+        {
+            code.Open("if (reader.TokenType == JsonTokenType.Number)");
+            code.Line($"return new {name}(context.Count(ref reader));");
+            code.Close();
+            code.Line();
+        }
+
+        if (union.All)
+        {
+            code.Open("if (reader.TokenType == JsonTokenType.String)");
+            code.Line($"return new {name}(context.All(ref reader));");
+            code.Close();
+            code.Line();
+        }
+
+        if (bySignature)
+        {
+            SignatureCases(code, name, cases);
+        }
+        else
+        {
+            PropertyCases(code, name, cases);
+        }
+
+        code.Outdent();
+        code.Line("}");
+    }
+
+    /// <summary>The cases of a union of operators and leaves, by their signature.</summary>
+    private static void SignatureCases(CodeWriter code, string name, RecordModel[] cases)
+    {
+        Dictionary<(string, string, string?), string> signatures = [];
         code.Wrap("int signature = ", $"context.Signature(ref reader, nameof({name}));", "");
         code.Line("return signature switch");
         code.Line("{");
         code.Indent();
-        foreach (Type caseType in union.Cases)
+        foreach (RecordModel record in cases)
         {
-            RecordModel record = _records.TryGetValue(caseType.Name, out RecordModel? found)
-                ? found
-                : throw new InvalidOperationException($"{name} holds {caseType.Name}, which is not a record.");
-            if ((record.Kind == "Unknown") || (record.DeclaredType is null))
-            {
-                throw new InvalidOperationException($"{name} holds {caseType.Name}, which has no signature.");
-            }
-
-            if (!signatures.TryAdd((record.Kind, record.DeclaredType, record.Family), caseType.Name))
+            (string, string, string?) signature = (record.Kind, record.DeclaredType!, record.Family);
+            if (!signatures.TryAdd(signature, record.Type.Name))
             {
                 throw new InvalidOperationException(
-                    $"{name}: {caseType.Name} has the signature of {signatures[(record.Kind, record.DeclaredType, record.Family)]}."
+                    $"{name}: {record.Type.Name} has the signature of {signatures[signature]}."
                 );
             }
 
             string arm = $"Signatures.{record.Signature} => ";
-            string read = $"new {name}(Read{caseType.Name}(ref reader, context)),";
+            string read = $"new {name}(Read{record.Type.Name}(ref reader, context)),";
             if (((3 * 4) + arm.Length + read.Length) <= CodeWriter.MaxLineLength)
             {
                 code.Line(arm + read);
@@ -452,7 +596,7 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             {
                 code.Line($"{arm}new {name}(");
                 code.Indent();
-                code.Line($"Read{caseType.Name}(ref reader, context)");
+                code.Line($"Read{record.Type.Name}(ref reader, context)");
                 code.Outdent();
                 code.Line("),");
             }
@@ -461,8 +605,64 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         code.Line($"_ => throw context.NotAccepted(nameof({name}), signature),");
         code.Outdent();
         code.Line("};");
+    }
+
+    /// <summary>
+    /// The cases of a union of records that are not expressions, by a property only
+    /// that case has (<c>subquery</c> of a <c>from</c>, <c>groupBy</c> of a grouped
+    /// <c>next</c>), as the schema's <c>oneOf</c> or condition tells them apart. The
+    /// case without such a property, else the first, is read when none is present.
+    /// </summary>
+    private static void PropertyCases(CodeWriter code, string name, RecordModel[] cases)
+    {
+        string?[] keys = [.. cases.Select(c => Key(c, cases))];
+        if (keys.Count(k => k is null) > 1)
+        {
+            throw new InvalidOperationException($"{name} has two cases without a property of their own.");
+        }
+
+        int fallback = Array.IndexOf(keys, null);
+        fallback = fallback < 0 ? 0 : fallback;
+        List<string> lines = [];
+        for (int i = 0; i < cases.Length; i++)
+        {
+            if (i != fallback)
+            {
+                lines.Add($"context.Has(ref reader, \"{keys[i]}\"u8) ? new {name}(Read{cases[i].Type.Name}(ref reader, context))");
+            }
+        }
+
+        string last = $"new {name}(Read{cases[fallback].Type.Name}(ref reader, context));";
+        if (lines.Count == 0)
+        {
+            code.Line($"return {last}");
+            return;
+        }
+
+        code.Line("return " + lines[0]);
+        code.Indent();
+        foreach (string line in lines.Skip(1))
+        {
+            code.Line(": " + line);
+        }
+
+        code.Line(": " + last);
         code.Outdent();
-        code.Line("}");
+    }
+
+    /// <summary>
+    /// The JSON property only this case of a union has, a required one first, or
+    /// <see langword="null"/>.
+    /// </summary>
+    private static string? Key(RecordModel record, RecordModel[] cases)
+    {
+        PropertyModel[] own =
+        [
+            .. record.Properties.Where(p =>
+                cases.All(c => (c == record) || c.Properties.All(o => o.Json != p.Json))
+            ),
+        ];
+        return own.FirstOrDefault(p => p.IsRequired)?.Json ?? own.FirstOrDefault()?.Json;
     }
 
     private static void UnionWriter(CodeWriter code, UnionModel union)
@@ -471,7 +671,31 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         Signature(code, $"internal static void Write{name}", "Utf8JsonWriter writer", $"{name} value");
         code.Line("{");
         code.Indent();
-        code.Line("Writes.Record(writer, value.Value);");
+        if (union.Check is not null)
+        {
+            code.Line($"Writes.Check(Checks.{union.Check}(value));");
+        }
+
+        code.Line(union.Count ? "Writes.Case(writer, value.Value);" : "Writes.Record(writer, value.Value);");
+        code.Outdent();
+        code.Line("}");
+    }
+
+    /// <summary>The readers and writers of the lists of lists of a record type.</summary>
+    private static void NestedLists(CodeWriter code, Type item, int minItems)
+    {
+        string name = item.Name;
+        Signature(code, $"private static {name}[] ReadMany{name}", "ref Utf8JsonReader reader", "ReadContext context");
+        code.Line("{");
+        code.Indent();
+        code.Line($"return context.Many(ref reader, {minItems}, Read{name});");
+        code.Outdent();
+        code.Line("}");
+        code.Line();
+        Signature(code, $"private static void WriteMany{name}", "Utf8JsonWriter writer", $"IEnumerable<{name}> value");
+        code.Line("{");
+        code.Indent();
+        code.Line($"Writes.Array(writer, value, Write{name});");
         code.Outdent();
         code.Line("}");
     }
@@ -482,16 +706,18 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         code.Open("internal static partial class ModelSerializers");
         code.Line("/// <summary>Registers the converter of every model type.</summary>");
         code.Open("public static void Register(ModelRegistry registry)");
+        code.Line($"registry.Record<{nameof(All)}>(ReadAll, WriteAll);");
         foreach (RecordModel record in _catalog.Records)
         {
             string name = record.Type.Name;
-            code.Call(
-                $"registry.Record<{name}>",
-                record.Nullable
-                    ? [$"Read{name}", $"Write{name}", "nullable: true"]
-                    : [$"Read{name}", $"Write{name}"],
-                ";"
-            );
+            string[] arguments =
+            [
+                $"Read{name}",
+                $"Write{name}",
+                .. record.Nullable ? (string[])["nullable: true"] : [],
+                .. record.DeclaredType is "Decimal" or "DecimalNullable" ? (string[])["isDecimal: true"] : [],
+            ];
+            code.Call($"registry.Record<{name}>", arguments, ";");
         }
 
         foreach (UnionModel union in _catalog.Unions)
@@ -510,15 +736,21 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
         CodeWriter code = Header();
         code.Line("/// <summary>");
         code.Line("/// The signature of every case of a union: the kind of node, its declared type");
-        code.Line("/// and, for a comparison, the family of its operand (see <see cref=\"Signature\"/>).");
+        code.Line("/// and what else chooses an operator, the family of an operand or whether");
+        code.Line("/// <c>digits</c> is present (see <see cref=\"Signature\"/>).");
         code.Line("/// </summary>");
         code.Open("internal static class Signatures");
         Dictionary<string, (string, string, string?)> constants = [with(StringComparer.Ordinal)];
         foreach (UnionModel union in _catalog.Unions.Where(u => !HandReadUnions.Contains(u.Type.Name)))
         {
-            foreach (Type caseType in union.Cases)
+            foreach (Type caseType in union.Records)
             {
                 RecordModel record = _records[caseType.Name];
+                if (record.Kind == "Unknown")
+                {
+                    continue;
+                }
+
                 (string, string, string?) signature = (record.Kind, record.DeclaredType!, record.Family);
                 if (constants.TryGetValue(record.Signature, out (string, string, string?) known))
                 {
@@ -534,11 +766,6 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             }
         }
 
-        if (constants.Values.Distinct().Count() != constants.Count)
-        {
-            throw new InvalidOperationException("Two signature constants are equal.");
-        }
-
         bool first = true;
         foreach (KeyValuePair<string, (string Kind, string Type, string? Family)> constant in constants.OrderBy(c => c.Key, StringComparer.Ordinal))
         {
@@ -548,6 +775,72 @@ internal sealed class Emitter(ModelCatalog catalog, string modelVersion)
             code.Wrap($"public const int {constant.Key} = ", value, ";");
         }
 
+        code.Close();
+        return code.ToString();
+    }
+
+    /// <summary>
+    /// The operator kinds: a constant for each, the <c>operator</c> values and what
+    /// else chooses each of them.
+    /// </summary>
+    private string KindsFile()
+    {
+        CodeWriter code = Header();
+        code.Open("internal static partial class Kinds");
+        string[] operators = ModelCatalog.Operators;
+        if (operators.Any(op => !_catalog.Choices.ContainsKey(ModelCatalog.Pascal(op))))
+        {
+            throw new InvalidOperationException("An operator of the specification has no record.");
+        }
+
+        for (int i = 0; i < operators.Length; i++)
+        {
+            code.Line($"public const int {ModelCatalog.Pascal(operators[i])} = {i + 1};");
+            code.Line();
+        }
+
+        code.Line("/// <summary>The last operator kind.</summary>");
+        code.Line($"public const int LastOperator = {operators.Length};");
+        code.Line();
+        code.Line("/// <summary>The <c>operator</c> values, indexed by kind.</summary>");
+        code.Line("private static readonly string[] Operators =");
+        code.Line("[");
+        code.Indent();
+        code.Line("\"\",");
+        foreach (string op in operators)
+        {
+            code.Line($"\"{op}\",");
+        }
+
+        code.Outdent();
+        code.Line("];");
+        code.Line();
+        code.Line("/// <summary>What else chooses each operator, indexed by kind.</summary>");
+        code.Line("private static readonly Choice[] Choices =");
+        code.Line("[");
+        code.Indent();
+        code.Line("Choice.None,");
+        foreach (string op in operators)
+        {
+            code.Line($"Choice.{_catalog.Choices[ModelCatalog.Pascal(op)]},");
+        }
+
+        code.Outdent();
+        code.Line("];");
+        code.Line();
+        code.Line("/// <summary>");
+        code.Line("/// The operators that have a case for an <c>integer</c> operand of its own.");
+        code.Line("/// </summary>");
+        code.Line("private static readonly int[] IntegerFamilies =");
+        code.Line("[");
+        code.Indent();
+        foreach (string kind in _catalog.IntegerFamilies)
+        {
+            code.Line($"{kind},");
+        }
+
+        code.Outdent();
+        code.Line("];");
         code.Close();
         return code.ToString();
     }

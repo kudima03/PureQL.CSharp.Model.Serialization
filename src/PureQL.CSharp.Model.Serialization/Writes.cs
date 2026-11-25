@@ -5,8 +5,9 @@ namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
 /// Writes the properties records are made of. Values equal to the schema default
-/// (<c>nullable: false</c>, the default <c>over</c> and <c>direction</c>) and absent
-/// optional properties are omitted; a missing required value is a
+/// (<c>nullable: false</c>, the default <c>over</c>, <c>direction</c> and
+/// <c>mode</c>, a <c>false</c> flag) and absent optional properties are omitted; a
+/// missing required value, or one the schema does not accept, is a
 /// <see cref="JsonException"/>.
 /// </summary>
 internal static class Writes
@@ -37,6 +38,16 @@ internal static class Writes
 
     private static readonly JsonEncodedText KindName = JsonEncodedText.Encode("kind");
 
+    private static readonly JsonEncodedText HalfEven = JsonEncodedText.Encode("halfEven");
+
+    private static readonly JsonEncodedText[] Forms =
+    [
+        JsonEncodedText.Encode("NFC"),
+        JsonEncodedText.Encode("NFD"),
+        JsonEncodedText.Encode("NFKC"),
+        JsonEncodedText.Encode("NFKD"),
+    ];
+
     private static readonly JsonEncodedText[] JoinKinds =
     [
         JsonEncodedText.Encode("inner"),
@@ -51,10 +62,47 @@ internal static class Writes
         ModelRegistry.Instance.Write(writer, value);
     }
 
+    /// <summary>
+    /// The case a union holds: a record, or a bare number of rows, levels or units.
+    /// </summary>
+    public static void Case(Utf8JsonWriter writer, object? value)
+    {
+        if (value is long count)
+        {
+            Check(Checks.Count(count));
+            writer.WriteNumberValue(count);
+        }
+        else
+        {
+            Record(writer, value);
+        }
+    }
+
     public static T NotNull<T>(T? value)
         where T : class
     {
         return value ?? throw Missing();
+    }
+
+    /// <summary>Fails the write with the message of a check that failed.</summary>
+    public static void Check(string? error)
+    {
+        if (error is not null)
+        {
+            throw new JsonException(error);
+        }
+    }
+
+    /// <summary>
+    /// Fails the write of a record whose properties are all optional when none is set,
+    /// as the schema requires one.
+    /// </summary>
+    public static void AtLeastOne(bool any)
+    {
+        if (!any)
+        {
+            throw new JsonException("A PureQL model value has none of the properties JSON requires one of");
+        }
     }
 
     public static JsonException Missing()
@@ -101,7 +149,18 @@ internal static class Writes
         Action<Utf8JsonWriter, T> write
     )
     {
-        writer.WriteStartArray(name);
+        writer.WritePropertyName(name);
+        Array(writer, values, write);
+    }
+
+    /// <summary>A list, the value of a property or an item of another list.</summary>
+    public static void Array<T>(
+        Utf8JsonWriter writer,
+        IEnumerable<T>? values,
+        Action<Utf8JsonWriter, T> write
+    )
+    {
+        writer.WriteStartArray();
         foreach (T value in values ?? throw Missing())
         {
             write(writer, value);
@@ -123,9 +182,11 @@ internal static class Writes
         }
     }
 
+    /// <summary>A name, which the schema's <c>NAME</c> pattern restricts.</summary>
     public static void String(Utf8JsonWriter writer, JsonEncodedText name, string? value)
     {
-        writer.WriteString(name, value ?? throw Missing());
+        Check(Checks.Name(value ?? throw Missing()));
+        writer.WriteString(name, value);
     }
 
     public static void OptionalString(
@@ -136,7 +197,7 @@ internal static class Writes
     {
         if (value is not null)
         {
-            writer.WriteString(name, value);
+            String(writer, name, value);
         }
     }
 
@@ -149,7 +210,8 @@ internal static class Writes
         writer.WriteStartArray(name);
         foreach (string? value in values ?? throw Missing())
         {
-            writer.WriteStringValue(value ?? throw Missing());
+            Check(Checks.Name(value ?? throw Missing()));
+            writer.WriteStringValue(value);
         }
 
         writer.WriteEndArray();
@@ -207,6 +269,37 @@ internal static class Writes
         if (direction == SortDirection.Desc)
         {
             writer.WriteString(DirectionName, Desc);
+        }
+    }
+
+    public static void Mode(Utf8JsonWriter writer, JsonEncodedText name, RoundingMode mode)
+    {
+        if (mode == RoundingMode.HalfEven)
+        {
+            writer.WriteString(name, HalfEven);
+        }
+        else if (mode != RoundingMode.HalfAwayFromZero)
+        {
+            throw new JsonException($"Unknown rounding mode {mode}");
+        }
+    }
+
+    public static void Form(Utf8JsonWriter writer, JsonEncodedText name, NormalizationForm form)
+    {
+        writer.WriteString(
+            name,
+            form is >= NormalizationForm.NFC and <= NormalizationForm.NFKD
+                ? Forms[(int)form]
+                : throw new JsonException($"Unknown normalization form {form}")
+        );
+    }
+
+    /// <summary>A flag such as <c>distinct</c>, written only when it is set.</summary>
+    public static void Flag(Utf8JsonWriter writer, JsonEncodedText name, bool flag)
+    {
+        if (flag)
+        {
+            writer.WriteBoolean(name, true);
         }
     }
 

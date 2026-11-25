@@ -1,19 +1,21 @@
 using System.Text.Json;
-using PureQL.CSharp.Model.Serialization.Literals;
 
 namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
 /// The readers and writers of every model type. They are generated (see
-/// <c>Generated/</c>) except here: the unions chosen by which properties are present
-/// rather than by a signature, as the schema's dependencies choose them, and the
-/// pagination bounds, which are a number or a parameter.
+/// <c>Generated/</c>) except here: the queries, chosen by which clauses are present as
+/// the schema's conditions and dependencies choose them, windows, chosen by the type of
+/// their sort key too, and the constant <c>"all"</c>.
 /// </summary>
 internal static partial class ModelSerializers
 {
+    private static readonly JsonEncodedText AllText = JsonEncodedText.Encode("all");
+
     /// <summary>
-    /// A main query: grouped with <c>groupBy</c>, else total with <c>aggregate</c>, else
-    /// plain; a paginated one requires <c>orderBy</c>.
+    /// A main query: combined with a set operation, else grouped with <c>groupBy</c>,
+    /// else total with <c>aggregate</c>, else plain; a paginated one requires
+    /// <c>orderBy</c>.
     /// </summary>
     internal static PureQLQuery ReadPureQLQuery(
         ref Utf8JsonReader reader,
@@ -22,7 +24,15 @@ internal static partial class ModelSerializers
     {
         QueryClauses clauses = context.Clauses(ref reader);
         bool paginated = clauses.HasFlag(QueryClauses.Pagination);
-        return clauses.HasFlag(QueryClauses.GroupBy)
+        return clauses.HasFlag(QueryClauses.UnionAll)
+                ? new PureQLQuery(ReadMainCombinedQueryUnionAll(ref reader, context))
+            : clauses.HasFlag(QueryClauses.Union)
+                ? new PureQLQuery(ReadMainCombinedQueryUnion(ref reader, context))
+            : clauses.HasFlag(QueryClauses.Intersect)
+                ? new PureQLQuery(ReadMainCombinedQueryIntersect(ref reader, context))
+            : clauses.HasFlag(QueryClauses.Except)
+                ? new PureQLQuery(ReadMainCombinedQueryExcept(ref reader, context))
+            : clauses.HasFlag(QueryClauses.GroupBy)
                 ? paginated
                     ? new PureQLQuery(ReadMainGroupedQueryWithPagination(ref reader, context))
                     : new PureQLQuery(
@@ -44,7 +54,15 @@ internal static partial class ModelSerializers
         QueryClauses clauses = context.Clauses(ref reader);
         bool paginated = clauses.HasFlag(QueryClauses.Pagination);
         bool ordered = clauses.HasFlag(QueryClauses.OrderBy);
-        return clauses.HasFlag(QueryClauses.GroupBy)
+        return clauses.HasFlag(QueryClauses.UnionAll)
+                ? new Query(ReadCombinedQueryUnionAll(ref reader, context))
+            : clauses.HasFlag(QueryClauses.Union)
+                ? new Query(ReadCombinedQueryUnion(ref reader, context))
+            : clauses.HasFlag(QueryClauses.Intersect)
+                ? new Query(ReadCombinedQueryIntersect(ref reader, context))
+            : clauses.HasFlag(QueryClauses.Except)
+                ? new Query(ReadCombinedQueryExcept(ref reader, context))
+            : clauses.HasFlag(QueryClauses.GroupBy)
                 ? paginated ? new Query(ReadGroupedQueryWithPagination(ref reader, context))
                 : ordered
                     ? new Query(
@@ -61,59 +79,56 @@ internal static partial class ModelSerializers
             : new Query(ReadPlainQueryWithoutPaginationWithoutOrderBy(ref reader, context));
     }
 
-    internal static From ReadFrom(ref Utf8JsonReader reader, ReadContext context)
+    /// <summary>
+    /// A window: with a <c>frame</c> over rows, with a <c>range</c> over the values of
+    /// its one sort key, whose declared type chooses the distances, or a partition
+    /// alone.
+    /// </summary>
+    internal static Window ReadWindow(ref Utf8JsonReader reader, ReadContext context)
     {
-        return context.Has(ref reader, "subquery"u8)
-            ? new From(ReadFromSubquery(ref reader, context))
-            : new From(ReadFromEntity(ref reader, context));
-    }
-
-    internal static Join ReadJoin(ref Utf8JsonReader reader, ReadContext context)
-    {
-        return context.Has(ref reader, "subquery"u8)
-            ? new Join(ReadJoinSubquery(ref reader, context))
-            : new Join(ReadJoinEntity(ref reader, context));
-    }
-
-    internal static PaginationSkip ReadPaginationSkip(
-        ref Utf8JsonReader reader,
-        ReadContext context
-    )
-    {
-        return reader.TokenType == JsonTokenType.Number
-            ? new PaginationSkip(LiteralValues.ReadInteger(ref reader, context))
-            : new PaginationSkip(ReadParamInteger(ref reader, context));
-    }
-
-    internal static PaginationTake ReadPaginationTake(
-        ref Utf8JsonReader reader,
-        ReadContext context
-    )
-    {
-        return reader.TokenType == JsonTokenType.Number
-            ? new PaginationTake(LiteralValues.ReadInteger(ref reader, context))
-            : new PaginationTake(ReadParamInteger(ref reader, context));
-    }
-
-    internal static void WritePaginationSkip(Utf8JsonWriter writer, PaginationSkip value)
-    {
-        WriteBound(writer, value.Value);
-    }
-
-    internal static void WritePaginationTake(Utf8JsonWriter writer, PaginationTake value)
-    {
-        WriteBound(writer, value.Value);
-    }
-
-    private static void WriteBound(Utf8JsonWriter writer, object? bound)
-    {
-        if (bound is long number)
+        if (context.Has(ref reader, "frame"u8))
         {
-            writer.WriteNumberValue(number);
+            return new Window(ReadWindowWithFrame(ref reader, context));
         }
-        else
+
+        if (!context.Has(ref reader, "range"u8))
         {
-            Writes.Record(writer, bound);
+            return new Window(ReadWindowWithoutFrameWithoutRange(ref reader, context));
         }
+
+        int key = context.RangeKey(ref reader) & ~TypeIds.NullableBit;
+        return key switch
+        {
+            // Without a sort key that declares a type, the reader reports what is
+            // missing.
+            TypeIds.None or TypeIds.Integer => new Window(
+                ReadWindowWithoutFrameWithRangeInteger(ref reader, context)
+            ),
+            TypeIds.Decimal => new Window(
+                ReadWindowWithoutFrameWithRangeDecimal(ref reader, context)
+            ),
+            TypeIds.Date => new Window(
+                ReadWindowWithoutFrameWithRangeDate(ref reader, context)
+            ),
+            TypeIds.Datetime => new Window(
+                ReadWindowWithoutFrameWithRangeDatetime(ref reader, context)
+            ),
+            _ => throw context.Error(
+                "A range window needs a sort key that declares an integer, a decimal, a "
+                    + "date or a datetime"
+            ),
+        };
+    }
+
+    /// <summary>The constant <c>"all"</c>: every row on one side of a window.</summary>
+    internal static All ReadAll(ref Utf8JsonReader reader, ReadContext context)
+    {
+        return context.All(ref reader);
+    }
+
+    internal static void WriteAll(Utf8JsonWriter writer, All value)
+    {
+        _ = Writes.NotNull(value);
+        writer.WriteStringValue(AllText);
     }
 }

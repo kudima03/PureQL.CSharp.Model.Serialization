@@ -24,6 +24,10 @@ internal sealed class ModelRegistry
 
     private readonly HashSet<Type> _nullable = [];
 
+    private readonly HashSet<Type> _decimal = [];
+
+    private readonly FrozenSet<Type> _decimalRecords;
+
     private readonly FrozenDictionary<Type, Action<Utf8JsonWriter, object>> _records;
 
     private readonly FrozenSet<Type> _nullableRecords;
@@ -33,6 +37,7 @@ internal sealed class ModelRegistry
         ModelSerializers.Register(this);
         _records = _writers.ToFrozenDictionary();
         _nullableRecords = _nullable.ToFrozenSet();
+        _decimalRecords = _decimal.ToFrozenSet();
     }
 
     public static ModelRegistry Instance { get; } = new ModelRegistry();
@@ -70,11 +75,19 @@ internal sealed class ModelRegistry
         return value is not null && _nullableRecords.Contains(value.GetType());
     }
 
+    /// <summary>Whether a record declares a <c>decimal</c> type, nullable or not.</summary>
+    public bool IsDecimal(object? value)
+    {
+        return value is not null && _decimalRecords.Contains(value.GetType());
+    }
+
     /// <param name="nullable">Whether the record declares a nullable type.</param>
+    /// <param name="isDecimal">Whether the record declares a decimal type.</param>
     public void Record<T>(
         ReadValue<T> read,
         Action<Utf8JsonWriter, T> write,
-        bool nullable = false
+        bool nullable = false,
+        bool isDecimal = false
     )
         where T : class
     {
@@ -83,6 +96,11 @@ internal sealed class ModelRegistry
         if (nullable)
         {
             _ = _nullable.Add(typeof(T));
+        }
+
+        if (isDecimal)
+        {
+            _ = _decimal.Add(typeof(T));
         }
     }
 

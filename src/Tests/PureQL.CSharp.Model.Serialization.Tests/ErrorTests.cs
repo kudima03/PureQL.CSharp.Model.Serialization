@@ -141,7 +141,7 @@ public sealed record ErrorTests
         typeof(EqualDecimalGroup)
     )]
     [InlineData(
-        """{"operator":"coalesce","type":{"name":"decimal"},"values":[{{K}},{{K}}]}""",
+        """{"operator":"coalesce","type":{"name":"decimal"},"values":[{"type":{"name":"decimal","nullable":true},"value":null},{{K}}]}""",
         "decimal",
         typeof(EqualDecimalGroup)
     )]
@@ -161,17 +161,17 @@ public sealed record ErrorTests
         typeof(EqualStringGroup)
     )]
     [InlineData(
-        """{"operator":"dateAddDays","type":{"name":"date"},"left":{"type":{"name":"date"},"value":"2024-01-01"},"right":{{I}}}""",
+        """{"operator":"dateAddDays","type":{"name":"date"},"operand":{"type":{"name":"date"},"value":"2024-01-01"},"days":{{I}}}""",
         "date",
         typeof(EqualDateGroup)
     )]
     [InlineData(
-        """{"operator":"timeAddSeconds","type":{"name":"time"},"left":{"type":{"name":"time"},"value":"10:00:00"},"right":{{I}}}""",
+        """{"operator":"timeAddSeconds","type":{"name":"time"},"operand":{"type":{"name":"time"},"value":"10:00:00"},"seconds":{{I}}}""",
         "time",
         typeof(EqualTimeGroup)
     )]
     [InlineData(
-        """{"operator":"datetimeAddSeconds","type":{"name":"datetime"},"left":{"type":{"name":"datetime"},"value":"2024-01-01T10:00:00Z"},"right":{{I}}}""",
+        """{"operator":"datetimeAddSeconds","type":{"name":"datetime"},"operand":{"type":{"name":"datetime"},"value":"2024-01-01T10:00:00Z"},"seconds":{{I}}}""",
         "datetime",
         typeof(EqualDatetimeGroup)
     )]

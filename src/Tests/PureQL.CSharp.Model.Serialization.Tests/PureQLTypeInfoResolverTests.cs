@@ -98,16 +98,16 @@ public sealed record PureQLTypeInfoResolverTests
 
         string written = JsonSerializer.Serialize(envelope, info);
         Envelope back = JsonSerializer.Deserialize(written, info)!;
+        PureQLQuery query = ((JsonElement)back.Query).Deserialize(
+            options.GetTypeInfo<PureQLQuery>()
+        );
 
         Assert.Equal("first", back.Name);
         Assert.Equal(
             JsonSemantics.Canonical(json),
-            JsonSemantics.Canonical(PureQLJson.Serialize(back.Query))
+            JsonSemantics.Canonical(PureQLJson.Serialize(query))
         );
-        Assert.Equal(
-            PureQLJson.Serialize(envelope.Query),
-            PureQLJson.Serialize(back.Query)
-        );
+        Assert.Equal(PureQLJson.Serialize((PureQLQuery)envelope.Query), PureQLJson.Serialize(query));
     }
 
     [Fact]
@@ -133,12 +133,14 @@ public sealed record PureQLTypeInfoResolverTests
     }
 }
 
-/// <summary>A document of the application that carries a query.</summary>
-internal sealed record Envelope(string Name, PureQLQuery Query);
+/// <summary>
+/// A document of the application that carries a query, written through the runtime
+/// type of <see cref="Query"/>, which <see cref="PureQLTypeInfoResolver"/> resolves. It
+/// is typed <see cref="object"/> so that the source generator does not reach the
+/// model: it walks every type a context reaches, which takes many minutes of build
+/// time for the model's thousands of records and unions.
+/// </summary>
+internal sealed record Envelope(string Name, object Query);
 
-// The source generator reports that it cannot tell the cases of the model's unions
-// apart (SYSLIB1227): it does not need to, PureQLTypeInfoResolver resolves them first.
-#pragma warning disable SYSLIB1227
 [JsonSerializable(typeof(Envelope))]
 internal sealed partial class EnvelopeContext : JsonSerializerContext;
-#pragma warning restore SYSLIB1227

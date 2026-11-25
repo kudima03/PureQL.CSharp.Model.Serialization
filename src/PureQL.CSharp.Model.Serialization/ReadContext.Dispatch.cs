@@ -16,8 +16,9 @@ internal sealed partial class ReadContext
     /// The <see cref="Serialization.Signature"/> of the node the reader is on: its
     /// <c>operator</c> or, for a leaf, its shape (<c>source</c> for a field,
     /// <c>param</c>, <c>key</c>, <c>subquery</c> for a list column, <c>value</c> for a
-    /// literal), the <c>type</c> it declares and, for a comparison, the family of the
-    /// type <c>left</c> (<c>operand</c> for <c>in</c>) declares.
+    /// literal), the <c>type</c> it declares and, for an operator chosen by more (see
+    /// <see cref="Kinds.ChoiceOf"/>), the family of the type <c>left</c> or
+    /// <c>operand</c> declares, or whether <c>digits</c> is present.
     /// </summary>
     /// <param name="reader">The reader, on the node; it is not moved.</param>
     /// <param name="union">The union choosing a case, for error messages.</param>
@@ -34,6 +35,7 @@ internal sealed partial class ReadContext
         int type = TypeIds.None;
         int left = -1;
         int operand = -1;
+        bool digits = false;
         while (Read(ref probe) == JsonTokenType.PropertyName)
         {
             if (probe.ValueTextEquals("operator"u8))
@@ -58,11 +60,14 @@ internal sealed partial class ReadContext
             }
             else if (probe.ValueTextEquals("left"u8))
             {
-                left = Family(ref probe, !isOperator || IsFamilyOf(kind, false));
+                left = Declared(ref probe, !isOperator || (Kinds.ChoiceOf(kind) == Choice.Left));
             }
             else if (probe.ValueTextEquals("operand"u8))
             {
-                operand = Family(ref probe, !isOperator || IsFamilyOf(kind, true));
+                operand = Declared(
+                    ref probe,
+                    !isOperator || (Kinds.ChoiceOf(kind) == Choice.Operand)
+                );
             }
             else
             {
@@ -71,16 +76,17 @@ internal sealed partial class ReadContext
                     kind = LeafKind(ref probe);
                 }
 
+                digits |= probe.ValueTextEquals("digits"u8);
                 Skip(ref probe);
             }
 
-            if (IsComplete(isOperator, kind, type, kind == Kinds.In ? operand : left))
+            if (IsComplete(isOperator, kind, type, left, operand))
             {
                 break;
             }
         }
 
-        return Complete(union, isOperator, kind, type, left, operand);
+        return Complete(union, isOperator, kind, type, left, operand, digits);
     }
 
     /// <summary>A union that has no case for the signature.</summary>
@@ -95,7 +101,7 @@ internal sealed partial class ReadContext
         return Error(
             family == Families.None
                 ? $"{union} does not accept '{text}'"
-                : $"{union} does not accept '{text}' of {TypeIds.Name(family)}"
+                : $"{union} does not accept '{text}' {Families.Describe(family)}"
         );
     }
 
@@ -115,7 +121,11 @@ internal sealed partial class ReadContext
         while (Read(ref probe) == JsonTokenType.PropertyName)
         {
             clauses |=
-                probe.ValueTextEquals("groupBy"u8) ? QueryClauses.GroupBy
+                probe.ValueTextEquals("unionAll"u8) ? QueryClauses.UnionAll
+                : probe.ValueTextEquals("union"u8) ? QueryClauses.Union
+                : probe.ValueTextEquals("intersect"u8) ? QueryClauses.Intersect
+                : probe.ValueTextEquals("except"u8) ? QueryClauses.Except
+                : probe.ValueTextEquals("groupBy"u8) ? QueryClauses.GroupBy
                 : probe.ValueTextEquals("aggregate"u8) ? QueryClauses.Aggregate
                 : probe.ValueTextEquals("pagination"u8) ? QueryClauses.Pagination
                 : probe.ValueTextEquals("orderBy"u8) ? QueryClauses.OrderBy
@@ -149,20 +159,71 @@ internal sealed partial class ReadContext
     }
 
     /// <summary>
-    /// Whether the family of <c>operand</c> (else of <c>left</c>) chooses the variant of
-    /// the operator.
+    /// The type the first sort key of the window the reader is on declares, which
+    /// chooses the distances of a <c>range</c>, or <see cref="TypeIds.None"/>.
     /// </summary>
-    private static bool IsFamilyOf(int kind, bool operand)
+    public int RangeKey(ref Utf8JsonReader reader)
     {
-        return Kinds.IsComparison(kind) && (operand ? kind == Kinds.In : kind != Kinds.In);
+        if (reader.TokenType != JsonTokenType.StartObject)
+        {
+            throw Error($"Expected an object, found {Describe(reader.TokenType)}");
+        }
+
+        Utf8JsonReader probe = reader;
+        while (Read(ref probe) == JsonTokenType.PropertyName)
+        {
+            if (!probe.ValueTextEquals("orderBy"u8))
+            {
+                Skip(ref probe);
+                continue;
+            }
+
+            Utf8JsonReader keys = probe;
+            if (!keys.Read() || (keys.TokenType != JsonTokenType.StartArray))
+            {
+                return TypeIds.None;
+            }
+
+            if (!keys.Read() || (keys.TokenType != JsonTokenType.StartObject))
+            {
+                return TypeIds.None;
+            }
+
+            while (keys.Read() && (keys.TokenType == JsonTokenType.PropertyName))
+            {
+                if (keys.ValueTextEquals("expression"u8))
+                {
+                    return keys.Read() && (keys.TokenType == JsonTokenType.StartObject)
+                        ? DeclaredName(ref keys)
+                        : TypeIds.None;
+                }
+
+                if (!keys.TrySkip())
+                {
+                    return TypeIds.None;
+                }
+            }
+
+            return TypeIds.None;
+        }
+
+        return TypeIds.None;
     }
 
-    private static bool IsComplete(bool isOperator, int kind, int type, int family)
+    private static bool IsComplete(bool isOperator, int kind, int type, int left, int operand)
     {
         return (type != TypeIds.None)
             && (
                 isOperator
-                    ? !Kinds.IsComparison(kind) || (family >= 0)
+                    ? Kinds.ChoiceOf(kind) switch
+                    {
+                        Choice.Left => left >= 0,
+                        Choice.Operand => operand >= 0,
+                        // Only the end of the node tells that digits are absent.
+                        Choice.Digits => false,
+                        Choice.None => true,
+                        _ => true,
+                    }
                     : kind != Kinds.Unknown
             );
     }
@@ -173,7 +234,8 @@ internal sealed partial class ReadContext
         int kind,
         int type,
         int left,
-        int operand
+        int operand,
+        bool digits
     )
     {
         if (!isOperator && (kind == Kinds.Unknown))
@@ -186,18 +248,29 @@ internal sealed partial class ReadContext
             throw Error("Missing property 'type'");
         }
 
-        if (!isOperator || !Kinds.IsComparison(kind))
+        Choice choice = isOperator ? Kinds.ChoiceOf(kind) : Choice.None;
+        if (choice == Choice.None)
         {
             return Serialization.Signature.Of(kind, type);
         }
 
-        string name = kind == Kinds.In ? "operand" : "left";
-        int family = kind == Kinds.In ? operand : left;
-        if (family < 0)
+        if (choice == Choice.Digits)
+        {
+            return Serialization.Signature.Of(
+                kind,
+                type,
+                digits ? Families.WithDigits : Families.WithoutDigits
+            );
+        }
+
+        string name = choice == Choice.Operand ? "operand" : "left";
+        int declared = choice == Choice.Operand ? operand : left;
+        if (declared < 0)
         {
             throw Error($"Missing property '{name}'");
         }
 
+        int family = Families.Of(kind, declared);
         if (family == Families.None)
         {
             Push(name);
@@ -208,31 +281,31 @@ internal sealed partial class ReadContext
     }
 
     /// <summary>
-    /// The family of the type an operand declares (<see cref="Families.None"/> when it
-    /// declares none of them), read when <paramref name="wanted"/> or when the operator
-    /// is not known yet. Nothing else is validated: the case reads the operand in full.
-    /// The reader is left on the operand's last token.
+    /// The name id of the type an operand declares (<see cref="TypeIds.None"/> when it
+    /// declares none), read when <paramref name="wanted"/> or when the operator is not
+    /// known yet. Nothing else is validated: the case reads the operand in full. The
+    /// reader is left on the operand's last token.
     /// </summary>
-    private int Family(ref Utf8JsonReader probe, bool wanted)
+    private int Declared(ref Utf8JsonReader probe, bool wanted)
     {
         _ = Read(ref probe);
-        int family = Families.None;
+        int declared = TypeIds.None;
         if (wanted && (probe.TokenType == JsonTokenType.StartObject))
         {
             Utf8JsonReader operand = probe;
-            family = DeclaredFamily(ref operand);
+            declared = DeclaredName(ref operand);
         }
 
         Skip(ref probe);
-        return family;
+        return declared;
     }
 
     /// <summary>
-    /// The family of the type the operand declares, read on a copy of the reader. A
-    /// value cut short gives <see cref="Families.None"/>: the caller reports it when it
-    /// skips the operand.
+    /// The name id of the type the node declares, read on a copy of the reader. A value
+    /// cut short gives <see cref="TypeIds.None"/>: the caller reports it when it skips
+    /// the node.
     /// </summary>
-    private static int DeclaredFamily(ref Utf8JsonReader operand)
+    private static int DeclaredName(ref Utf8JsonReader operand)
     {
         while (operand.Read() && (operand.TokenType == JsonTokenType.PropertyName))
         {
@@ -240,7 +313,7 @@ internal sealed partial class ReadContext
             {
                 if (!operand.TrySkip())
                 {
-                    return Families.None;
+                    return TypeIds.None;
                 }
 
                 continue;
@@ -248,7 +321,7 @@ internal sealed partial class ReadContext
 
             if (!operand.Read() || (operand.TokenType != JsonTokenType.StartObject))
             {
-                return Families.None;
+                return TypeIds.None;
             }
 
             while (operand.Read() && (operand.TokenType == JsonTokenType.PropertyName))
@@ -257,21 +330,21 @@ internal sealed partial class ReadContext
                 {
                     if (!operand.TrySkip())
                     {
-                        return Families.None;
+                        return TypeIds.None;
                     }
 
                     continue;
                 }
 
                 return operand.Read() && (operand.TokenType == JsonTokenType.String)
-                    ? Families.Of(TypeIds.Find(ref operand))
-                    : Families.None;
+                    ? TypeIds.Find(ref operand)
+                    : TypeIds.None;
             }
 
-            return Families.None;
+            return TypeIds.None;
         }
 
-        return Families.None;
+        return TypeIds.None;
     }
 
     private static int LeafKind(ref Utf8JsonReader probe)
