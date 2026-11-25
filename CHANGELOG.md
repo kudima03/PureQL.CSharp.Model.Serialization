@@ -7,6 +7,70 @@ Versioning mirrors the PureQL specification with a `-csharp.N` suffix where need
 
 ---
 
+## [0.1.0-preview.7.0.0] - 2026-11-25
+
+Moves serialization to PureQL specification `0.1.0-preview.3.0.0` through
+`PureQL.CSharp.Model 0.1.0-preview.15.0.0`. Every query of the specification's
+`samples/valid` round-trips, and every one of its 4 197 `samples/invalid` is rejected:
+the list of invalid queries the model accepted is gone. The public API of this package
+is unchanged; the model it serializes has breaking changes (see Changed).
+
+### Added
+
+- **The whole 3.0.0 language**: string, regular-expression, Unicode, math,
+  trigonometry, date-part, `startOf…`, month, from-parts, conversion and `tryAs…`
+  operators, `nullIfEqual`, `greatest` / `least`, `countDistinct`, `first` / `last`,
+  `concatAll`, the statistics and regressions, window functions (`over` with
+  `partitionBy`, `orderBy`, `frame` or `range`), ranking and `previous` / `next`,
+  combined queries (`unionAll`, `union`, `intersect`, `except`), inline rows,
+  recursive subqueries, and `orderBy` by `{ column }`.
+- **More dispatch**: operators split by the family of their operand (`year` of a
+  `date` or a `datetime`, `asString`, `asDate`, `asTime`, `asDatetime`, `asDecimal`,
+  where `integer` is a family of its own) and by whether `digits` is present
+  (`round`, `truncate`); range windows by the type of their sort key; queries,
+  subqueries, recursive steps, `orderBy` items and distances by their properties; the
+  sides of a window, `skip`, `take` and `maxDepth` by the JSON token (a number,
+  `"all"`, an object).
+- **Rules of the schema that the model's types do not express are checked on read
+  and on write**: names follow `NAME`; bare numbers start from 1, a literal `buckets`
+  and regex `group` from 1 and a literal `offset` from 2; a literal `fraction` is from
+  0 to 1 and a decimal distance more than 0; a literal regex `pattern` is in the
+  specification's dialect; a literal `zone` is one of its time zone names;
+  `pagination`, a frame and a range have a property, and a frame or a range is not
+  `"all"` on both sides; a range window has one sort key; `distinct` is only `true`
+  and `mode` only `halfEven`.
+- **The exact declared type is checked on read**: an operator declared `decimal` whose
+  number operands are all integers (`add`, `subtract`, `multiply`, `modulo`, `if`,
+  `coalesce`, `greatest`, `least`) and a non-null `coalesce` without exactly one
+  non-null operand are rejected (both were accepted before).
+- `RoundingMode`, `NormalizationForm` and the `distinct` flag are read and written,
+  with their defaults omitted.
+
+### Changed
+
+- **Breaking (model)**: `PureQL.CSharp.Model` `0.1.0-preview.15.0.0` — `orderBy` items
+  of a query are unions of `…Expression` / `…Column`, `Subquery` is a union of
+  `SubqueryQuery` / `SubqueryRows` / `SubqueryRecursive`, `Query` / `PureQLQuery`
+  include combined queries, `dateAddDays` takes `(operand, days)` and
+  `timeAddSeconds` / `datetimeAddSeconds` `(operand, seconds)`, `Pagination` has an
+  optional `skip`, `RoundInteger*` is replaced by `RoundWithDigits…` /
+  `RoundWithoutDigits…`, `floor` / `ceiling` / `round` without digits take decimals,
+  and aggregates in a plain query take `Window? over`.
+- **Breaking (JSON)**: documents the 3.0.0 schema rejects are rejected: `"skip": 0`,
+  an empty list literal, `{ left, right }` of the add operators, an integer operand
+  of `floor` / `ceiling` / `round` without digits, and names the `NAME` pattern
+  rejects (accepted before).
+- Literal lists need at least one value.
+- The operator kinds and what chooses each of them are generated (`Kinds.g.cs`).
+- **Keep model types out of a source-generated `JsonSerializerContext`**: the .NET 11
+  source generator walks every type a context reaches, and for the model's thousands
+  of types a context holding a `PureQLQuery` did not compile in ten minutes (about 100
+  seconds with the previous model). The README now holds the query as `object`, written
+  through `PureQLTypeInfoResolver` and read back from a `JsonElement`; the tests and the
+  Native AOT check do the same, and no longer suppress SYSLIB1227.
+- The specification submodule is pinned to the tag `0.1.0-preview.3.0.0` instead of
+  following `main`; Dependabot no longer bumps it.
+
 ## [0.1.0-preview.6.1.0] - 2026-11-11
 
 Updates the dependency on `PureQL.CSharp.Model` to `0.1.0-preview.14.1.0`. No public API change.

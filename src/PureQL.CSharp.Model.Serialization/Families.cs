@@ -1,14 +1,17 @@
 namespace PureQL.CSharp.Model.Serialization;
 
 /// <summary>
-/// The operand families that choose a variant of <c>equal</c>, <c>notEqual</c>,
-/// <c>in</c> and the comparisons: that of the type the operand declares, where
-/// <c>integer</c> belongs to the decimal family. The last part of a
+/// What chooses the case of an operator beside its declared type (see
+/// <see cref="Choice"/>): the family of the type an operand declares, where
+/// <c>integer</c> belongs to the decimal family unless the operator has a case of its
+/// own for it, or whether <c>digits</c> is present. The last part of a
 /// <see cref="Signature"/>, which is <see cref="None"/> for any other node.
 /// </summary>
 internal static class Families
 {
     public const int None = 0;
+
+    public const int Integer = TypeIds.Integer;
 
     public const int Decimal = TypeIds.Decimal;
 
@@ -24,15 +27,32 @@ internal static class Families
 
     public const int Uuid = TypeIds.Uuid;
 
-    /// <summary>The family of a declared type, <see cref="None"/> for a list.</summary>
-    public static int Of(int type)
+    public const int WithDigits = 64;
+
+    public const int WithoutDigits = 65;
+
+    /// <summary>
+    /// The family of a type an operand of the operator declares, <see cref="None"/> for
+    /// a list or no type.
+    /// </summary>
+    public static int Of(int kind, int type)
     {
         int name = type & ~TypeIds.NullableBit;
         return name switch
         {
-            TypeIds.Integer => Decimal,
+            TypeIds.Integer => Kinds.HasIntegerFamily(kind) ? Integer : Decimal,
             >= TypeIds.Decimal and <= TypeIds.Uuid => name,
             _ => None,
+        };
+    }
+
+    public static string Describe(int family)
+    {
+        return family switch
+        {
+            WithDigits => "with digits",
+            WithoutDigits => "without digits",
+            _ => $"of {TypeIds.Name(family)}",
         };
     }
 }

@@ -93,12 +93,20 @@ public sealed record DefaultValueTests
     {
         string expression = /*lang=json,strict*/
             """{"key":"user_id","type":{"name":"integer"}}""";
-        OrderItemGroup item = new OrderItemGroup(new KeyInteger("user_id"), direction);
+        OrderItemGroup item = new OrderItemGroupExpression(
+            new KeyInteger("user_id"),
+            direction
+        );
 
         string json = PureQLJson.Serialize(item);
 
         Assert.Equal($$"""{"expression":{{expression}}{{suffix}}}""", json);
-        Assert.Equal(direction, PureQLJson.Deserialize<OrderItemGroup>(json).Direction);
+        Assert.Equal(
+            direction,
+            Assert.IsType<OrderItemGroupExpression>(
+                PureQLJson.Deserialize<OrderItemGroup>(json).Value
+            ).Direction
+        );
     }
 
     [Fact]
@@ -127,31 +135,45 @@ public sealed record DefaultValueTests
     }
 
     [Fact]
-    public void RoundIsToldApartByItsDeclaredType()
+    public void RoundIsToldApartByItsDeclaredTypeAndDigits()
     {
-        string operand = /*lang=json,strict*/
+        string @decimal = /*lang=json,strict*/
             """{"source":"o","field":"f","type":{"name":"decimal"}}""";
+        string integer = /*lang=json,strict*/
+            """{"source":"o","field":"n","type":{"name":"integer"}}""";
         string digits = /*lang=json,strict*/
-            """{"type":{"name":"integer"},"value":2}""";
+            """{"type":{"name":"integer"},"value":-2}""";
 
         DecimalRow withDigits = PureQLJson.Deserialize<DecimalRow>(
-            $$"""{"operator":"round","type":{"name":"decimal"},"operand":{{operand}},"digits":{{digits}}}"""
+            $$"""{"operator":"round","type":{"name":"decimal"},"operand":{{@decimal}},"digits":{{digits}}}"""
+        );
+        DecimalRow integerWithDigits = PureQLJson.Deserialize<DecimalRow>(
+            $$"""{"digits":{{digits}},"operator":"round","type":{"name":"integer"},"operand":{{integer}}}"""
         );
         DecimalRow withoutDigits = PureQLJson.Deserialize<DecimalRow>(
-            $$"""{"operator":"round","type":{"name":"integer"},"operand":{{operand}}}"""
+            $$"""{"operator":"round","type":{"name":"integer"},"operand":{{@decimal}},"mode":"halfEven"}"""
         );
 
         _ = Assert.IsType<RoundDecimalRow>(withDigits.Value);
-        _ = Assert.IsType<RoundIntegerRow>(withoutDigits.Value);
+        _ = Assert.IsType<RoundWithDigitsIntegerRow>(integerWithDigits.Value);
+        RoundWithoutDigitsIntegerRow round = Assert.IsType<RoundWithoutDigitsIntegerRow>(
+            withoutDigits.Value
+        );
+        Assert.Equal(RoundingMode.HalfEven, round.Mode);
     }
 
     [Theory]
-    [InlineData("integer", true)]
-    [InlineData("decimal", false)]
-    public void DigitsBelongToADecimalRound(string type, bool withDigits)
+    [InlineData("decimal", "decimal", false)]
+    [InlineData("integer", "integer", false)]
+    [InlineData("decimal", "integer", true)]
+    public void RoundIsRejectedWhereNoSignatureFits(
+        string operandType,
+        string type,
+        bool withDigits
+    )
     {
-        string operand = /*lang=json,strict*/
-            """{"source":"o","field":"f","type":{"name":"decimal"}}""";
+        string operand =
+            $$$"""{"source":"o","field":"f","type":{"name":"{{{operandType}}}"}}""";
         string count = /*lang=json,strict*/
             """{"type":{"name":"integer"},"value":2}""";
         string suffix = withDigits ? $",\"digits\":{count}" : "";
@@ -160,6 +182,36 @@ public sealed record DefaultValueTests
             PureQLJson.Deserialize<DecimalRow>(
                 $$"""{"operator":"round","type":{"name":"{{type}}"},"operand":{{operand}}{{suffix}}}"""
             )
+        );
+    }
+
+    [Theory]
+    [InlineData(RoundingMode.HalfAwayFromZero, "")]
+    [InlineData(RoundingMode.HalfEven, ",\"mode\":\"halfEven\"")]
+    public void HalfAwayFromZeroIsOmitted(RoundingMode mode, string suffix)
+    {
+        RoundWithoutDigitsIntegerRow round = new RoundWithoutDigitsIntegerRow(
+            new FieldDecimal("o", "f"),
+            mode
+        );
+
+        string json = PureQLJson.Serialize(round);
+
+        Assert.EndsWith($"}}{suffix}}}", json, StringComparison.Ordinal);
+        Assert.Equal(mode, PureQLJson.Deserialize<RoundWithoutDigitsIntegerRow>(json).Mode);
+    }
+
+    [Theory]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"round","type":{"name":"integer"},"operand":{"source":"o","field":"f","type":{"name":"decimal"}},"mode":"halfAwayFromZero"}"""
+    )]
+    [InlineData( /*lang=json,strict*/
+        """{"operator":"concatAll","type":{"name":"string"},"selector":{"source":"o","field":"f","type":{"name":"string"}},"separator":{"type":{"name":"string"},"value":","},"orderBy":[{"expression":{"source":"o","field":"f","type":{"name":"string"}}}],"distinct":false}"""
+    )]
+    public void ExplicitDefaultsOfNewOptionsAreRejected(string json)
+    {
+        _ = Assert.Throws<System.Text.Json.JsonException>(() =>
+            PureQLJson.Deserialize<ExprGroup>(json)
         );
     }
 }

@@ -25,7 +25,7 @@
     />
   </ItemGroup>
   <ItemGroup>
-    <!-- The PureQL-Specification submodule, tracking its main branch. -->
+    <!-- The PureQL-Specification submodule, pinned to the tag 0.1.0-preview.3.0.0. -->
     <None
       Include="..\PureQL-Specification\samples\valid\*.json;..\PureQL-Specification\samples\valid\*.jsonc"
       LinkBase="Specification\samples\valid"

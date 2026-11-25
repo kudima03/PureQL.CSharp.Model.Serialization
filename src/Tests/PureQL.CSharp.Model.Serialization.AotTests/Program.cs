@@ -68,7 +68,8 @@ foreach (string file in files)
         Envelope back = JsonSerializer.Deserialize(document, envelopeInfo)!;
         if (
             back.Name != name
-            || JsonSerializer.Serialize(back.Query, queryInfo) != output
+            || back.Query is not JsonElement inner
+            || JsonSerializer.Serialize(inner.Deserialize(queryInfo), queryInfo) != output
         )
         {
             return Fail($"{name} does not round-trip inside a document:\n{document}");
@@ -91,12 +92,13 @@ static int Fail(string message)
     return 1;
 }
 
-/// <summary>A document of the application that carries a query.</summary>
-internal sealed record Envelope(string Name, PureQLQuery Query);
+/// <summary>
+/// A document of the application that carries a query, written through its runtime
+/// type, which PureQLTypeInfoResolver resolves. It is typed object so that the source
+/// generator does not reach the model, whose thousands of types it would take many
+/// minutes of build time to walk.
+/// </summary>
+internal sealed record Envelope(string Name, object Query);
 
-// The source generator reports that it cannot tell the cases of the model's unions
-// apart (SYSLIB1227): it does not need to, PureQLTypeInfoResolver resolves them first.
-#pragma warning disable SYSLIB1227
 [JsonSerializable(typeof(Envelope))]
 internal sealed partial class EnvelopeContext : JsonSerializerContext;
-#pragma warning restore SYSLIB1227

@@ -45,9 +45,9 @@ public sealed partial record SchemaConformanceTests
         foreach (object value in ModelSamples.Of(type))
         {
             string json = JsonSerializer.Serialize(value, type, PureQLJson.Options);
-            // Unions are flat: a union holds a record, or the number of a pagination.
+            // Unions are flat: a union holds a record, a bare number or "all".
             object leaf = value is IUnion union ? union.Value! : value;
-            if (leaf.GetType().IsPrimitive)
+            if (leaf.GetType().IsPrimitive || (leaf is All))
             {
                 continue;
             }
@@ -163,6 +163,8 @@ public sealed partial record SchemaConformanceTests
 
     private sealed partial class Schema
     {
+        private static readonly string[] Contexts = ["Row", "Projection", "Group", "Total"];
+
         private readonly BuildOptions _options = new BuildOptions
         {
             SchemaRegistry = new SchemaRegistry(),
@@ -215,9 +217,52 @@ public sealed partial record SchemaConformanceTests
                 _ when leaf.Success => leaf.Groups[1].Value,
                 "FromEntity" or "FromSubquery" => "From",
                 "JoinEntity" or "JoinSubquery" => "Join",
+                "SubqueryQuery" or "SubqueryRows" or "SubqueryRecursive" => "Subquery",
+                "OrderItemProjectionExpression" or "OrderItemProjectionColumn" =>
+                    "OrderItemProjection",
+                "OrderItemGroupExpression" or "OrderItemGroupColumn" => "OrderItemGroup",
+                "OrderItemIntegerRow"
+                or "OrderItemDecimalRow"
+                or "OrderItemDateRow"
+                or "OrderItemDatetimeRow" => "OrderItemRow",
+                "DistanceDateDays" or "DistanceDateMonths" => "DistanceDate",
+                "DistanceDatetimeSeconds" or "DistanceDatetimeMonths" => "DistanceDatetime",
+                _ when name.StartsWith("MainCombinedQuery", StringComparison.Ordinal) =>
+                    "MainCombinedQuery",
+                _ when name.StartsWith("CombinedQuery", StringComparison.Ordinal) =>
+                    "CombinedQuery",
+                _ when name.StartsWith("Window", StringComparison.Ordinal) => "Window",
                 _ => name,
             };
-            return _byTypeName.TryGetValue(mapped, out definition);
+            return _byTypeName.TryGetValue(mapped, out definition)
+                || (type.IsClass && TryFindOperator(mapped, out definition));
+        }
+
+        /// <summary>
+        /// The definition of the operator a record of a split signature belongs to
+        /// (<c>asString@row</c> for <c>AsStringDecimalStringRow</c>, which the schema
+        /// reaches through <c>asString.decimal@row</c>): that of the longest operator
+        /// the record's name starts with.
+        /// </summary>
+        private bool TryFindOperator(string name, [NotNullWhen(true)] out string? definition)
+        {
+            string? context = Contexts.FirstOrDefault(c =>
+                name.EndsWith(c, StringComparison.Ordinal)
+            );
+            string? op = context is null
+                ? null
+                : Enumerable
+                    .Range(1, Kinds.LastOperator)
+                    .Select(kind => Kinds.Name(kind))
+                    .Select(o => char.ToUpperInvariant(o[0]) + o[1..])
+                    .Where(o =>
+                        name.StartsWith(o, StringComparison.Ordinal)
+                        && char.IsUpper(name[o.Length])
+                    )
+                    .MaxBy(o => o.Length);
+            definition = null;
+            return (op is not null)
+                && _byTypeName.TryGetValue(op + context, out definition);
         }
 
         public bool IsValid(string? definition, string json)

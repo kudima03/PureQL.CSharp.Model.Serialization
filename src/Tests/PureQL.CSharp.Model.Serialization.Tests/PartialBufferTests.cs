@@ -18,7 +18,7 @@ public sealed record PartialBufferTests
     /// query variants, a <c>from</c> subquery, an <c>in</c> subquery, operators and the
     /// operand family of comparisons.
     /// </summary>
-    private const string Pipeline = "samples/valid/057_subquery_full_pipeline.json";
+    private const string Pipeline = "samples/valid/104_subquery_full_pipeline.json";
 
     [Theory]
     [MemberData(nameof(ValidFiles))]

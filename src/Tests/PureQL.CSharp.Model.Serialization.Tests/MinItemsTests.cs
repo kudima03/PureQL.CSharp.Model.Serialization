@@ -19,11 +19,19 @@ public sealed record MinItemsTests
         ["aggregate"] = 1,
         ["conditions"] = 2,
         ["distinctBy"] = 1,
+        ["except"] = 2,
         ["groupBy"] = 1,
+        ["intersect"] = 2,
         ["joins"] = 1,
         ["orderBy"] = 1,
+        ["partitionBy"] = 1,
+        ["removables"] = 1,
+        ["rows"] = 1,
         ["select"] = 1,
         ["subqueries"] = 1,
+        ["union"] = 2,
+        ["unionAll"] = 2,
+        ["value"] = 1,
         ["values"] = 2,
     };
 
@@ -147,8 +155,11 @@ public sealed record MinItemsTests
         {
             foreach (JsonProperty property in element.EnumerateObject())
             {
+                // The rows of inline rows are lists themselves, of the minItems of
+                // "rows" too.
                 if (
                     (property.Value.ValueKind == JsonValueKind.Object)
+                    && (property.Name != "items")
                     && property.Value.TryGetProperty("minItems", out JsonElement min)
                 )
                 {
